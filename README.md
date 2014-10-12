@@ -61,6 +61,30 @@ The following are known issues and their solutions or workarounds.
 
 You have probably got the `getFieldOrder` list wrong. Use the field list from Class.getFields() to get a suitable order.
 
+#### My device doesn't work on Ubuntu
+
+Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under `/etc/udev/rules.d`:
+
+```
+$ sudo gedit /etc/udev/rules.d/99-myhid.rules
+```
+
+Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor`):
+
+```
+# My HID device
+ATTRS{idProduct}=="0001", ATTRS{idVendor}=="abcd", MODE="0660", GROUP="plugdev"
+```
+
+Save and exit from root, then unplug and replug your device. The rules should take effect immediately. If they're still not 
+running it may that you're not a member of the `plugdev` group. You can fix this as follows (assuming that `plugdev` is not present on 
+your system):
+
+```
+$ sudo addgroup plugdev
+$ sudo addgroup yourusername plugdev 
+```
+
 ### Closing notes
 
 All trademarks and copyrights are acknowledged.

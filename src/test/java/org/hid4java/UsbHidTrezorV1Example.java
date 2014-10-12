@@ -32,6 +32,8 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
     hidServices = HidManager.getHidServices();
     hidServices.addUsbServicesListener(this);
 
+    System.out.println("Enumerating attached devices...");
+
     // Provide a list of attached devices
     for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {
       System.out.println(hidDeviceInfo);
@@ -42,8 +44,9 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
     if (trezor != null) {
       // Device is already attached so send message
       sendInitialise(trezor);
+    } else {
+      System.out.println("Waiting for Trezor attach...");
     }
-
     // Stop the main thread to demonstrate attach and detach events
     sleepUninterruptibly(1, TimeUnit.HOURS);
 
