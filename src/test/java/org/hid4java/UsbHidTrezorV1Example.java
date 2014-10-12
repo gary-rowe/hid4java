@@ -75,8 +75,6 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
 
     System.err.println("Device detached: " + event);
 
-
-
   }
 
   @Override

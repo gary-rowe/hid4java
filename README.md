@@ -17,7 +17,34 @@ The hid4java project supports USB HID devices through a common API which is prov
 ### Code example
 
 ```java
+// Get HID services
+hidServices = HidManager.getHidServices();
+hidServices.addUsbServicesListener(this);
 
+// Provide a list of attached devices
+for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {
+  System.out.println(hidDeviceInfo);
+}
+
+// Open a Bitcoin Trezor device by Vendor ID and Product ID with wildcard serial number
+HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);
+
+// Send the Initialise message
+byte[] message = new byte[64];
+for (int i = 0; i < 64; i++) {
+  message[i] = 0x00;
+}
+message[0] = 0x3f;
+message[1] = 0x23;
+message[2] = 0x23;
+
+int val = trezor.write(message, 64, (byte) 0);
+if (val != -1) {
+  System.out.println("> [" + val + "]");
+} else {
+  System.err.println(trezor.getLastErrorMessage());
+}
+    
 ```
  
 ### Getting started
