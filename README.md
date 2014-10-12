@@ -2,11 +2,13 @@ Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=mas
 
 ### Project status
 
-Early-Beta: Expect bugs and minimal API changes. Not suitable for production, but developers should start integrating.
+Late-Beta: Expect minimal API changes. Suitable for early production.
 
-### hid4java 
+### Summary 
 
 The hid4java project supports USB HID devices through a common API which is provided here under the MIT license.
+The API is very simple but provides great flexibility such as support for feature reports and blocking reads with
+timeouts. Attach/detach events are provided to allow applications to respond instantly to device availability.
 
 ### Technologies
 
@@ -61,11 +63,23 @@ and you're good to go. Your next step is to explore the examples.
 
 If you have a native version of `hidapi` for your platform then you'll be able to support it. 
 
-Pre-compiled versions for Windows (32/64), OS X (10.5+) and Linux (32/64) are provided.
+Pre-compiled versions for Windows (32/64), OS X (10.5+) and Linux (32/64) are provided and you
+must follow the JNA naming convention when adding new libraries.
 
 #### Why not just use usb4java ?
 
-The usb4java project, while superb, does not support HID devices on OS X and there are no plans to introduce HID support anytime soon.
+The [usb4java](http://usb4java.org/) project, while superb, does not support HID devices on OS X 
+and apparently there are no plans to introduce HID support anytime soon.
+ 
+You will find that trying to claim the USB device on OS X will fail with permissions problems. If
+you apply a workaround (such as adding a kernel extension) then it will still fall over just a
+little later in the process. The bottom line is that you *must* use hidapi to communicate with HID
+devices on OS X.
+
+#### Is this going into Maven Central ?
+
+Yes. There's a bit of general tidying work left to do to take it to a first release but when that's 
+done it will be uploaded to Maven Central. 
  
 #### Can I just copy this code into my project ?
 
@@ -83,11 +97,14 @@ The following are known issues and their solutions or workarounds.
 
 #### I get a `SIGSEGV (0xb)` when starting up
 
+This shouldn't occur unless you've been changing the code. 
 You have probably got the `getFieldOrder` list wrong. Use the field list from Class.getFields() to get a suitable order.
+Another cause is if a `Structure` has not been initialised and is being deferenced, perhaps in a `toString()` method.
 
 #### My device doesn't work on Ubuntu
 
-Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under `/etc/udev/rules.d`:
+Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under 
+`/etc/udev/rules.d`:
 
 ```
 $ sudo gedit /etc/udev/rules.d/99-myhid.rules
