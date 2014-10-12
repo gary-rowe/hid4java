@@ -31,9 +31,6 @@ HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);
 
 // Send the Initialise message
 byte[] message = new byte[64];
-for (int i = 0; i < 64; i++) {
-  message[i] = 0x00;
-}
 message[0] = 0x3f;
 message[1] = 0x23;
 message[2] = 0x23;
