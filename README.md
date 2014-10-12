@@ -19,7 +19,7 @@ The hid4java project supports USB HID devices through a common API which is prov
 ```java
 // Get HID services
 hidServices = HidManager.getHidServices();
-hidServices.addUsbServicesListener(this);
+hidServices.addHidServicesListener(this);
 
 // Provide a list of attached devices
 for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {

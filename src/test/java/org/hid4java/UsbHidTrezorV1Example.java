@@ -30,7 +30,7 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
 
     // Get HID services
     hidServices = HidManager.getHidServices();
-    hidServices.addUsbServicesListener(this);
+    hidServices.addHidServicesListener(this);
 
     System.out.println("Enumerating attached devices...");
 

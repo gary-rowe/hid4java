@@ -41,7 +41,7 @@ public class HidServices {
   /**
    * @param listener The listener to add
    */
-  public void addUsbServicesListener(final HidServicesListener listener) {
+  public void addHidServicesListener(final HidServicesListener listener) {
     this.listeners.add(listener);
   }
 
