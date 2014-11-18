@@ -10,6 +10,8 @@ The hid4java project supports USB HID devices through a common API which is prov
 The API is very simple but provides great flexibility such as support for feature reports and blocking reads with
 timeouts. Attach/detach events are provided to allow applications to respond instantly to device availability.
 
+The wiki provides a [guide to building the project](https://github.com/gary-rowe/hid4java/wiki/How-to-build-the-project).
+
 ### Technologies
 
 * [hidapi](https://github.com/signal11/hidapi) - Native USB HID library for multiple platforms
