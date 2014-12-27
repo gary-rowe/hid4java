@@ -77,4 +77,17 @@ public class HidServices {
   public HidDevice getHidDevice(int vendorId, int productId, String serialNumber) {
     return deviceManager.open(vendorId, productId, serialNumber);
   }
+  
+ /**
+   * Opens a HID device through it's info structure
+   * @param info The device Information structure from HidDeviceManager.getAttachedHidDevices
+   * @return The device if attached, null if detached
+   */
+  public HidDevice getHidDevice(HidDeviceInfo info) {
+	  if (info==null) {
+		  return null;
+	  }
+	  
+	  return deviceManager.open(info);
+  }
 }

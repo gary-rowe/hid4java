@@ -165,7 +165,7 @@ public class HidDeviceInfo {
    */
   public String getId() {
 
-    return "" + vendorId + "_" + productId + (serialNumber == null ? "" : "_" + serialNumber);
+    return "" + vendorId + "_" + productId + (serialNumber == null ? "" : "_" + serialNumber) + "_" + interfaceNumber;
 
   }
 
