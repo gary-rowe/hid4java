@@ -23,7 +23,8 @@ public class HidServicesListenerList {
    */
   private final List<HidServicesListener> listeners = Collections.synchronizedList(new ArrayList<HidServicesListener>());
 
-  private final ExecutorService executorService = Executors.newFixedThreadPool(3, new ThreadFactory() {
+  private final ExecutorService executorService = Executors.newFixedThreadPool(
+    3, new ThreadFactory() {
       @Override
       public Thread newThread(Runnable runnable) {
         Thread thread = Executors.defaultThreadFactory().newThread(runnable);

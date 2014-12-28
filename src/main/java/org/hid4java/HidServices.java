@@ -11,7 +11,6 @@ import java.util.List;
  * </ul>
  * <p>Requires the hidapi to be present on the classpath or the system library search path.</p>
  *
- *
  * @since 0.0.1
  *  
  */
@@ -28,7 +27,6 @@ public class HidServices {
   private final HidDeviceManager deviceManager;
 
   /**
-   *
    * @throws HidException If something goes wrong
    */
   public HidServices() throws HidException {
@@ -77,17 +75,19 @@ public class HidServices {
   public HidDevice getHidDevice(int vendorId, int productId, String serialNumber) {
     return deviceManager.open(vendorId, productId, serialNumber);
   }
-  
- /**
+
+  /**
    * Opens a HID device through it's info structure
+   *
    * @param info The device Information structure from HidDeviceManager.getAttachedHidDevices
+   *
    * @return The device if attached, null if detached
    */
   public HidDevice getHidDevice(HidDeviceInfo info) {
-	  if (info==null) {
-		  return null;
-	  }
-	  
-	  return deviceManager.open(info);
+    if (info == null) {
+      return null;
+    }
+
+    return deviceManager.open(info);
   }
 }

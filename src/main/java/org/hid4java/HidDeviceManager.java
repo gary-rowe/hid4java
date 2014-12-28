@@ -169,18 +169,19 @@ class HidDeviceManager {
   }
 
   public HidDevice open(HidDeviceInfo info) {
-	
-	if (info == null || info.getPath() == null) {
-	  return null;
-	}
 
-	HidDeviceStructure deviceStructure = HidApi.open(info.getPath());
-	
-	if (deviceStructure != null) {
-	  return new HidDevice(this, deviceStructure, info.getVendorId(), info.getProductId(),
-					info.getSerialNumber().toString());
-	}
-	return null;
+    if (info == null || info.getPath() == null) {
+      return null;
+    }
+
+    HidDeviceStructure deviceStructure = HidApi.open(info.getPath());
+
+    if (deviceStructure != null) {
+      return new HidDevice(
+        this, deviceStructure, info.getVendorId(), info.getProductId(),
+        info.getSerialNumber().toString());
+    }
+    return null;
 
   }
 }
