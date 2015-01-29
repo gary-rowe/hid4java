@@ -35,8 +35,8 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
     System.out.println("Enumerating attached devices...");
 
     // Provide a list of attached devices
-    for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {
-      System.out.println(hidDeviceInfo);
+    for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
+      System.out.println(hidDevice);
     }
 
     // Open the Trezor device by Vendor ID and Product ID with wildcard serial number
@@ -57,8 +57,8 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
 
     System.out.println("Device attached: " + event);
 
-    if (event.getHidDeviceInfo().getVendorId() == 0x534c &&
-      event.getHidDeviceInfo().getProductId() == 0x01) {
+    if (event.getHidDevice().getVendorId() == 0x534c &&
+      event.getHidDevice().getProductId() == 0x01) {
 
       // Open the Trezor device by Vendor ID and Product ID with wildcard serial number
       HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);

@@ -3,7 +3,6 @@ package org.hid4java;
 import org.hid4java.event.HidServicesListenerList;
 import org.hid4java.jna.HidApi;
 import org.hid4java.jna.HidDeviceInfoStructure;
-import org.hid4java.jna.HidDeviceStructure;
 
 import java.util.*;
 
@@ -27,7 +26,7 @@ class HidDeviceManager {
   /**
    * The currently attached devices keyed on ID
    */
-  private final Map<String, HidDeviceInfo> attachedDevices = Collections.synchronizedMap(new HashMap<String, HidDeviceInfo>());
+  private final Map<String, HidDevice> attachedDevices = Collections.synchronizedMap(new HashMap<String, HidDevice>());
 
   /**
    * HID services listener list
@@ -57,28 +56,28 @@ class HidDeviceManager {
 
     List<String> removeList = new ArrayList<String>();
 
-    List<HidDeviceInfo> currentList = getAttachedHidDevices();
+    List<HidDevice> attachedHidDeviceList = getAttachedHidDevices();
 
-    for (HidDeviceInfo deviceInfo : currentList) {
+    for (HidDevice attachedDevice : attachedHidDeviceList) {
 
-      if (!this.attachedDevices.containsKey(deviceInfo.getId())) {
+      if (!this.attachedDevices.containsKey(attachedDevice.getId())) {
 
         // Device has become attached so add it but do not open
-        attachedDevices.put(deviceInfo.getId(), deviceInfo);
+        attachedDevices.put(attachedDevice.getId(), attachedDevice);
 
         // Fire the event on a separate thread
-        listenerList.fireHidDeviceAttached(deviceInfo);
+        listenerList.fireHidDeviceAttached(attachedDevice);
 
       }
 
     }
 
-    for (Map.Entry<String, HidDeviceInfo> entry : attachedDevices.entrySet()) {
+    for (Map.Entry<String, HidDevice> entry : attachedDevices.entrySet()) {
 
       String deviceId = entry.getKey();
-      HidDeviceInfo hidDeviceInfo = entry.getValue();
+      HidDevice hidDevice = entry.getValue();
 
-      if (!currentList.contains(hidDeviceInfo)) {
+      if (!attachedHidDeviceList.contains(hidDevice)) {
 
         // Keep track of removals
         removeList.add(deviceId);
@@ -134,9 +133,9 @@ class HidDeviceManager {
   /**
    * @return A list of all attached HID devices
    */
-  public List<HidDeviceInfo> getAttachedHidDevices() {
+  public List<HidDevice> getAttachedHidDevices() {
 
-    List<HidDeviceInfo> hidDeviceInfoList = new ArrayList<HidDeviceInfo>();
+    List<HidDevice> hidDeviceList = new ArrayList<HidDevice>();
 
     // Use 0,0 to list all attached devices
     // This comes back as a linked list from hidapi
@@ -145,8 +144,8 @@ class HidDeviceManager {
 
       HidDeviceInfoStructure hidDeviceInfoStructure = root;
       do {
-        // Wrap in HidDeviceInfo
-        hidDeviceInfoList.add(new HidDeviceInfo(hidDeviceInfoStructure));
+        // Wrap in HidDevice
+        hidDeviceList.add(new HidDevice(hidDeviceInfoStructure));
         // Move to the next in the linked list
         hidDeviceInfoStructure = hidDeviceInfoStructure.next();
       } while (hidDeviceInfoStructure != null);
@@ -155,33 +154,7 @@ class HidDeviceManager {
       HidApi.freeEnumeration(root);
     }
 
-    return hidDeviceInfoList;
+    return hidDeviceList;
   }
 
-  public HidDevice open(int vendorId, int productId, String serialNumber) {
-
-    HidDeviceStructure deviceStructure = HidApi.open(vendorId, productId, serialNumber);
-
-    if (deviceStructure != null) {
-      return new HidDevice(this, deviceStructure, vendorId, productId, serialNumber);
-    }
-    return null;
-  }
-
-  public HidDevice open(HidDeviceInfo info) {
-
-    if (info == null || info.getPath() == null) {
-      return null;
-    }
-
-    HidDeviceStructure deviceStructure = HidApi.open(info.getPath());
-
-    if (deviceStructure != null) {
-      return new HidDevice(
-        this, deviceStructure, info.getVendorId(), info.getProductId(),
-        info.getSerialNumber().toString());
-    }
-    return null;
-
-  }
 }

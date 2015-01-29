@@ -95,7 +95,7 @@ public class HidDeviceInfoStructure extends Structure implements Structure.ByRef
    */
   public String show() {
     HidDeviceInfoStructure u = this;
-    String str = "HidDeviceInfo\n";
+    String str = "HidDevice\n";
     str += "\tpath:" + u.path + ">\n";
     str += "\tvendor_id: " + Integer.toHexString(u.vendor_id) + "\n";
     str += "\tproduct_id: " + Integer.toHexString(u.product_id) + "\n";

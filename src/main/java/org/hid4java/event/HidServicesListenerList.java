@@ -1,6 +1,6 @@
 package org.hid4java.event;
 
-import org.hid4java.HidDeviceInfo;
+import org.hid4java.HidDevice;
 import org.hid4java.HidServicesListener;
 
 import java.util.ArrayList;
@@ -78,9 +78,9 @@ public class HidServicesListenerList {
   /**
    * <p>Fire the HID device attached event</p>
    *
-   * @param deviceInfo The device that was attached
+   * @param hidDevice The device that was attached
    */
-  public void fireHidDeviceAttached(final HidDeviceInfo deviceInfo) {
+  public void fireHidDeviceAttached(final HidDevice hidDevice) {
 
     // Broadcast on a different thread
     executorService.submit(
@@ -88,7 +88,7 @@ public class HidServicesListenerList {
         @Override
         public void run() {
 
-          HidServicesEvent event = new HidServicesEvent(deviceInfo);
+          HidServicesEvent event = new HidServicesEvent(hidDevice);
 
           for (final HidServicesListener listener : toArray()) {
             listener.hidDeviceAttached(event);
@@ -102,9 +102,9 @@ public class HidServicesListenerList {
   /**
    * <p>Fire the HID device detached event</p>
    *
-   * @param deviceInfo The device that was detached
+   * @param hidDevice The device that was detached
    */
-  public void fireHidDeviceDetached(final HidDeviceInfo deviceInfo) {
+  public void fireHidDeviceDetached(final HidDevice hidDevice) {
 
     // Broadcast on a different thread
     executorService.submit(
@@ -112,7 +112,7 @@ public class HidServicesListenerList {
         @Override
         public void run() {
 
-          HidServicesEvent event = new HidServicesEvent(deviceInfo);
+          HidServicesEvent event = new HidServicesEvent(hidDevice);
 
           for (final HidServicesListener listener : toArray()) {
             listener.hidDeviceDetached(event);
@@ -126,9 +126,9 @@ public class HidServicesListenerList {
   /**
    * <p>Fire the HID failure event</p>
    *
-   * @param deviceInfo The device info that caused the error if known
+   * @param hidDevice The device that caused the error if known
    */
-  public void fireHidFailure(final HidDeviceInfo deviceInfo) {
+  public void fireHidFailure(final HidDevice hidDevice) {
 
     // Broadcast on a different thread
     executorService.submit(
@@ -136,7 +136,7 @@ public class HidServicesListenerList {
         @Override
         public void run() {
 
-          HidServicesEvent event = new HidServicesEvent(deviceInfo);
+          HidServicesEvent event = new HidServicesEvent(hidDevice);
 
           for (final HidServicesListener listener : toArray()) {
             listener.hidFailure(event);

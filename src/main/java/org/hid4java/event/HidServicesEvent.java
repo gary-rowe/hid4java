@@ -1,6 +1,6 @@
 package org.hid4java.event;
 
-import org.hid4java.HidDeviceInfo;
+import org.hid4java.HidDevice;
 
 
 /**
@@ -14,26 +14,26 @@ import org.hid4java.HidDeviceInfo;
  */
 public class HidServicesEvent {
 
-  private final HidDeviceInfo hidDeviceInfo;
+  private final HidDevice hidDevice;
 
   /**
-   * @param device The HidDeviceInfo involved in the event
+   * @param device The HidDevice involved in the event
    */
-  public HidServicesEvent(HidDeviceInfo device) {
-    hidDeviceInfo = device;
+  public HidServicesEvent(HidDevice device) {
+    hidDevice = device;
   }
 
   /**
-   * @return The associated HidDeviceInfo
+   * @return The associated HidDevice
    */
-  public HidDeviceInfo getHidDeviceInfo() {
-    return hidDeviceInfo;
+  public HidDevice getHidDevice() {
+    return hidDevice;
   }
 
   @Override
   public String toString() {
     return "HidServicesEvent{" +
-      "hidDeviceInfo=" + hidDeviceInfo +
+      "hidDevice=" + hidDevice +
       '}';
   }
 }

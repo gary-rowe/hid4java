@@ -60,7 +60,7 @@ public class HidServices {
   /**
    * @return A list of all attached HID devices
    */
-  public List<HidDeviceInfo> getAttachedHidDevices() {
+  public List<HidDevice> getAttachedHidDevices() {
 
     return deviceManager.getAttachedHidDevices();
   }
@@ -73,21 +73,17 @@ public class HidServices {
    * @return The device if attached, null if detached
    */
   public HidDevice getHidDevice(int vendorId, int productId, String serialNumber) {
-    return deviceManager.open(vendorId, productId, serialNumber);
-  }
-
-  /**
-   * Opens a HID device through it's info structure
-   *
-   * @param info The device Information structure from HidDeviceManager.getAttachedHidDevices
-   *
-   * @return The device if attached, null if detached
-   */
-  public HidDevice getHidDevice(HidDeviceInfo info) {
-    if (info == null) {
-      return null;
+    List<HidDevice> devices = deviceManager.getAttachedHidDevices();
+    for (HidDevice device : devices) {
+      if (device.isVidPidSerial(vendorId, productId, serialNumber)) {
+        if (device.open()) {
+          return device;
+        } else {
+          return null;
+        }
+      }
     }
 
-    return deviceManager.open(info);
+    return null;
   }
 }
