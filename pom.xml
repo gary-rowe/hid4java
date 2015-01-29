@@ -64,6 +64,11 @@
     <tag>HEAD</tag>
   </scm>
 
+  <properties>
+    <!-- Ensure source is under UTF-8 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <profiles>
 
     <!-- To activate this use 'mvn release:prepare release:perform' -->
