@@ -26,8 +26,8 @@ hidServices = HidManager.getHidServices();
 hidServices.addHidServicesListener(this);
 
 // Provide a list of attached devices
-for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {
-  System.out.println(hidDeviceInfo);
+for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
+  System.out.println(hidDevice);
 }
 
 // Open a Bitcoin Trezor device by Vendor ID and Product ID with wildcard serial number
