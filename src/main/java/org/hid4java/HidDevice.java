@@ -55,10 +55,15 @@ public class HidDevice {
   }
 
   /**
+   * The "path" is well-supported across Windows, Mac and Linux so makes a
+   * better choice for a unique ID
+   *
+   * See #8 for details
+   *
    * @return A unique device ID made up from vendor ID, product ID and serial number
    */
   public String getId() {
-    return "" + vendorId + "_" + productId + (serialNumber == null ? "" : "_" + serialNumber);
+    return path;
   }
 
   public String getPath() {
