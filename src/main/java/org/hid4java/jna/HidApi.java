@@ -1,5 +1,6 @@
 package org.hid4java.jna;
 
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
@@ -352,22 +353,34 @@ public class HidApi {
    */
   public static int write(HidDeviceStructure device, byte[] data, int len, byte reportId) {
 
+    // Fail fast
     if (device == null || data == null) {
       return DEVICE_ERROR;
     }
 
-    WideStringBuffer m = new WideStringBuffer(len + 1);
-    m.buffer[0] = reportId;
-
+    // Precondition checks
     if (data.length < len) {
       len = data.length;
     }
 
-    if (len > 1) {
-      System.arraycopy(data, 0, m.buffer, 1, len);
-    }
+    final WideStringBuffer report;
 
-    return hidApiLibrary.hid_write(device.ptr(), m, m.buffer.length);
+    if (Platform.isWindows() && reportId == 0) {
+      // Compensate on Windows for 0x00 report ID misalignment
+      report = new WideStringBuffer(len);
+      if (len > 1) {
+        System.arraycopy(data, 0, report.buffer, 0, len);
+      }
+    } else {
+      // Put report ID into position 0 and fill out buffer
+      report = new WideStringBuffer(len + 1);
+      report.buffer[0] = reportId;
+      if (len > 1) {
+        System.arraycopy(data, 0, report.buffer, 1, len);
+      }
+    }
+    return hidApiLibrary.hid_write(device.ptr(), report, report.buffer.length);
+
   }
 
   /**
