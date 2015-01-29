@@ -1,5 +1,4 @@
-package org.hid4java;
-
+import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
 
 import java.util.concurrent.TimeUnit;

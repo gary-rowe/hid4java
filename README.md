@@ -53,11 +53,19 @@ if (val != -1) {
 The project uses the standard Maven build process and can be used without having external hardware attached. Just do the usual
 
 ```
-$ cd <project directory>
-$ mvn clean install
+cd <project directory>
+mvn clean install
 ```
 
-and you're good to go. Your next step is to explore the examples.
+and you're good to go. Your next step is to explore the examples (e.g. `UsbHidTrezorV1Example`). From the command line:
+
+```
+mvn clean compile exec:java -Dexec.mainClass="UsbHidTrezorV1Example"
+```
+If you have a Trezor device attached you'll see a "Features" message appear as a big block of hex otherwise it will be
+just a simple enumeration of attached USB devices. You can plug various devices in and out to see messages.
+
+Use CTRL+C to quit the example.
 
 ### Frequently asked questions (FAQ)
 
@@ -109,7 +117,7 @@ Out of the box Ubuntu classifies HID devices as belonging to root. You can overr
 `/etc/udev/rules.d`:
 
 ```
-$ sudo gedit /etc/udev/rules.d/99-myhid.rules
+sudo gedit /etc/udev/rules.d/99-myhid.rules
 ```
 
 Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor`):
@@ -124,8 +132,8 @@ running it may that you're not a member of the `plugdev` group. You can fix this
 your system):
 
 ```
-$ sudo addgroup plugdev
-$ sudo addgroup yourusername plugdev 
+sudo addgroup plugdev
+sudo addgroup yourusername plugdev
 ```
 
 ### Closing notes
