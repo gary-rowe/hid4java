@@ -367,6 +367,7 @@ public class HidApi {
 
     if (Platform.isWindows() && reportId == 0) {
       // Compensate on Windows for 0x00 report ID misalignment
+      // This avoids "The parameter is incorrect" on Windows
       report = new WideStringBuffer(len);
       if (len > 1) {
         System.arraycopy(data, 0, report.buffer, 0, len);
