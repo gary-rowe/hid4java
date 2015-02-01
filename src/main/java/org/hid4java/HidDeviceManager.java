@@ -32,6 +32,7 @@ class HidDeviceManager {
    * HID services listener list
    */
   private final HidServicesListenerList listenerList;
+  private Thread scanThread;
 
   /**
    * Constructs a new device manager
@@ -45,6 +46,47 @@ class HidDeviceManager {
 
     this.listenerList = listenerList;
     this.scanInterval = scanInterval;
+
+  }
+
+  /**
+   * Performs an immediate scan of attached devices then continues scanning in the background
+   */
+  public void start() {
+
+    // Perform a one-off scan to populate attached devices
+    scan();
+
+    // Do not start the scan thread when interval is set to 0
+    final int scanInterval = this.scanInterval;
+    if (scanInterval == 0) {
+      return;
+    }
+
+    // Create a daemon thread to ensure lifecycle
+    scanThread = new Thread(
+      new Runnable() {
+        @Override
+        public void run() {
+          while (true) {
+            try {
+              Thread.sleep(scanInterval);
+            } catch (final InterruptedException e) {
+              Thread.currentThread().interrupt();
+              break;
+            }
+            scan();
+          }
+        }
+      });
+    scanThread.setDaemon(true);
+    scanThread.setName("hid4java Device Scanner");
+    scanThread.start();
+  }
+
+  public synchronized void stop() {
+
+    scanThread.interrupt();
 
   }
 
@@ -97,40 +139,6 @@ class HidDeviceManager {
   }
 
   /**
-   * Performs an immediate scan of attached devices then continues scanning in the background
-   */
-  public void start() {
-
-    // Perform a one-off scan to populate attached devices
-    scan();
-
-    // Do not start the scan thread when interval is set to 0
-    final int scanInterval = this.scanInterval;
-    if (scanInterval == 0) {
-      return;
-    }
-
-    // Create a daemon thread to ensure lifecycle
-    final Thread thread = new Thread(
-      new Runnable() {
-        @Override
-        public void run() {
-          while (true) {
-            try {
-              Thread.sleep(scanInterval);
-            } catch (final InterruptedException e) {
-              Thread.currentThread().interrupt();
-            }
-            scan();
-          }
-        }
-      });
-    thread.setDaemon(true);
-    thread.setName("hid4java Device Scanner");
-    thread.start();
-  }
-
-  /**
    * @return A list of all attached HID devices
    */
   public List<HidDevice> getAttachedHidDevices() {
@@ -156,5 +164,4 @@ class HidDeviceManager {
 
     return hidDeviceList;
   }
-
 }

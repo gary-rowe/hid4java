@@ -152,7 +152,7 @@ public class HidApi {
     }
 
     WideStringBuffer wStr = new WideStringBuffer(WSTR_LEN);
-    int res = hidApiLibrary.hid_get_manufacturer_string(device.ptr(), wStr, WSTR_LEN);
+    hidApiLibrary.hid_get_manufacturer_string(device.ptr(), wStr, WSTR_LEN);
 
     return wStr.toString();
   }
@@ -168,10 +168,10 @@ public class HidApi {
       return DEVICE_NULL;
     }
 
-    WideStringBuffer wStr = new WideStringBuffer(WSTR_LEN);
-    int res = hidApiLibrary.hid_get_product_string(device.ptr(), wStr, WSTR_LEN);
+    WideStringBuffer wBuffer = new WideStringBuffer(WSTR_LEN);
+    hidApiLibrary.hid_get_product_string(device.ptr(), wBuffer, WSTR_LEN);
 
-    return wStr.toString();
+    return wBuffer.toString();
   }
 
   /**
@@ -185,11 +185,11 @@ public class HidApi {
       return DEVICE_NULL;
     }
 
-    WideStringBuffer wStr = new WideStringBuffer(WSTR_LEN);
+    WideStringBuffer wBuffer = new WideStringBuffer(WSTR_LEN);
 
-    int res = hidApiLibrary.hid_get_serial_number_string(device.ptr(), wStr, WSTR_LEN);
+    hidApiLibrary.hid_get_serial_number_string(device.ptr(), wBuffer, WSTR_LEN);
 
-    return wStr.toString();
+    return wBuffer.toString();
   }
 
   /**
@@ -214,10 +214,10 @@ public class HidApi {
   /**
    * <p>Read an Input report from a HID device</p>
    * <p>Input reports are returned to the host through the INTERRUPT IN endpoint. The first byte
-   * will contain the Report number if the device uses numbered reports</p>
+   * will contain the Report ID if the device uses numbered reports.</p>
    *
    * @param device The HID device
-   * @param buffer The buffer to read into
+   * @param buffer The buffer to read into (allow an extra byte if device supports multiple report IDs)
    *
    * @return The actual number of bytes read and -1 on error. If no packet was available to be read
    * and the handle is in non-blocking mode, this function returns 0.
@@ -228,10 +228,9 @@ public class HidApi {
       return DEVICE_ERROR;
     }
 
-    WideStringBuffer m = new WideStringBuffer(buffer);
+    WideStringBuffer wBuffer = new WideStringBuffer(buffer);
 
-    return hidApiLibrary.hid_read(device.ptr(), m, m.buffer.length);
-
+    return hidApiLibrary.hid_read(device.ptr(), wBuffer, wBuffer.buffer.length);
   }
 
   /**
@@ -250,9 +249,9 @@ public class HidApi {
       return DEVICE_ERROR;
     }
 
-    WideStringBuffer m = new WideStringBuffer(buffer);
+    WideStringBuffer wBuffer = new WideStringBuffer(buffer);
 
-    return hidApiLibrary.hid_read_timeout(device.ptr(), m, buffer.length, timeoutMillis);
+    return hidApiLibrary.hid_read_timeout(device.ptr(), wBuffer, buffer.length, timeoutMillis);
 
   }
 
@@ -278,15 +277,15 @@ public class HidApi {
     }
 
     // Create a large buffer
-    WideStringBuffer m = new WideStringBuffer(WSTR_LEN);
-    m.buffer[0] = reportId;
-    int res = hidApiLibrary.hid_get_feature_report(device.ptr(), m, data.length + 1);
+    WideStringBuffer report = new WideStringBuffer(WSTR_LEN);
+    report.buffer[0] = reportId;
+    int res = hidApiLibrary.hid_get_feature_report(device.ptr(), report, data.length + 1);
 
     if (res == -1) {
       return res;
     }
 
-    System.arraycopy(m.buffer, 1, data, 0, res);
+    System.arraycopy(report.buffer, 1, data, 0, res);
     return res;
 
   }
@@ -300,9 +299,11 @@ public class HidApi {
    * The first byte of data[] must contain the Report ID. For devices which only support a single report,
    * this must be set to 0x0. The remaining bytes contain the report data</p>
    * <p>Since the Report ID is mandatory, calls to hid_send_feature_report() will always contain one more byte than
-   * the report contains. For example, if a hid report is 16 bytes long, 17 bytes must be passed to
-   * hid_send_feature_report(): the Report ID (or 0x0, for devices which do not use numbered reports), followed by
-   * the report data (16 bytes). In this example, the length passed in would be 17</p>
+   * the report contains.</p>
+   *
+   * <p>For example, if a hid report is 16 bytes long, 17 bytes must be passed to
+   * hid_send_feature_report(): the Report ID (or 0x00, for devices which do not use numbered reports), followed by
+   * the report data (16 bytes). In this example, the bytes written would be 17.</p>
    *
    * <p>This method handles all the array manipulation for you</p>
    *
@@ -318,11 +319,11 @@ public class HidApi {
       return DEVICE_ERROR;
     }
 
-    WideStringBuffer m = new WideStringBuffer(data.length + 1);
-    m.buffer[0] = reportId;
+    WideStringBuffer report = new WideStringBuffer(data.length + 1);
+    report.buffer[0] = reportId;
 
-    System.arraycopy(data, 0, m.buffer, 1, data.length);
-    return hidApiLibrary.hid_send_feature_report(device.ptr(), m, m.buffer.length);
+    System.arraycopy(data, 0, report.buffer, 1, data.length);
+    return hidApiLibrary.hid_send_feature_report(device.ptr(), report, report.buffer.length);
 
   }
 
@@ -332,7 +333,7 @@ public class HidApi {
    * <h3>HID API notes</h3>
    *
    * <p>In USB HID the first byte of the data packet must contain the Report ID.
-   * For devices which only support a single report, this must be set to 0x0.
+   * For devices which only support a single report, this must be set to 0x00.
    * The remaining bytes contain the report data. Since the Report ID is mandatory,
    * calls to <code>hid_write()</code> will always contain one more byte than the report
    * contains.</p>

@@ -135,6 +135,16 @@ public class HidDevice {
 
   /**
    * <p>
+   * Close this device freeing the HidApi resources
+   * </p>
+   */
+  public void close() {
+    HidApi.close(hidDeviceStructure);
+    hidDeviceStructure = null;
+  }
+
+  /**
+   * <p>
    * Set the device handle to be non-blocking
    * </p>
    *
@@ -260,16 +270,6 @@ public class HidDevice {
    */
   public String getIndexedString(int index) {
     return HidApi.getIndexedString(hidDeviceStructure, index);
-  }
-
-  /**
-   * <p>
-   * Close this device
-   * </p>
-   */
-  public void close() {
-    HidApi.close(hidDeviceStructure);
-    hidDeviceStructure = null;
   }
 
   public boolean isOpen() {

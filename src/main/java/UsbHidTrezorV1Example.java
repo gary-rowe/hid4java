@@ -47,8 +47,13 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
       System.out.println("Waiting for Trezor attach...");
     }
     // Stop the main thread to demonstrate attach and detach events
-    sleepUninterruptibly(1, TimeUnit.HOURS);
+    sleepUninterruptibly(5, TimeUnit.SECONDS);
 
+    if (trezor != null && trezor.isOpen()) {
+      trezor.close();
+    }
+
+    System.exit(0);
   }
 
   @Override

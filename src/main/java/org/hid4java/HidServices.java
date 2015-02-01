@@ -1,6 +1,7 @@
 package org.hid4java;
 
 import org.hid4java.event.HidServicesListenerList;
+import org.hid4java.jna.HidApi;
 
 import java.util.List;
 
@@ -27,12 +28,33 @@ public class HidServices {
   private final HidDeviceManager deviceManager;
 
   /**
+   * Initialise and start scanning for USB devices
+   *
    * @throws HidException If something goes wrong
    */
   public HidServices() throws HidException {
 
     deviceManager = new HidDeviceManager(listeners, 500);
     deviceManager.start();
+
+    // Ensure we release resources
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        System.err.println("Triggered shutdown hook");
+        deviceManager.stop();
+        HidApi.exit();
+      }
+    });
+
+  }
+
+  /**
+   * Stop scanning for devices and close connection to HidApi
+   */
+  public void stop() {
+
+    deviceManager.stop();
 
   }
 

@@ -49,8 +49,35 @@ public interface HidApiLibrary extends Library {
 
   Pointer hid_error(Pointer device);
 
+  /**
+   * Read an Input report from a HID device.
+   *
+   * Input reports are returned to the host through the INTERRUPT IN endpoint. The first byte will contain the Report number
+   * if the device uses numbered reports.
+   *
+   * @param device A device handle returned from hid_open().
+   * @param bytes  A buffer to put the read data into.
+   * @param length The number of bytes to read. For devices with multiple reports, make sure to read an extra byte for the report number.
+   *
+   * @return This function returns the actual number of bytes read and -1 on error. If no packet was available to be read
+   * and the handle is in non-blocking mode this function returns 0.
+   */
   int hid_read(Pointer device, WideStringBuffer.ByReference bytes, int length);
 
+  /**
+   * Read an Input report from a HID device with timeout.
+   *
+   * Input reports are returned to the host through the INTERRUPT IN endpoint. The first byte will contain the Report number
+   * if the device uses numbered reports.
+   *
+   * @param device  A device handle
+   * @param bytes   A buffer to put the read data into.
+   * @param length  The number of bytes to read. For devices with multiple reports, make sure to read an extra byte for the report number.
+   * @param timeout The timeout in milliseconds or -1 for blocking wait.
+   *
+   * @return This function returns the actual number of bytes read and -1 on error. If no packet was available to be read within
+   * the timeout period, this function returns 0.
+   */
   int hid_read_timeout(Pointer device, WideStringBuffer.ByReference bytes, int length, int timeout);
 
   int hid_write(Pointer device, WideStringBuffer.ByReference data, int len);
