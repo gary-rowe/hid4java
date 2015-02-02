@@ -119,7 +119,12 @@ On startup hid4java will search the classpath looking for a library that matches
 
 #### The hidapi library loads but takes a long time on Windows
 
-You have probably terminated the JVM using a `kill -9` rather than a clean shutdown. This will have left the `HidApi` process lock on the DLL still in force and Windows will continuously check to see if it can share it with a new instance. After a few clean shutdowns the lock tends to be released restoring normal operation or if you're in a hurry a reboot will fix it immediately.
+You have probably terminated the JVM using a `kill -9` rather than a clean shutdown. This will have left the `HidApi` process lock on the DLL still in force and Windows will continuously check to see if it can share it with a new instance.
+Just detach and re-attach the device to clear it.
+
+#### I'm seeing spurious attach/detach events occurring on Windows
+
+This was a device enumeration bug in early versions of hid4java. Use 0.3.1 or higher.
 
 #### My device doesn't work on Linux
 
