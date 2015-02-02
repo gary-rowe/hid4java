@@ -283,82 +283,19 @@ public class HidDevice {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + interfaceNumber;
-    result = prime * result
-      + ((manufacturer == null) ? 0 : manufacturer.hashCode());
-    result = prime * result + ((path == null) ? 0 : path.hashCode());
-    result = prime * result + ((product == null) ? 0 : product.hashCode());
-    result = prime * result + productId;
-    result = prime * result + releaseNumber;
-    result = prime * result
-      + ((serialNumber == null) ? 0 : serialNumber.hashCode());
-    result = prime * result + usage;
-    result = prime * result + usagePage;
-    result = prime * result + vendorId;
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    HidDevice hidDevice = (HidDevice) o;
+
+    if (!path.equals(hidDevice.path)) return false;
+
+    return true;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    HidDevice other = (HidDevice) obj;
-    if (interfaceNumber != other.interfaceNumber) {
-      return false;
-    }
-    if (manufacturer == null) {
-      if (other.manufacturer != null) {
-        return false;
-      }
-    } else if (!manufacturer.equals(other.manufacturer)) {
-      return false;
-    }
-    if (path == null) {
-      if (other.path != null) {
-        return false;
-      }
-    } else if (!path.equals(other.path)) {
-      return false;
-    }
-    if (product == null) {
-      if (other.product != null) {
-        return false;
-      }
-    } else if (!product.equals(other.product)) {
-      return false;
-    }
-    if (productId != other.productId) {
-      return false;
-    }
-    if (releaseNumber != other.releaseNumber) {
-      return false;
-    }
-    if (serialNumber == null) {
-      if (other.serialNumber != null) {
-        return false;
-      }
-    } else if (!serialNumber.equals(other.serialNumber)) {
-      return false;
-    }
-    if (usage != other.usage) {
-      return false;
-    }
-    if (usagePage != other.usagePage) {
-      return false;
-    }
-    if (vendorId != other.vendorId) {
-      return false;
-    }
-    return true;
+  public int hashCode() {
+    return path.hashCode();
   }
 }
