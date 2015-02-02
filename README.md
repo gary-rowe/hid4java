@@ -2,7 +2,9 @@ Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=mas
 
 ### Project status
 
-Late-Beta: Expect minimal API changes. Suitable for early production.
+Pre-release: Not in Maven Central but available for production work.
+
+Latest release: 0.3.0
 
 ### Summary 
 
@@ -16,7 +18,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 
 * [hidapi](https://github.com/signal11/hidapi) - Native USB HID library for multiple platforms
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
-* Java 7+ - to remove dependencies on JVMs that have reached end of life
+* Java 6+ - to remove dependencies on JVMs that have reached end of life
 
 ### Code example
 
@@ -111,31 +113,38 @@ This shouldn't occur unless you've been changing the code.
 You have probably got the `getFieldOrder` list wrong. Use the field list from Class.getFields() to get a suitable order.
 Another cause is if a `Structure` has not been initialised and is being deferenced, perhaps in a `toString()` method.
 
-#### My device doesn't work on Ubuntu
+#### The hidapi library doesn't load
 
-Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under 
-`/etc/udev/rules.d`:
+On startup hid4java will search the classpath looking for a library that matches the machine OS and architecture (e.g. Windows running on AMD64). It uses the JNA naming conventions to do this and will report the expected path if it fails. You can add your own entry under `src/main/resources` and it should get picked up. Ideally you should [raise an issue](https://github.com/gary-rowe/hid4java/issues) on the hid4java repo so that the proper library can be put into the project so that others can avoid this problem.
 
+#### The hidapi library loads but takes a long time on Windows
+
+You have probably terminated the JVM using a `kill -9` rather than a clean shutdown. This will have left the `HidApi` process lock on the DLL still in force and Windows will continuously check to see if it can share it with a new instance. After a few clean shutdowns the lock tends to be released restoring normal operation or if you're in a hurry a reboot will fix it immediately.
+
+#### My device doesn't work on Linux
+
+Different flavours of Linux require different settings:
+
+##### Ubuntu
+Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under `/etc/udev/rules.d`:
 ```
 sudo gedit /etc/udev/rules.d/99-myhid.rules
 ```
-
 Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor`):
-
 ```
 # My HID device
 ATTRS{idProduct}=="0001", ATTRS{idVendor}=="abcd", MODE="0660", GROUP="plugdev"
 ```
-
-Save and exit from root, then unplug and replug your device. The rules should take effect immediately. If they're still not 
-running it may that you're not a member of the `plugdev` group. You can fix this as follows (assuming that `plugdev` is not present on 
-your system):
-
+Save and exit from root, then unplug and replug your device. The rules should take effect immediately. If they're still not running it may that you're not a member of the `plugdev` group. You can fix this as follows (assuming that `plugdev` is not present on your system):
 ```
 sudo addgroup plugdev
 sudo addgroup yourusername plugdev
 ```
-
+##### Slackware
+Edit the USB udev rules `/etc/udev/rules.d` as follows:
+```
+MODE="0666", GROUP="dialout"
+```
 ### Closing notes
 
 All trademarks and copyrights are acknowledged.
