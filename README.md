@@ -18,7 +18,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 
 * [hidapi](https://github.com/signal11/hidapi) - Native USB HID library for multiple platforms
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
-* Java 7+ - to remove dependencies on JVMs that have reached end of life
+* Java 6+ - to remove dependencies on JVMs that have reached end of life
 
 ### Code example
 
