@@ -108,15 +108,17 @@ public class HidDevice {
 
   @Override
   public String toString() {
-    return "HidDevice [path=" + path + ", vendorId=0x"
-      + Integer.toHexString(vendorId) + ", productId=0x"
-      + Integer.toHexString(productId) + ", serialNumber="
-      + serialNumber + ", releaseNumber=0x"
-      + Integer.toHexString(releaseNumber) + ", manufacturer="
-      + manufacturer + ", product=" + product + ", usagePage=0x"
-      + Integer.toHexString(usagePage) + ", usage=0x"
-      + Integer.toHexString(usage) + ", interfaceNumber="
-      + interfaceNumber + "]";
+    return "HidDevice [path=" + path
+      + ", vendorId=0x" + Integer.toHexString(vendorId)
+      + ", productId=0x" + Integer.toHexString(productId)
+      + ", serialNumber=" + serialNumber
+      + ", releaseNumber=0x" + Integer.toHexString(releaseNumber)
+      + ", manufacturer=" + manufacturer
+      + ", product=" + product
+      + ", usagePage=0x" + Integer.toHexString(usagePage)
+      + ", usage=0x" + Integer.toHexString(usage)
+      + ", interfaceNumber=" + interfaceNumber
+      + "]";
   }
 
   public int write(byte[] message, int packetLength, byte reportId) {
