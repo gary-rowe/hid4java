@@ -60,6 +60,9 @@ configuration in your projects:
 
 ### Code example
 
+Taken from [UsbHidTrezorV1Example.java](https://github.com/gary-rowe/hid4java/blob/develop/src/main/java/UsbHidTrezorV1Example.java) which
+provides more details. See later for how to run it from the command line.
+
 ```java
 // Get HID services
 hidServices = HidManager.getHidServices();
