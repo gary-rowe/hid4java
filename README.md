@@ -2,7 +2,7 @@ Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=mas
 
 ### Project status
 
-Pre-release: Not in Maven Central but available for production work.
+Release: Available for production work
 
 Latest release: 0.3.1
 
