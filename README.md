@@ -20,6 +20,44 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
 * Java 6+ - to remove dependencies on JVMs that have reached end of life
 
+### Maven dependency
+
+I've not gotten around to putting this into Maven Central (it's on my list) so as an interim measure please use the following
+configuration in your projects:
+```xml
+<repositories>
+
+  <repository>
+    <id>mbhd-maven-release</id>
+    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/releases</url>
+    <releases/>
+  </repository>
+
+  <!-- Only include the snapshot repo if you're working with the latest hid4java on develop -->
+  <repository>
+    <id>mbhd-maven-snapshot</id>
+    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/snapshots</url>
+    <!-- These artifacts change frequently during development iterations -->
+    <snapshots>
+      <updatePolicy>always</updatePolicy>
+    </snapshots>
+  </repository>
+
+</repositories>
+
+<dependencies>
+
+  <!-- hid4java for cross-platform HID USB -->
+  <dependency>
+    <groupId>org.hid4java</groupId>
+    <artifactId>hid4java</artifactId>
+    <version>0.3.1</version>
+  </dependency>
+
+</dependencies>
+
+```
+
 ### Code example
 
 ```java
