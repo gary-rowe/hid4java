@@ -33,6 +33,11 @@ class HidDeviceManager {
    */
   private final HidServicesListenerList listenerList;
   private Thread scanThread;
+  
+  /**
+   * Indicates whether or net the {@link #scanThread} is running.
+   */
+  private boolean scanning = false;
 
   /**
    * Constructs a new device manager
@@ -50,10 +55,15 @@ class HidDeviceManager {
   }
 
   /**
-   * Performs an immediate scan of attached devices then continues scanning in the background
+   * If currently no background scanning is running, 
+   * performs an immediate scan of attached devices then continues scanning in the background.
+   * Otherwise this does nothing.
    */
   public void start() {
 
+	if (this.isScanning()) {
+		return;
+	}
     // Perform a one-off scan to populate attached devices
     scan();
 
@@ -68,6 +78,7 @@ class HidDeviceManager {
       new Runnable() {
         @Override
         public void run() {
+          scanning = true;
           while (true) {
             try {
               Thread.sleep(scanInterval);
@@ -77,6 +88,7 @@ class HidDeviceManager {
             }
             scan();
           }
+          scanning = false;
         }
       });
     scanThread.setDaemon(true);
@@ -137,6 +149,25 @@ class HidDeviceManager {
     }
 
   }
+
+  /**
+   * sets the scan interval for the scan thread. Takes effect the next time the thread is started.
+   * 
+   * @param scanInterval the next scan threads interval in millis.
+   */
+  public void setScanInterval(int scanInterval) {
+    this.scanInterval = scanInterval;
+  }
+  
+  /**
+   * Get the scan threads status.
+   * 
+   * @return true if the scan thread is running, false otherwise.
+   */
+  public boolean isScanning() {
+	return scanning;
+  }
+
 
   /**
    * @return A list of all attached HID devices
