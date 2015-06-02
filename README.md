@@ -151,7 +151,7 @@ This shouldn't occur unless you've been changing the code.
 You have probably got the `getFieldOrder` list wrong. Use the field list from Class.getFields() to get a suitable order.
 Another cause is if a `Structure` has not been initialised and is being deferenced, perhaps in a `toString()` method.
 
-### I get a "The parameter is incorrect" when writing
+#### I get a "The parameter is incorrect" when writing
 
 There is a special case on Windows for report ID `0x00` which can cause a misalignment during a hidapi `write()`.
 To compensate for this, hid4java will detect when it is running on Windows with a report ID of `0x00` and simply copy
@@ -198,7 +198,7 @@ Edit the USB udev rules `/etc/udev/rules.d` as follows:
 MODE="0666", GROUP="dialout"
 ```
 
-### My device doesn't work on Windows
+#### My device doesn't work on Windows
 
 Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
 cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
