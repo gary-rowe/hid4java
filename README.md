@@ -60,7 +60,7 @@ configuration in your projects:
 
 ### Code example
 
-Taken from [UsbHidTrezorV1Example.java](https://github.com/gary-rowe/hid4java/blob/develop/src/main/java/UsbHidTrezorV1Example.java) which
+Taken from [UsbHidTrezorV1Example](https://github.com/gary-rowe/hid4java/blob/develop/src/main/java/UsbHidTrezorV1Example.java) which
 provides more details. See later for how to run it from the command line.
 
 ```java
@@ -92,6 +92,8 @@ if (val != -1) {
 ```
  
 ### Getting started
+
+If you're unfamiliar with Maven and git the wiki provides [an easy guide to creating a development environment](https://github.com/gary-rowe/hid4java/wiki/How-to-build-the-project).
 
 The project uses the standard Maven build process and can be used without having external hardware attached. Just do the usual
 
