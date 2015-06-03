@@ -28,8 +28,9 @@ public class HidServices {
   private final HidDeviceManager deviceManager;
 
   /**
-   * Initialise and start scanning for USB devices at 500ms interval. Will shutdown the API
-   * automatically with a JRE shutdown hook.
+   * Initialise and start scanning for USB devices at 500ms interval.
+   *
+   * Will shutdown the API automatically with a JRE shutdown hook.
    *
    * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
    */
@@ -38,14 +39,13 @@ public class HidServices {
   }
 
   /**
-   * Initialise and start scanning for USB devices at 500ms interval. Optionally shutdown the
-   * API automatically with a JRE shutdown hook.
+   * Initialise and start scanning for USB devices at 500ms interval.
    *
-   * @param autoShutdown
-   *            whether or not to register the shutdown hook to close the API
-   *            automatically.
-   * @throws HidException
-   *             If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
+   * Optionally shutdown the API automatically with a JRE shutdown hook.
+   *
+   * @param autoShutdown True if a shutdown hook should be set to close the API automatically
+   *
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
    */
   public HidServices(boolean autoShutdown) throws HidException {
     this(autoShutdown, 500);
@@ -55,11 +55,9 @@ public class HidServices {
    * Initialise and start scanning for USB devices at the given interval. Optionally shutdown the
    * API automatically with a JRE shutdown hook.
    *
-   * @param autoShutdown
-   *            whether or not to register the shutdown hook to close the API
-   *            automatically.
-   * @throws HidException
-   *             If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
+   * @param autoShutdown True if a shutdown hook should be set to close the API automatically
+   *
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
    */
   public HidServices(boolean autoShutdown, int scanInterval) throws HidException {
     deviceManager = new HidDeviceManager(listeners, scanInterval);
@@ -73,14 +71,14 @@ public class HidServices {
         shutdown();
       }
     };
-    
-    if (autoShutdown) {    	
-    	Runtime.getRuntime().addShutdownHook(shutdownHook);
-    }	
+
+    if (autoShutdown) {
+      Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
   }
-  
+
   /**
-   * Stop scanning for devices and shut down the {@link HidApi}. 
+   * Stop scanning for devices and shut down the {@link HidApi}
    */
   public void shutdown() {
     deviceManager.stop();
@@ -97,22 +95,22 @@ public class HidServices {
   }
 
   /**
-   * Start scanning for devices (if not already scanning).
+   * Start scanning for devices (if not already scanning)
    */
   public void start() {
-	deviceManager.start();
+    deviceManager.start();
   }
-  
+
   /**
-   * Start scanning for devices with the specified interval (if not already scanning). 
-   * 
-   * @param scanInterval the new scan interval in millis.
+   * Start scanning for devices with the specified interval (if not already scanning)
+   *
+   * @param scanInterval The (new) scan interval in millis
    */
   public void start(int scanInterval) {
-	  deviceManager.setScanInterval(scanInterval);
-	  deviceManager.start();
+    deviceManager.setScanInterval(scanInterval);
+    deviceManager.start();
   }
-  
+
   /**
    * @param listener The listener to add
    */

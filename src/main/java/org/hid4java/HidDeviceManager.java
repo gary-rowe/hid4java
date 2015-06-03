@@ -4,7 +4,11 @@ import org.hid4java.event.HidServicesListenerList;
 import org.hid4java.jna.HidApi;
 import org.hid4java.jna.HidDeviceInfoStructure;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Manager to provide the following to HID services:</p>
@@ -32,10 +36,10 @@ class HidDeviceManager {
    * HID services listener list
    */
   private final HidServicesListenerList listenerList;
-  private Thread scanThread;
-  
+  private Thread scanThread = null;
+
   /**
-   * Indicates whether or net the {@link #scanThread} is running.
+   * Indicates whether or not the {@link #scanThread} is running
    */
   private boolean scanning = false;
 
@@ -55,15 +59,20 @@ class HidDeviceManager {
   }
 
   /**
-   * If currently no background scanning is running, 
-   * performs an immediate scan of attached devices then continues scanning in the background.
-   * Otherwise this does nothing.
+   * Starts the manager.
+   *
+   * If already started (scanning) it will immediately return without doing anything
+   *
+   * Otherwise this will perform a one-off scan of all devices then if the scan interval
+   * is zero will stop there or will start the scanning daemon thread at the required interval.
    */
   public void start() {
 
-	if (this.isScanning()) {
-		return;
-	}
+    // Check for previous start
+    if (this.isScanning()) {
+      return;
+    }
+
     // Perform a one-off scan to populate attached devices
     scan();
 
@@ -88,6 +97,7 @@ class HidDeviceManager {
             }
             scan();
           }
+          // Allow restart
           scanning = false;
         }
       });
@@ -96,9 +106,14 @@ class HidDeviceManager {
     scanThread.start();
   }
 
+  /**
+   * Stop the scanning thread if it is running
+   */
   public synchronized void stop() {
 
-    scanThread.interrupt();
+    if (scanThread != null) {
+      scanThread.interrupt();
+    }
 
   }
 
@@ -151,21 +166,17 @@ class HidDeviceManager {
   }
 
   /**
-   * sets the scan interval for the scan thread. Takes effect the next time the thread is started.
-   * 
-   * @param scanInterval the next scan threads interval in millis.
+   * @param scanInterval The scan thread's interval in millis (requires restart of thread)
    */
   public void setScanInterval(int scanInterval) {
     this.scanInterval = scanInterval;
   }
-  
+
   /**
-   * Get the scan threads status.
-   * 
-   * @return true if the scan thread is running, false otherwise.
+   * @return True if the scan thread is running, false otherwise.
    */
   public boolean isScanning() {
-	return scanning;
+    return scanning;
   }
 
 
