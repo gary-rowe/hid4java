@@ -34,7 +34,7 @@ package org.hid4java;
  * @since 0.0.1
  *  
  */
-public class HidException extends Exception {
+public class HidException extends RuntimeException {
 
   public HidException(String message) {
     super(message);

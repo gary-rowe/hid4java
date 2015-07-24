@@ -84,12 +84,14 @@ class HidDeviceManager {
   }
 
   /**
-   * Starts the manager.
+   * Starts the manager
    *
    * If already started (scanning) it will immediately return without doing anything
    *
    * Otherwise this will perform a one-off scan of all devices then if the scan interval
    * is zero will stop there or will start the scanning daemon thread at the required interval.
+   *
+   * @throws HidException If something goes wrong (such as Hidapi not initialising correctly)
    */
   public void start() {
 
@@ -212,9 +214,19 @@ class HidDeviceManager {
 
     List<HidDevice> hidDeviceList = new ArrayList<HidDevice>();
 
-    // Use 0,0 to list all attached devices
-    // This comes back as a linked list from hidapi
-    HidDeviceInfoStructure root = HidApi.enumerateDevices(0, 0);
+    final HidDeviceInfoStructure root;
+    try {
+      // Use 0,0 to list all attached devices
+      // This comes back as a linked list from hidapi
+      root = HidApi.enumerateDevices(0, 0);
+    } catch (NoClassDefFoundError e) {
+      // Could not initialise hidapi (possibly an unknown platform)
+      // Prevent further scanning as a fail safe
+      stop();
+      // Inform the caller that something serious has gone wrong
+      throw new HidException("Unable to start HidApi: " + e.getMessage());
+    }
+
     if (root != null) {
 
       HidDeviceInfoStructure hidDeviceInfoStructure = root;

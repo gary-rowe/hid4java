@@ -107,7 +107,11 @@ public class HidServices {
    */
   public void shutdown() {
     deviceManager.stop();
-    HidApi.exit();
+    try {
+      HidApi.exit();
+    } catch (NoClassDefFoundError e) {
+      // Silently fail (user will already have been given an exception)
+    }
   }
 
   /**
