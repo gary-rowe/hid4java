@@ -2,7 +2,7 @@ Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=mas
 
 ### Project status
 
-Pre-release: Not in Maven Central but available for production work.
+Release: Available for production work
 
 Latest release: 0.3.1
 
@@ -20,7 +20,48 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
 * Java 6+ - to remove dependencies on JVMs that have reached end of life
 
+### Maven dependency
+
+I've not gotten around to putting this into Maven Central (it's on my list) so as an interim measure please use the following
+configuration in your projects:
+```xml
+<repositories>
+
+  <repository>
+    <id>mbhd-maven-release</id>
+    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/releases</url>
+    <releases/>
+  </repository>
+
+  <!-- Only include the snapshot repo if you're working with the latest hid4java on develop -->
+  <repository>
+    <id>mbhd-maven-snapshot</id>
+    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/snapshots</url>
+    <!-- These artifacts change frequently during development iterations -->
+    <snapshots>
+      <updatePolicy>always</updatePolicy>
+    </snapshots>
+  </repository>
+
+</repositories>
+
+<dependencies>
+
+  <!-- hid4java for cross-platform HID USB -->
+  <dependency>
+    <groupId>org.hid4java</groupId>
+    <artifactId>hid4java</artifactId>
+    <version>0.3.1</version>
+  </dependency>
+
+</dependencies>
+
+```
+
 ### Code example
+
+Taken from [UsbHidTrezorV1Example](https://github.com/gary-rowe/hid4java/blob/develop/src/main/java/UsbHidTrezorV1Example.java) which
+provides more details. See later for how to run it from the command line.
 
 ```java
 // Get HID services
@@ -51,6 +92,8 @@ if (val != -1) {
 ```
  
 ### Getting started
+
+If you're unfamiliar with Maven and git the wiki provides [an easy guide to creating a development environment](https://github.com/gary-rowe/hid4java/wiki/How-to-build-the-project).
 
 The project uses the standard Maven build process and can be used without having external hardware attached. Just do the usual
 
@@ -113,6 +156,15 @@ This shouldn't occur unless you've been changing the code.
 You have probably got the `getFieldOrder` list wrong. Use the field list from Class.getFields() to get a suitable order.
 Another cause is if a `Structure` has not been initialised and is being deferenced, perhaps in a `toString()` method.
 
+#### I get a "The parameter is incorrect" when writing
+
+There is a special case on Windows for report ID `0x00` which can cause a misalignment during a hidapi `write()`.
+To compensate for this, hid4java will detect when it is running on Windows with a report ID of `0x00` and simply copy
+the `data` unmodified to the write buffer. In all other cases it will prepend the report ID to the data before submitting
+it to hidapi.
+
+If you're seeing this then it may be that your code is attempting to second guess hid4java.
+
 #### The hidapi library doesn't load
 
 On startup hid4java will search the classpath looking for a library that matches the machine OS and architecture (e.g. Windows running on AMD64). It uses the JNA naming conventions to do this and will report the expected path if it fails. You can add your own entry under `src/main/resources` and it should get picked up. Ideally you should [raise an issue](https://github.com/gary-rowe/hid4java/issues) on the hid4java repo so that the proper library can be put into the project so that others can avoid this problem.
@@ -150,6 +202,12 @@ Edit the USB udev rules `/etc/udev/rules.d` as follows:
 ```
 MODE="0666", GROUP="dialout"
 ```
+
+#### My device doesn't work on Windows
+
+Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
+cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
+
 ### Closing notes
 
 All trademarks and copyrights are acknowledged.

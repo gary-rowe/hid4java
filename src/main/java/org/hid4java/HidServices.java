@@ -53,25 +53,61 @@ public class HidServices {
   private final HidDeviceManager deviceManager;
 
   /**
-   * Initialise and start scanning for USB devices
+   * Initialise and start scanning for USB devices at 500ms interval.
    *
-   * @throws HidException If something goes wrong
+   * Will shutdown the API automatically with a JRE shutdown hook.
+   *
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
    */
   public HidServices() throws HidException {
+    this(true);
+  }
 
-    deviceManager = new HidDeviceManager(listeners, 500);
+  /**
+   * Initialise and start scanning for USB devices at 500ms interval.
+   *
+   * Optionally shutdown the API automatically with a JRE shutdown hook.
+   *
+   * @param autoShutdown True if a shutdown hook should be set to close the API automatically
+   *
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
+   */
+  public HidServices(boolean autoShutdown) throws HidException {
+    this(autoShutdown, 500);
+  }
+
+  /**
+   * Initialise and start scanning for USB devices at the given interval. Optionally shutdown the
+   * API automatically with a JRE shutdown hook.
+   *
+   * @param autoShutdown True if a shutdown hook should be set to close the API automatically
+   *
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
+   */
+  public HidServices(boolean autoShutdown, int scanInterval) throws HidException {
+    deviceManager = new HidDeviceManager(listeners, scanInterval);
     deviceManager.start();
 
     // Ensure we release resources
-    Runtime.getRuntime().addShutdownHook(new Thread() {
+    Thread shutdownHook = new Thread() {
       @Override
       public void run() {
         System.err.println("Triggered shutdown hook");
-        deviceManager.stop();
-        HidApi.exit();
+        shutdown();
       }
-    });
+    };
 
+    if (autoShutdown) {
+      Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+  }
+
+  /**
+   * Stop scanning for devices and shut down the {@link HidApi}
+   */
+  public void shutdown() {
+    deviceManager.stop();
+    HidApi.exit();
   }
 
   /**
@@ -81,6 +117,23 @@ public class HidServices {
 
     deviceManager.stop();
 
+  }
+
+  /**
+   * Start scanning for devices (if not already scanning)
+   */
+  public void start() {
+    deviceManager.start();
+  }
+
+  /**
+   * Start scanning for devices with the specified interval (if not already scanning)
+   *
+   * @param scanInterval The (new) scan interval in millis
+   */
+  public void start(int scanInterval) {
+    deviceManager.setScanInterval(scanInterval);
+    deviceManager.start();
   }
 
   /**
