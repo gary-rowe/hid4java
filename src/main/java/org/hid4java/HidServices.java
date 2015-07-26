@@ -92,7 +92,6 @@ public class HidServices {
     Thread shutdownHook = new Thread() {
       @Override
       public void run() {
-        System.err.println("Triggered shutdown hook");
         shutdown();
       }
     };
@@ -109,7 +108,7 @@ public class HidServices {
     deviceManager.stop();
     try {
       HidApi.exit();
-    } catch (NoClassDefFoundError e) {
+    } catch (Throwable e) {
       // Silently fail (user will already have been given an exception)
     }
   }

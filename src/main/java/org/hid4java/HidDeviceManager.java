@@ -81,6 +81,14 @@ class HidDeviceManager {
     this.listenerList = listenerList;
     this.scanInterval = scanInterval;
 
+    // Attempt to initialise and fail fast
+    try {
+      HidApi.init();
+    } catch (Throwable t) {
+      // Typically this is a linking issue with the native library
+      throw new HidException("Hidapi did not initialise: " + t.getMessage());
+    }
+
   }
 
   /**
@@ -219,7 +227,7 @@ class HidDeviceManager {
       // Use 0,0 to list all attached devices
       // This comes back as a linked list from hidapi
       root = HidApi.enumerateDevices(0, 0);
-    } catch (NoClassDefFoundError e) {
+    } catch (Throwable e) {
       // Could not initialise hidapi (possibly an unknown platform)
       // Prevent further scanning as a fail safe
       stop();
