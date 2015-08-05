@@ -310,7 +310,9 @@ public class HidApi {
       return res;
     }
 
-    System.arraycopy(report.buffer, 1, data, 0, res);
+    // Avoid index out of bounds exception
+    System.arraycopy(report.buffer, 1, data, 0, res > data.length ? data.length : res);
+
     return res;
 
   }
