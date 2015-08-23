@@ -4,7 +4,7 @@ Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=mas
 
 Release: Available for production work
 
-Latest release: 0.3.1
+Latest release: 0.4.0
 
 ### Summary 
 
@@ -51,7 +51,7 @@ configuration in your projects:
   <dependency>
     <groupId>org.hid4java</groupId>
     <artifactId>hid4java</artifactId>
-    <version>0.3.1</version>
+    <version>0.4.0</version>
   </dependency>
 
 </dependencies>
