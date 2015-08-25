@@ -197,11 +197,19 @@ Save and exit from root, then unplug and replug your device. The rules should ta
 sudo addgroup plugdev
 sudo addgroup yourusername plugdev
 ```
+
 ##### Slackware
 Edit the USB udev rules `/etc/udev/rules.d` as follows:
 ```
 MODE="0666", GROUP="dialout"
 ```
+
+##### ARM
+Running on ARM machines you may encounter problems due to a missing library. This is just a naming issue for the `udev` library and can be resolved using the following command (or equivalent for your system):
+```
+sudo ln -sf /lib/arm-linux-gnueabihf/libudev.so.1 /lib/arm-linux-gnueabihf/libudev.so.0
+```
+Thanks to @MaxRoma for that one!
 
 #### My device doesn't work on Windows
 
