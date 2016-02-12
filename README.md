@@ -22,28 +22,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 
 ### Maven dependency
 
-I've not gotten around to putting this into Maven Central (it's on my list) so as an interim measure please use the following
-configuration in your projects:
 ```xml
-<repositories>
-
-  <repository>
-    <id>mbhd-maven-release</id>
-    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/releases</url>
-    <releases/>
-  </repository>
-
-  <!-- Only include the snapshot repo if you're working with the latest hid4java on develop -->
-  <repository>
-    <id>mbhd-maven-snapshot</id>
-    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/snapshots</url>
-    <!-- These artifacts change frequently during development iterations -->
-    <snapshots>
-      <updatePolicy>always</updatePolicy>
-    </snapshots>
-  </repository>
-
-</repositories>
 
 <dependencies>
 
@@ -57,6 +36,7 @@ configuration in your projects:
 </dependencies>
 
 ```
+
 
 ### Code example
 
@@ -131,10 +111,43 @@ you apply a workaround (such as adding a kernel extension) then it will still fa
 little later in the process. The bottom line is that you *must* use hidapi to communicate with HID
 devices on OS X.
 
-#### Is this going into Maven Central ?
+#### Is the latest code in Maven Central ?
 
-Yes. There's a bit of general tidying work left to do to take it to a first release but when that's 
-done it will be uploaded to Maven Central. 
+Yes but not the older versions at present. If you need to use the older code for some
+reason, you'll need to add this to your project's `pom.xml`.
+```xml
+<repositories>
+
+  <repository>
+    <id>mbhd-maven-release</id>
+    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/releases</url>
+    <releases/>
+  </repository>
+
+  <!-- Only include the snapshot repo if you're working with the latest hid4java on develop -->
+  <repository>
+    <id>mbhd-maven-snapshot</id>
+    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/snapshots</url>
+    <!-- These artifacts change frequently during development iterations -->
+    <snapshots>
+      <updatePolicy>always</updatePolicy>
+    </snapshots>
+  </repository>
+
+</repositories>
+
+<dependencies>
+
+  <!-- hid4java for cross-platform HID USB -->
+  <dependency>
+    <groupId>org.hid4java</groupId>
+    <artifactId>hid4java</artifactId>
+    <version>0.4.0</version>
+  </dependency>
+
+</dependencies>
+
+```
  
 #### Can I just copy this code into my project ?
 
