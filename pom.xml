@@ -4,7 +4,7 @@
 
   <groupId>org.hid4java</groupId>
   <artifactId>hid4java</artifactId>
-  <version>0.4.1-SNAPSHOT</version>
+  <version>develop-SNAPSHOT</version>
 
   <name>hid4java</name>
   <description>A cross-platform Java Native Access (JNA) wrapper for the signal11/hidapi library</description>
