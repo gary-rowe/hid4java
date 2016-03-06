@@ -40,7 +40,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
   private static final Integer VENDOR_ID = 0x534c;
   private static final Integer PRODUCT_ID = 0x01;
   private static final int PACKET_LENGTH = 64;
-  private HidServices hidServices;
+  public static final String SERIAL_NUMBER = null;
 
   public static void main(String[] args) throws HidException {
 
@@ -54,7 +54,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     System.out.println("Loading hidapi...");
 
     // Get HID services
-    hidServices = HidManager.getHidServices();
+    HidServices hidServices = HidManager.getHidServices();
     hidServices.addHidServicesListener(this);
 
     System.out.println("Enumerating attached devices...");
@@ -65,7 +65,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     }
 
     // Open the device device by Vendor ID and Product ID with wildcard serial number
-    HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, null);
+    HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, SERIAL_NUMBER);
     if (hidDevice != null) {
       // Consider overriding dropReportIdZero on Windows
       // if you see "The parameter is incorrect"
@@ -78,10 +78,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     }
     // Stop the main thread to demonstrate attach and detach events
     sleepUninterruptibly(5, TimeUnit.SECONDS);
-
-    if (hidDevice != null && hidDevice.isOpen()) {
-      hidDevice.close();
-    }
+    hidServices.shutdown();
 
     System.exit(0);
   }
@@ -91,15 +88,11 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
     System.out.println("Device attached: " + event);
 
+    // Add serial number when more than one device with the same
+    // vendor ID and product ID will be present at the same time
     if (event.getHidDevice().getVendorId() == VENDOR_ID &&
       event.getHidDevice().getProductId() == PRODUCT_ID) {
-
-      // Open the Trezor device by Vendor ID and Product ID with wildcard serial number
-      HidDevice trezor = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, null);
-      if (trezor != null) {
-        sendMessage(trezor);
-      }
-
+      sendMessage(event.getHidDevice());
     }
 
   }
