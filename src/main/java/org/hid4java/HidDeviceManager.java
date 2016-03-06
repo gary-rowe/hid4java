@@ -86,7 +86,7 @@ class HidDeviceManager {
       HidApi.init();
     } catch (Throwable t) {
       // Typically this is a linking issue with the native library
-      throw new HidException("Hidapi did not initialise: " + t.getMessage());
+      throw new HidException("Hidapi did not initialise: " + t.getMessage(), t);
     }
 
   }
