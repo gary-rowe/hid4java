@@ -44,20 +44,20 @@ public interface HidServicesListener extends EventListener {
    *
    * @param event The event
    */
-  public void hidDeviceAttached(HidServicesEvent event);
+  void hidDeviceAttached(HidServicesEvent event);
 
   /**
    * A HID device was detached
    *
    * @param event The event
    */
-  public void hidDeviceDetached(HidServicesEvent event);
+  void hidDeviceDetached(HidServicesEvent event);
 
   /**
    * A HID failure occurred during scanning
    *
    * @param event The event
    */
-  public void hidFailure(HidServicesEvent event);
+  void hidFailure(HidServicesEvent event);
 
 }
