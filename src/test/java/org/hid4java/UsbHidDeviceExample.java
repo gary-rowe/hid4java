@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Gary Rowe
+ * Copyright (c) 2014-2016 Gary Rowe
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,7 @@
  *
  */
 
-import org.hid4java.*;
-import org.hid4java.event.HidServicesEvent;
+package org.hid4java;import org.hid4java.event.HidServicesEvent;
 
 import java.util.concurrent.TimeUnit;
 

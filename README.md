@@ -82,10 +82,11 @@ cd <project directory>
 mvn clean install
 ```
 
-and you're good to go. Your next step is to explore the examples (e.g. `UsbHidTrezorV1Example`). From the command line:
+and you're good to go. If you're in an IDE then you can use `src/test/java/org/hid4java/UsbHidTrezorV1Example`) to verify correct
+operation. From the command line:
 
 ```
-mvn clean compile exec:java -Dexec.mainClass="UsbHidTrezorV1Example"
+ mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.UsbHidDeviceExample"
 ```
 If you have a Trezor device attached you'll see a "Features" message appear as a big block of hex otherwise it will be
 just a simple enumeration of attached USB devices. You can plug various devices in and out to see messages.
@@ -165,9 +166,12 @@ The following are known issues and their solutions or workarounds.
 
 #### I get a `SIGSEGV (0xb)` when starting up
 
-This shouldn't occur unless you've been changing the code. 
+This shouldn't occur unless you've been changing the code.
+
 You have probably got the `getFieldOrder` list wrong. Use the field list from Class.getFields() to get a suitable order.
 Another cause is if a `Structure` has not been initialised and is being deferenced, perhaps in a `toString()` method.
+
+There is also the possibility that using the built-in `HidDeviceManager` code can cause problems in some applications.
 
 #### I get a "The parameter is incorrect" when writing
 
