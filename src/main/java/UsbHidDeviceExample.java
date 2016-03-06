@@ -36,14 +36,16 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  * @since 0.0.1
  *  
  */
-public class UsbHidTrezorV1Example implements HidServicesListener {
+public class UsbHidDeviceExample implements HidServicesListener {
 
-  static final int PACKET_LENGTH = 64;
+  private static final Integer VENDOR_ID = 0x534c;
+  private static final Integer PRODUCT_ID = 0x01;
+  private static final int PACKET_LENGTH = 64;
   private HidServices hidServices;
 
   public static void main(String[] args) throws HidException {
 
-    UsbHidTrezorV1Example example = new UsbHidTrezorV1Example();
+    UsbHidDeviceExample example = new UsbHidDeviceExample();
     example.executeExample();
 
   }
@@ -63,19 +65,23 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
       System.out.println(hidDevice);
     }
 
-    // Open the Trezor device by Vendor ID and Product ID with wildcard serial number
-    HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);
-    if (trezor != null) {
+    // Open the device device by Vendor ID and Product ID with wildcard serial number
+    HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, null);
+    if (hidDevice != null) {
+      // Consider overriding dropReportIdZero on Windows
+      // if you see "The parameter is incorrect"
+      // HidApi.dropReportIdZero = true;
+
       // Device is already attached so send message
-      sendInitialise(trezor);
+      sendMessage(hidDevice);
     } else {
-      System.out.println("Waiting for Trezor attach...");
+      System.out.println("Waiting for device attach...");
     }
     // Stop the main thread to demonstrate attach and detach events
     sleepUninterruptibly(5, TimeUnit.SECONDS);
 
-    if (trezor != null && trezor.isOpen()) {
-      trezor.close();
+    if (hidDevice != null && hidDevice.isOpen()) {
+      hidDevice.close();
     }
 
     System.exit(0);
@@ -86,13 +92,13 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
 
     System.out.println("Device attached: " + event);
 
-    if (event.getHidDevice().getVendorId() == 0x534c &&
-      event.getHidDevice().getProductId() == 0x01) {
+    if (event.getHidDevice().getVendorId() == VENDOR_ID &&
+      event.getHidDevice().getProductId() == PRODUCT_ID) {
 
       // Open the Trezor device by Vendor ID and Product ID with wildcard serial number
-      HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);
+      HidDevice trezor = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, null);
       if (trezor != null) {
-        sendInitialise(trezor);
+        sendMessage(trezor);
       }
 
     }
@@ -113,19 +119,19 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
 
   }
 
-  private void sendInitialise(HidDevice trezor) {
+  private void sendMessage(HidDevice hidDevice) {
 
     // Send the Initialise message
-    byte[] message = new byte[64];
-    message[0] = 0x3f;
-    message[1] = 0x23;
-    message[2] = 0x23;
+    byte[] message = new byte[PACKET_LENGTH];
+    message[0] = 0x3f; // USB: Payload 63 bytes
+    message[1] = 0x23; // Device: '#'
+    message[2] = 0x23; // Device: '#'
 
-    int val = trezor.write(message, PACKET_LENGTH, (byte) 0);
+    int val = hidDevice.write(message, PACKET_LENGTH, (byte) 0x00);
     if (val != -1) {
       System.out.println("> [" + val + "]");
     } else {
-      System.err.println(trezor.getLastErrorMessage());
+      System.err.println(hidDevice.getLastErrorMessage());
     }
 
     // Prepare to read a single data packet
@@ -133,10 +139,10 @@ public class UsbHidTrezorV1Example implements HidServicesListener {
     while (moreData) {
       byte data[] = new byte[PACKET_LENGTH];
       // This method will now block for 500ms or until data is read
-      val = trezor.read(data, 500);
+      val = hidDevice.read(data, 500);
       switch (val) {
         case -1:
-          System.err.println(trezor.getLastErrorMessage());
+          System.err.println(hidDevice.getLastErrorMessage());
           break;
         case 0:
           moreData = false;

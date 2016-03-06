@@ -147,8 +147,7 @@ public class HidDevice {
   }
 
   public int write(byte[] message, int packetLength, byte reportId) {
-    return HidApi
-      .write(hidDeviceStructure, message, packetLength, reportId);
+    return HidApi.write(hidDeviceStructure, message, packetLength, reportId);
   }
 
   public String getLastErrorMessage() {
