@@ -65,19 +65,23 @@ public class UsbHidDeviceExample implements HidServicesListener {
       System.out.println(hidDevice);
     }
 
-    // Open the Trezor device by Vendor ID and Product ID with wildcard serial number
-    HidDevice trezor = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, null);
-    if (trezor != null) {
+    // Open the device device by Vendor ID and Product ID with wildcard serial number
+    HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, null);
+    if (hidDevice != null) {
+      // Consider overriding dropReportIdZero on Windows
+      // if you see "The parameter is incorrect"
+      // HidApi.dropReportIdZero = true;
+
       // Device is already attached so send message
-      sendMessage(trezor);
+      sendMessage(hidDevice);
     } else {
-      System.out.println("Waiting for Trezor attach...");
+      System.out.println("Waiting for device attach...");
     }
     // Stop the main thread to demonstrate attach and detach events
     sleepUninterruptibly(5, TimeUnit.SECONDS);
 
-    if (trezor != null && trezor.isOpen()) {
-      trezor.close();
+    if (hidDevice != null && hidDevice.isOpen()) {
+      hidDevice.close();
     }
 
     System.exit(0);
