@@ -68,6 +68,9 @@ if (val != -1) {
 } else {
   System.err.println(trezor.getLastErrorMessage());
 }
+
+// Clean shutdown
+hidServices.shutdown();
     
 ```
  
