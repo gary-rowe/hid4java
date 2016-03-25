@@ -34,25 +34,67 @@ package org.hid4java;
  * @since 0.0.1
  *  
  */
-public class HidManager {
+public class HidManager
+{
 
-  private static final Object servicesLock = new Object();
+    private static final Object servicesLock = new Object();
 
-  private static HidServices hidServices = null;
+    private static HidServices hidServices = null;
 
-  /**
-   * @return A single instance of the HID services
-   */
-  public static HidServices getHidServices() throws HidException {
 
-    synchronized (servicesLock) {
-      if (null == hidServices) {
-        hidServices = new HidServices();
-      }
+    /**
+     * Create HidServices with scanInterval of 500 ms and autoShutdown enabled.
+     *
+     * @return A single instance of the HID services
+     */
+    public static HidServices getHidServices() throws HidException
+    {
+        return getHidServices(true, 500);
     }
 
-    return hidServices;
 
-  }
+    /**
+     *  Create HidServices with scanInterval of 500 ms and parameter for autoShutdown.
+     *
+     *  @param autoShutdown true is API should autoShutdown
+     *  @return A single instance of the HID services
+     */
+    public static HidServices getHidServices(boolean autoShutdown) throws HidException
+    {
+        return getHidServices(autoShutdown, 500);
+    }
+
+
+    /**
+     * Create HidServices with autoShutdown enabled and scanInterval parameter (0 = disabled)
+     *
+     * @param scanInterval scan interval (0 = disabled)
+     * @return A single instance of the HID services
+     */
+    public static HidServices getHidServices(int scanInterval) throws HidException
+    {
+        return getHidServices(true, scanInterval);
+    }
+
+
+    /**
+     * Create HidServices with parameters for autoShutdown and scanInterval 
+     *
+     * @param autoShutdown true is API should autoShutdown
+     * @param scanInterval scan interval (0 = disabled)
+     * @return A single instance of the HID services
+     */
+    public static HidServices getHidServices(boolean autoShutdown, int scanInterval) throws HidException
+    {
+        synchronized (servicesLock)
+        {
+            if (hidServices == null)
+            {
+                hidServices = new HidServices(autoShutdown, scanInterval);
+            }
+        }
+
+        return hidServices;
+    }
 
 }
