@@ -81,6 +81,7 @@ public class HidServices {
    * API automatically with a JRE shutdown hook.
    *
    * @param autoShutdown True if a shutdown hook should be set to close the API automatically
+   * @param scanInterval The scan interval in milliseconds (default is 500ms but use a higher value for constrained devices to reduce processing load)
    *
    * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
    */

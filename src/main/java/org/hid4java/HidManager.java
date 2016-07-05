@@ -41,13 +41,38 @@ public class HidManager {
   private static HidServices hidServices = null;
 
   /**
-   * @return A single instance of the HID services
+   * <p>Simple service provider providing generally safe defaults. If you find you are experiencing problems, particularly
+   * with constrained devices, consider using the other method.</p>
+   *
+   * @return A single instance of the HID services using default parameters (auto shutdown and 500ms scan interval)
    */
   public static HidServices getHidServices() throws HidException {
 
     synchronized (servicesLock) {
       if (null == hidServices) {
         hidServices = new HidServices();
+      }
+    }
+
+    return hidServices;
+
+  }
+
+  /**
+   * <p>Fully configurable service provider</p>
+   *
+   * @param autoShutdown True if a shutdown hook should be set to close the API automatically (recommended)
+   * @param scanInterval The scan interval in milliseconds (default is 500ms but use a higher value for constrained devices to reduce processing load)
+   *
+   * @return A single instance of the HID services using tuned parameters
+   *
+   * @since 0.5.0
+   */
+  public static HidServices getHidServices(boolean autoShutdown, int scanInterval) throws HidException {
+
+    synchronized (servicesLock) {
+      if (null == hidServices) {
+        hidServices = new HidServices(autoShutdown, scanInterval);
       }
     }
 

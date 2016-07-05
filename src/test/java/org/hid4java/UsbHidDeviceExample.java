@@ -54,7 +54,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     System.out.println("Loading hidapi...");
 
     // Get HID services
-    HidServices hidServices = HidManager.getHidServices();
+    HidServices hidServices = HidManager.getHidServices(true, 1000);
     hidServices.addHidServicesListener(this);
 
     System.out.println("Enumerating attached devices...");
