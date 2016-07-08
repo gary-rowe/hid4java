@@ -41,6 +41,7 @@ import org.hid4java.jna.HidDeviceStructure;
  */
 public class HidDevice {
 
+  private final HidDeviceManager hidDeviceManager;
   private HidDeviceStructure hidDeviceStructure;
 
   private String path;
@@ -56,8 +57,11 @@ public class HidDevice {
 
   /**
    * @param infoStructure The HID device info structure providing details
+   * @param hidDeviceManager The HID device manager providing access to device enumeration for post IO scanning
    */
-  public HidDevice(HidDeviceInfoStructure infoStructure) {
+  public HidDevice(HidDeviceInfoStructure infoStructure, HidDeviceManager hidDeviceManager) {
+
+    this.hidDeviceManager = hidDeviceManager;
 
     this.hidDeviceStructure = null;
 
@@ -131,32 +135,20 @@ public class HidDevice {
     return interfaceNumber;
   }
 
-  @Override
-  public String toString() {
-    return "HidDevice [path=" + path
-      + ", vendorId=0x" + Integer.toHexString(vendorId)
-      + ", productId=0x" + Integer.toHexString(productId)
-      + ", serialNumber=" + serialNumber
-      + ", releaseNumber=0x" + Integer.toHexString(releaseNumber)
-      + ", manufacturer=" + manufacturer
-      + ", product=" + product
-      + ", usagePage=0x" + Integer.toHexString(usagePage)
-      + ", usage=0x" + Integer.toHexString(usage)
-      + ", interfaceNumber=" + interfaceNumber
-      + "]";
-  }
-
-  public int write(byte[] message, int packetLength, byte reportId) {
-    return HidApi.write(hidDeviceStructure, message, packetLength, reportId);
-  }
-
-  public String getLastErrorMessage() {
-    return HidApi.getLastErrorMessage(hidDeviceStructure);
-  }
-
+  /**
+   * <p>Open this device and obtain a device structure</p>
+   * @return True if the device was successfully opened
+   */
   public boolean open() {
     hidDeviceStructure = HidApi.open(path);
-    return (hidDeviceStructure != null);
+    return hidDeviceStructure != null;
+  }
+
+  /**
+   * @return True if the device structure is present
+   */
+  public boolean isOpen() {
+    return hidDeviceStructure != null;
   }
 
   /**
@@ -165,6 +157,9 @@ public class HidDevice {
    * </p>
    */
   public void close() {
+    if (!isOpen()) {
+      return;
+    }
     HidApi.close(hidDeviceStructure);
     hidDeviceStructure = null;
   }
@@ -187,6 +182,9 @@ public class HidDevice {
    * @param nonBlocking True if non-blocking mode is required
    */
   public void setNonBlocking(boolean nonBlocking) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     HidApi.setNonBlocking(hidDeviceStructure, nonBlocking);
   }
 
@@ -207,6 +205,9 @@ public class HidDevice {
    * function returns 0.
    */
   public int read(byte[] data) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     return HidApi.read(hidDeviceStructure, data);
   }
 
@@ -222,7 +223,9 @@ public class HidDevice {
    * available to be read within the timeout period returns 0.
    */
   public int read(byte[] bytes, int timeoutMillis) {
-
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     return HidApi.read(hidDeviceStructure, bytes, timeoutMillis);
 
   }
@@ -247,6 +250,9 @@ public class HidDevice {
    * been removed from the first byte), or -1 on error.
    */
   public int getFeatureReport(byte[] data, byte reportId) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     return HidApi.getFeatureReport(hidDeviceStructure, data, reportId);
   }
 
@@ -282,6 +288,9 @@ public class HidDevice {
    * on error.
    */
   public int sendFeatureReport(byte[] data, byte reportId) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     return HidApi.sendFeatureReport(hidDeviceStructure, data, reportId);
   }
 
@@ -298,10 +307,24 @@ public class HidDevice {
     return HidApi.getIndexedString(hidDeviceStructure, index);
   }
 
-  public boolean isOpen() {
-    return hidDeviceStructure != null;
+  public int write(byte[] message, int packetLength, byte reportId) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
+    return HidApi.write(hidDeviceStructure, message, packetLength, reportId);
   }
 
+  public String getLastErrorMessage() {
+    return HidApi.getLastErrorMessage(hidDeviceStructure);
+  }
+
+  /**
+   * @param vendorId     The vendor ID
+   * @param productId    The product ID
+   * @param serialNumber The serial number
+   *
+   * @return True if the device matches the given the combination
+   */
   public boolean isVidPidSerial(int vendorId, int productId, String serialNumber) {
     return (vendorId == 0 || this.vendorId == vendorId)
       && (productId == 0 || this.productId == productId)
@@ -315,13 +338,28 @@ public class HidDevice {
 
     HidDevice hidDevice = (HidDevice) o;
 
-    if (!path.equals(hidDevice.path)) return false;
+    return path.equals(hidDevice.path);
 
-    return true;
   }
 
   @Override
   public int hashCode() {
     return path.hashCode();
   }
+
+  @Override
+  public String toString() {
+    return "HidDevice [path=" + path
+      + ", vendorId=0x" + Integer.toHexString(vendorId)
+      + ", productId=0x" + Integer.toHexString(productId)
+      + ", serialNumber=" + serialNumber
+      + ", releaseNumber=0x" + Integer.toHexString(releaseNumber)
+      + ", manufacturer=" + manufacturer
+      + ", product=" + product
+      + ", usagePage=0x" + Integer.toHexString(usagePage)
+      + ", usage=0x" + Integer.toHexString(usage)
+      + ", interfaceNumber=" + interfaceNumber
+      + "]";
+  }
+
 }
