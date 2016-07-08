@@ -29,11 +29,7 @@ import org.hid4java.event.HidServicesListenerList;
 import org.hid4java.jna.HidApi;
 import org.hid4java.jna.HidDeviceInfoStructure;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Manager to provide the following to HID services:</p>
@@ -48,9 +44,9 @@ import java.util.Map;
 class HidDeviceManager {
 
   /**
-   * The scan interval in milliseconds
+   * The HID services specification providing configuration parameters
    */
-  private int scanInterval = 500;
+  private final HidServicesSpecification hidServicesSpecification;
 
   /**
    * The currently attached devices keyed on ID
@@ -61,25 +57,27 @@ class HidDeviceManager {
    * HID services listener list
    */
   private final HidServicesListenerList listenerList;
-  private Thread scanThread = null;
 
   /**
-   * Indicates whether or not the {@link #scanThread} is running
+   * The device enumeration thread
+   *
+   * We use a Thread instead of Executor since it may be stopped/paused/restarted frequently
+   * and executors are more heavyweight in this regard
    */
-  private boolean scanning = false;
+  private Thread scanThread = null;
 
   /**
    * Constructs a new device manager
    *
-   * @param listenerList The HID services providing access to the event model
-   * @param scanInterval The scan interval in milliseconds (default is 500ms)
+   * @param listenerList             The HID services providing access to the event model
+   * @param hidServicesSpecification Provides various parameters for configuring HID services
    *
    * @throws HidException If USB HID initialization fails
    */
-  HidDeviceManager(HidServicesListenerList listenerList, final int scanInterval) throws HidException {
+  HidDeviceManager(HidServicesListenerList listenerList, HidServicesSpecification hidServicesSpecification) throws HidException {
 
     this.listenerList = listenerList;
-    this.scanInterval = scanInterval;
+    this.hidServicesSpecification = hidServicesSpecification;
 
     // Attempt to initialise and fail fast
     try {
@@ -111,42 +109,17 @@ class HidDeviceManager {
     // Perform a one-off scan to populate attached devices
     scan();
 
-    // Do not start the scan thread when interval is set to 0
-    final int scanInterval = this.scanInterval;
-    if (scanInterval == 0) {
-      return;
-    }
+    // Ensure we have a scan thread available
+    configureScanThread(getScanRunnable());
 
-    // Create a daemon thread to ensure lifecycle
-    scanThread = new Thread(
-      new Runnable() {
-        @Override
-        public void run() {
-          scanning = true;
-          while (true) {
-            try {
-              Thread.sleep(scanInterval);
-            } catch (final InterruptedException e) {
-              Thread.currentThread().interrupt();
-              break;
-            }
-            scan();
-          }
-          // Allow restart
-          scanning = false;
-        }
-      });
-    scanThread.setDaemon(true);
-    scanThread.setName("hid4java Device Scanner");
-    scanThread.start();
   }
 
   /**
-   * Stop the scanning thread if it is running
+   * Stop the scan executor and block until terminated (max 5 seconds)
    */
   public synchronized void stop() {
 
-    if (scanThread != null) {
+    if (isScanning()) {
       scanThread.interrupt();
     }
 
@@ -154,7 +127,9 @@ class HidDeviceManager {
 
   /**
    * Updates the device list by adding newly connected devices to it and by
-   * removing no longer connected devices
+   * removing no longer connected devices.
+   *
+   * Will fire attach/detach events as appropriate.
    */
   public synchronized void scan() {
 
@@ -173,7 +148,6 @@ class HidDeviceManager {
         listenerList.fireHidDeviceAttached(attachedDevice);
 
       }
-
     }
 
     for (Map.Entry<String, HidDevice> entry : attachedDevices.entrySet()) {
@@ -190,7 +164,6 @@ class HidDeviceManager {
         listenerList.fireHidDeviceDetached(this.attachedDevices.get(deviceId));
 
       }
-
     }
 
     if (!removeList.isEmpty()) {
@@ -201,19 +174,11 @@ class HidDeviceManager {
   }
 
   /**
-   * @param scanInterval The scan thread's interval in millis (requires restart of thread)
-   */
-  public void setScanInterval(int scanInterval) {
-    this.scanInterval = scanInterval;
-  }
-
-  /**
    * @return True if the scan thread is running, false otherwise.
    */
   public boolean isScanning() {
-    return scanning;
+    return scanThread != null && scanThread.isAlive();
   }
-
 
   /**
    * @return A list of all attached HID devices
@@ -240,7 +205,7 @@ class HidDeviceManager {
       HidDeviceInfoStructure hidDeviceInfoStructure = root;
       do {
         // Wrap in HidDevice
-        hidDeviceList.add(new HidDevice(hidDeviceInfoStructure));
+        hidDeviceList.add(new HidDevice(hidDeviceInfoStructure, this));
         // Move to the next in the linked list
         hidDeviceInfoStructure = hidDeviceInfoStructure.next();
       } while (hidDeviceInfoStructure != null);
@@ -251,4 +216,95 @@ class HidDeviceManager {
 
     return hidDeviceList;
   }
+
+  /**
+   * Indicate that a device write has occurred which may require a change in scanning frequency
+   */
+  public void afterDeviceWrite() {
+
+    if (ScanMode.SCAN_AT_FIXED_INTERVAL_WITH_PAUSE_AFTER_WRITE == hidServicesSpecification.getScanMode() && isScanning()) {
+      stop();
+      // Ensure we have a new scan executor service available
+      configureScanThread(getScanRunnable());
+
+    }
+
+  }
+
+  /**
+   * Configures the scan executor service to allow recovery from stop or pause
+   */
+  private synchronized void configureScanThread(Runnable scanRunnable) {
+
+    if (isScanning()) {
+      stop();
+    }
+
+    // Require a new one
+    scanThread = new Thread(scanRunnable);
+    scanThread.setDaemon(true);
+    scanThread.setName("hid4java Device Scanner");
+    scanThread.start();
+
+  }
+
+  private synchronized Runnable getScanRunnable() {
+
+    final int scanInterval = hidServicesSpecification.getScanInterval();
+    final int pauseInterval = hidServicesSpecification.getPauseInterval();
+
+    switch (hidServicesSpecification.getScanMode()) {
+      case NO_SCAN:
+        return new Runnable() {
+          @Override
+          public void run() {
+            // Do nothing
+          }
+        };
+      case SCAN_AT_FIXED_INTERVAL:
+        return new Runnable() {
+          @Override
+          public void run() {
+
+            while (true) {
+              try {
+                Thread.sleep(scanInterval);
+              } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+              }
+              scan();
+            }
+          }
+        };
+      case SCAN_AT_FIXED_INTERVAL_WITH_PAUSE_AFTER_WRITE:
+        return new Runnable() {
+          @Override
+          public void run() {
+            // Provide an initial pause
+            try {
+              Thread.sleep(pauseInterval);
+            } catch (final InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+
+            // Switch to continuous running
+            while (true) {
+              try {
+                Thread.sleep(scanInterval);
+              } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+              }
+              scan();
+            }
+          }
+        };
+      default:
+        return null;
+    }
+
+
+  }
+
 }

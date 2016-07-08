@@ -51,11 +51,20 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
   public void executeExample() throws HidException {
 
-    System.out.println("Loading hidapi...");
+    // Configure to use custom specification
+    HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
+    hidServicesSpecification.setAutoShutdown(true);
+    hidServicesSpecification.setScanInterval(500);
+    hidServicesSpecification.setPauseInterval(5000);
+    hidServicesSpecification.setScanMode(ScanMode.SCAN_AT_FIXED_INTERVAL_WITH_PAUSE_AFTER_WRITE);
 
-    // Get HID services
-    HidServices hidServices = HidManager.getHidServices(true, 1000);
+    // Get HID services using custom specification
+    HidServices hidServices = HidManager.getHidServices(hidServicesSpecification);
     hidServices.addHidServicesListener(this);
+
+    // Start the services
+    System.out.println("Starting HID services.");
+    hidServices.start();
 
     System.out.println("Enumerating attached devices...");
 
@@ -71,16 +80,18 @@ public class UsbHidDeviceExample implements HidServicesListener {
       // if you see "The parameter is incorrect"
       // HidApi.dropReportIdZero = true;
 
-      // Device is already attached so send message
+      // Device is already attached and successfully opened so send message
       sendMessage(hidDevice);
-    } else {
-      System.out.println("Waiting for device attach...");
     }
+
+    System.out.printf("Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n");
+
     // Stop the main thread to demonstrate attach and detach events
-    sleepUninterruptibly(5, TimeUnit.SECONDS);
+    sleepUninterruptibly(30, TimeUnit.SECONDS);
+
+    // Shut down and rely on auto-shutdown hook to clear HidApi resources
     hidServices.shutdown();
 
-    System.exit(0);
   }
 
   @Override
@@ -90,8 +101,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
     // Add serial number when more than one device with the same
     // vendor ID and product ID will be present at the same time
-    if (event.getHidDevice().getVendorId() == VENDOR_ID &&
-      event.getHidDevice().getProductId() == PRODUCT_ID) {
+    if (event.getHidDevice().isVidPidSerial(VENDOR_ID, PRODUCT_ID, null)) {
       sendMessage(event.getHidDevice());
     }
 
@@ -113,6 +123,11 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
   private void sendMessage(HidDevice hidDevice) {
 
+    // Ensure device is open after an attach/detach event
+    if (!hidDevice.isOpen()) {
+      hidDevice.open();
+    }
+
     // Send the Initialise message
     byte[] message = new byte[PACKET_LENGTH];
     message[0] = 0x3f; // USB: Payload 63 bytes
@@ -120,7 +135,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     message[2] = 0x23; // Device: '#'
 
     int val = hidDevice.write(message, PACKET_LENGTH, (byte) 0x00);
-    if (val != -1) {
+    if (val >= 0) {
       System.out.println("> [" + val + "]");
     } else {
       System.err.println(hidDevice.getLastErrorMessage());

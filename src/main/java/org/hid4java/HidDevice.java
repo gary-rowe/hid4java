@@ -311,7 +311,10 @@ public class HidDevice {
     if (!isOpen()) {
       throw new IllegalStateException("Device has not been opened");
     }
-    return HidApi.write(hidDeviceStructure, message, packetLength, reportId);
+    int result = HidApi.write(hidDeviceStructure, message, packetLength, reportId);
+    // Update HID manager
+    hidDeviceManager.afterDeviceWrite();
+    return result;
   }
 
   public String getLastErrorMessage() {

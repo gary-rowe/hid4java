@@ -43,70 +43,51 @@ import java.util.List;
 public class HidServices {
 
   /**
-   * The HID services listeners
+   * The HID services listeners for receiving attach/detach events etc
    */
   private final HidServicesListenerList listeners = new HidServicesListenerList();
 
   /**
-   * The HID device scanner
+   * The HID device manager handles scanning operations
    */
-  private final HidDeviceManager deviceManager;
+  private final HidDeviceManager hidDeviceManager;
 
   /**
-   * Initialise and start scanning for USB devices at 500ms interval.
+   * Initialise with a default HID specification
    *
-   * Will shutdown the API automatically with a JRE shutdown hook.
-   *
-   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, HidServicesSpecification)}
    */
   public HidServices() throws HidException {
-    this(true);
+    this(new HidServicesSpecification());
   }
 
   /**
-   * Initialise and start scanning for USB devices at 500ms interval.
+   * @param hidServicesSpecification Provides various parameters for configuring HID services
    *
-   * Optionally shutdown the API automatically with a JRE shutdown hook.
-   *
-   * @param autoShutdown True if a shutdown hook should be set to close the API automatically
-   *
-   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
+   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, HidServicesSpecification)}
    */
-  public HidServices(boolean autoShutdown) throws HidException {
-    this(autoShutdown, 500);
-  }
+  public HidServices(HidServicesSpecification hidServicesSpecification) {
+    hidDeviceManager = new HidDeviceManager(listeners, hidServicesSpecification);
+    hidDeviceManager.start();
 
-  /**
-   * Initialise and start scanning for USB devices at the given interval. Optionally shutdown the
-   * API automatically with a JRE shutdown hook.
-   *
-   * @param autoShutdown True if a shutdown hook should be set to close the API automatically
-   * @param scanInterval The scan interval in milliseconds (default is 500ms but use a higher value for constrained devices to reduce processing load)
-   *
-   * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, int)}
-   */
-  public HidServices(boolean autoShutdown, int scanInterval) throws HidException {
-    deviceManager = new HidDeviceManager(listeners, scanInterval);
-    deviceManager.start();
-
-    // Ensure we release resources
-    Thread shutdownHook = new Thread() {
-      @Override
-      public void run() {
-        shutdown();
-      }
-    };
-
-    if (autoShutdown) {
-      Runtime.getRuntime().addShutdownHook(shutdownHook);
+    if (hidServicesSpecification.isAutoShutdown()) {
+      // Ensure we release resources during shutdown
+      Runtime.getRuntime().addShutdownHook(
+        new Thread() {
+          @Override
+          public void run() {
+            shutdown();
+          }
+        });
     }
+
   }
 
   /**
    * Stop scanning for devices and shut down the {@link HidApi}
    */
   public void shutdown() {
-    deviceManager.stop();
+    stop();
     try {
       HidApi.exit();
     } catch (Throwable e) {
@@ -115,29 +96,17 @@ public class HidServices {
   }
 
   /**
-   * Stop scanning for devices and close connection to HidApi
+   * Stop scanning for devices
    */
   public void stop() {
-
-    deviceManager.stop();
-
+    hidDeviceManager.stop();
   }
 
   /**
    * Start scanning for devices (if not already scanning)
    */
   public void start() {
-    deviceManager.start();
-  }
-
-  /**
-   * Start scanning for devices with the specified interval (if not already scanning)
-   *
-   * @param scanInterval The (new) scan interval in millis
-   */
-  public void start(int scanInterval) {
-    deviceManager.setScanInterval(scanInterval);
-    deviceManager.start();
+    hidDeviceManager.start();
   }
 
   /**
@@ -158,14 +127,14 @@ public class HidServices {
    * Manually scans for HID device connection changes and triggers listener events as required
    */
   public void scan() {
-    this.deviceManager.scan();
+    this.hidDeviceManager.scan();
   }
 
   /**
    * @return A list of all attached HID devices
    */
   public List<HidDevice> getAttachedHidDevices() {
-    return deviceManager.getAttachedHidDevices();
+    return hidDeviceManager.getAttachedHidDevices();
   }
 
   /**
@@ -177,7 +146,7 @@ public class HidServices {
    */
   public HidDevice getHidDevice(int vendorId, int productId, String serialNumber) {
 
-    List<HidDevice> devices = deviceManager.getAttachedHidDevices();
+    List<HidDevice> devices = hidDeviceManager.getAttachedHidDevices();
     for (HidDevice device : devices) {
       if (device.isVidPidSerial(vendorId, productId, serialNumber)) {
         if (device.open()) {
