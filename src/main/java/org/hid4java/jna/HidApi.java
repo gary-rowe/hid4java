@@ -25,7 +25,6 @@
 
 package org.hid4java.jna;
 
-import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
@@ -71,23 +70,6 @@ public class HidApi {
    * <p>See https://github.com/gary-rowe/hid4java/issues/36 for more information.</p>
    */
   public static boolean dropReportIdZero = false;
-
-  static {
-
-    // Determine a suitable starting value for the drop report ID flag
-    // so that downstream code can expect the same behaviour as in earlier
-    // versions by default, with a bug fix for Windows 7
-    if (Platform.isWindows()) {
-      // Report ID 0x00 problems have been seen on Windows 8, 10 only so far
-      String osVersion = System.getProperty("os.version");
-      if ("6.2".equals(osVersion) ||
-          "6.3".equals(osVersion)) {
-        // Windows 8, 10
-        dropReportIdZero = true;
-      }
-    }
-
-  }
 
   /**
    * <p>Open a HID device using a Vendor ID (VID), Product ID (PID) and optionally a serial number</p>
@@ -422,23 +404,11 @@ public class HidApi {
 
     final WideStringBuffer report;
 
-    if (dropReportIdZero && reportId == 0) {
-      // Use the alternative buffer representation that does
-      // not include report ID 0x00
-      // This overcomes "The parameter is incorrect" errors on
-      // Windows 8 and 10
-      // See the commentary on the dropReportIdZero flag for more info
-      report = new WideStringBuffer(len);
-      if (len > 1) {
-        System.arraycopy(data, 0, report.buffer, 0, len);
-      }
-    } else {
-      // Put report ID into position 0 and fill out buffer
-      report = new WideStringBuffer(len + 1);
-      report.buffer[0] = reportId;
-      if (len > 1) {
-        System.arraycopy(data, 0, report.buffer, 1, len);
-      }
+    // Put report ID into position 0 and fill out buffer
+    report = new WideStringBuffer(len + 1);
+    report.buffer[0] = reportId;
+    if (len > 1) {
+      System.arraycopy(data, 0, report.buffer, 1, len);
     }
     return hidApiLibrary.hid_write(device.ptr(), report, report.buffer.length);
 
