@@ -133,6 +133,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     message[0] = 0x3f; // USB: Payload 63 bytes
     message[1] = 0x23; // Device: '#'
     message[2] = 0x23; // Device: '#'
+    message[3] = 0x00; // INITIALISE
 
     int val = hidDevice.write(message, PACKET_LENGTH, (byte) 0x00);
     if (val >= 0) {
