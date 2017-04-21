@@ -5,6 +5,7 @@ Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=mas
 Release: Available for production work
 
 Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java)
+[![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
 
 ### Summary 
 
