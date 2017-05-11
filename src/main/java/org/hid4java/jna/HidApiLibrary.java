@@ -25,6 +25,10 @@
 
 package org.hid4java.jna;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
 /**
  * <p>[Pattern] to provide the following to {@link Object}:</p>
  * <ul>
@@ -49,7 +53,49 @@ import com.sun.jna.WString;
  */
 public interface HidApiLibrary extends Library {
 
-  HidApiLibrary INSTANCE = (HidApiLibrary) Native.loadLibrary("hidapi", HidApiLibrary.class);
+	HidApiLibrary INSTANCE = (HidApiLibrary) Loader.loadLibrary();
+	
+	static class Loader {		
+		public static Object loadLibrary() {
+			String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+			String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+			String bit = arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? "64" : "32";
+			
+			String osName = System.getProperty("os.name").toLowerCase();
+			String pathInJar = null;
+			if(osName.contains("windows")) {
+				pathInJar = "/native/win/" + bit + "/hidapi.dll";
+			} else if(osName.contains("mac os")) {
+				pathInJar = "/native/mac/" + bit + "/hidapi.jnilib";
+			} else {
+				pathInJar = "/native/linux/" + bit + "/hidapi.so";
+			}
+			
+			InputStream in = Loader.class.getResourceAsStream(pathInJar);
+		    byte[] buffer = new byte[1024];
+		    int read = -1;
+			try {
+				File temp = new File(System.getProperty("java.io.tmpdir"), pathInJar.substring(pathInJar.lastIndexOf('/')));
+			    if(!temp.exists()) {
+					FileOutputStream fos = new FileOutputStream(temp);
+				    while((read = in.read(buffer)) != -1) {
+				        fos.write(buffer, 0, read);
+				    }
+				    fos.close();
+				    in.close();
+			    }
+			    
+			    //System.out.println("Library extracted from "+ pathInJar +" to " + temp.getAbsolutePath());
+			    
+			    System.setProperty("jna.library.path", System.getProperty("java.io.tmpdir"));
+			    
+				return Native.loadLibrary("hidapi", HidApiLibrary.class);
+			} catch(Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
 
   /**
    * <p>Initialize the HIDAPI library.</p>
