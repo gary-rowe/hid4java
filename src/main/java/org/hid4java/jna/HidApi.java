@@ -429,14 +429,14 @@ public class HidApi {
       // Windows 8 and 10
       // See the commentary on the dropReportIdZero flag for more info
       report = new WideStringBuffer(len);
-      if (len > 1) {
+      if (len >= 1) {
         System.arraycopy(data, 0, report.buffer, 0, len);
       }
     } else {
       // Put report ID into position 0 and fill out buffer
       report = new WideStringBuffer(len + 1);
       report.buffer[0] = reportId;
-      if (len > 1) {
+      if (len >= 1) {
         System.arraycopy(data, 0, report.buffer, 1, len);
       }
     }
