@@ -31,7 +31,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
   <dependency>
     <groupId>org.hid4java</groupId>
     <artifactId>hid4java</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
   </dependency>
 
 </dependencies>
@@ -41,7 +41,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 
 ### Code example
 
-Taken from [UsbHidTrezorV1Example](https://github.com/gary-rowe/hid4java/blob/develop/src/main/java/UsbHidTrezorV1Example.java) which
+Taken from [UsbHidTrezorV1Example](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/UsbHidDeviceExample.java) which
 provides more details. See later for how to run it from the command line.
 
 ```java
