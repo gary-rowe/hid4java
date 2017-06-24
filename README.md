@@ -147,7 +147,7 @@ reason, you'll need to add this to your project's `pom.xml`.
   <dependency>
     <groupId>org.hid4java</groupId>
     <artifactId>hid4java</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
   </dependency>
 
 </dependencies>
