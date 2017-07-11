@@ -329,9 +329,13 @@ public class HidDevice {
    * @return True if the device matches the given the combination
    */
   public boolean isVidPidSerial(int vendorId, int productId, String serialNumber) {
-    return (vendorId == 0 || this.vendorId == vendorId)
+    if(serialNumber == null)
+      return (vendorId == 0 || this.vendorId == vendorId)
+        && (productId == 0 || this.productId == productId);
+    else
+       return (vendorId == 0 || this.vendorId == vendorId)
       && (productId == 0 || this.productId == productId)
-      && (serialNumber == null || this.serialNumber.equals(serialNumber));
+      && ( this.serialNumber.equals(serialNumber));
   }
 
   @Override
