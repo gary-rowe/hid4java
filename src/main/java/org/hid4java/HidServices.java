@@ -149,11 +149,8 @@ public class HidServices {
     List<HidDevice> devices = hidDeviceManager.getAttachedHidDevices();
     for (HidDevice device : devices) {
       if (device.isVidPidSerial(vendorId, productId, serialNumber)) {
-        if (device.open()) {
-          return device;
-        } else {
-          return null;
-        }
+        device.open();
+        return device; 
       }
     }
 
