@@ -210,7 +210,78 @@ public class HidDevice {
     }
     return HidApi.read(hidDeviceStructure, data);
   }
-
+  
+  /**
+   * <p>
+   * Read an Input report from a HID device
+   * </p>
+   * <p>
+   * Input reports are returned to the host through the INTERRUPT IN endpoint.
+   * The first byte will contain the Report number if the device uses numbered
+   * reports
+   * </p>
+   *
+   * @param amountToRead the number of bytes to read
+   * @param timeoutMillis The number of milliseconds to wait before giving up
+   *
+   * @return a Byte array of the read data
+   */
+  public Byte [] read(int amountToRead, int timeoutMillis) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
+    
+    byte[] bytes=  new byte[amountToRead];
+	int read = HidApi.read(hidDeviceStructure, bytes, timeoutMillis);
+    Byte [] retData = new Byte[read];
+    for(int i=0;i<read;i++){
+    	retData[i] = new Byte(bytes[i]);
+    }
+    return retData;
+  }
+  /**
+   * <p>
+   * Read an Input report from a HID device
+   * </p>
+   * <p>
+   * Input reports are returned to the host through the INTERRUPT IN endpoint.
+   * The first byte will contain the Report number if the device uses numbered
+   * reports
+   * </p>
+   *
+   * @param amountToRead the number of bytes to read
+   *
+   * @return a Byte array of the read data
+   */
+  public Byte [] read(int amountToRead) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
+    
+    byte[] bytes=  new byte[amountToRead];
+	int read = HidApi.read(hidDeviceStructure, bytes);
+    Byte [] retData = new Byte[read];
+    for(int i=0;i<read;i++){
+    	retData[i] = new Byte(bytes[i]);
+    }
+    return retData;
+  }
+  /**
+   * <p>
+   * Read an Input report from a HID device
+   * </p>
+   * <p>
+   * Input reports are returned to the host through the INTERRUPT IN endpoint.
+   * The first byte will contain the Report number if the device uses numbered
+   * reports
+   * </p>
+   *
+   *
+   * @return a Byte array of the read data
+   */
+  public Byte [] read() {
+	  return read(64, 1000);
+  }
   /**
    * <p>
    * Read an Input report from a HID device with timeout
