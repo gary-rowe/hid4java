@@ -53,18 +53,11 @@ if [[ "$BRANCH" =~ ^issue.* ]]; then
       exit -1
     fi
 
-    if grep -s -q ":issue-" "./docker-compose.yml"; then
-      echo -e "\033[31mFailed\033[0m - The docker-compose.yml contains ':issue-' implying an issue dependency which is not allowed in the develop branch.\n"
+    if grep -s -q ":issue-" "./pom.xml"; then
+      echo -e "\033[31mFailed\033[0m - The pom.xml contains ':issue-' implying an issue dependency which is not allowed in the develop branch.\n"
       exit -1
     else
-      echo -e "\033[32mOK\033[0m - No 'issue' dependencies in './docker-compose.yml'"
-    fi
-
-    if grep -s -q ":issue-" "./gradle.build"; then
-      echo -e "\033[31mFailed\033[0m - The gradle.build contains ':issue-' implying an issue dependency which is not allowed in the develop branch.\n"
-      exit -1
-    else
-      echo -e "\033[32mOK\033[0m - No 'issue' dependencies in './gradle.build'"
+      echo -e "\033[32mOK\033[0m - No 'issue' dependencies in './pom.xml'"
     fi
 
     # Force user to be sure about releasing

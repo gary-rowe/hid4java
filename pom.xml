@@ -7,24 +7,15 @@
   <version>develop-SNAPSHOT</version>
 
   <name>hid4java</name>
-  <description>A cross-platform Java Native Access (JNA) wrapper for the signal11/hidapi library</description>
+  <description>A cross-platform Java Native Access (JNA) wrapper for the libusb/hidapi library</description>
 
   <url>http://github.com/gary-rowe/hid4java</url>
   <inceptionYear>2014</inceptionYear>
 
-  <organization>
-    <name>Bitcoin Solutions Ltd</name>
-    <url>http://bitcoin-solutions.co.uk</url>
-  </organization>
-
   <developers>
     <developer>
       <name>Gary Rowe</name>
-      <email>gary.rowe@bitcoin-solutions.co.uk</email>
-    </developer>
-    <developer>
-      <name>Jim Burton</name>
-      <email>jim.burton@bitcoin-solutions.co.uk</email>
+      <email>gary.rowe@froot.co.uk</email>
     </developer>
   </developers>
 
@@ -153,6 +144,21 @@
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
       </plugin>
+
+      <!-- Generates a META/MANIFEST.MF file to assist programmatic library version (see #69)-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 

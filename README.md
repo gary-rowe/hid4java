@@ -198,6 +198,16 @@ mv libhidapi-0.dll ~/src/hid4java/src/main/resources/win32-x86/hidapi.dll
 Some of the older versions of the `hidapi` native libraries have been removed in version 0.6.0, so if you have a particular requirement and can demonstrate a good case to
  include it in the standard build, please raise an issue to get it looked at.
 
+#### How can I know the version of this library programmatically?
+
+The `HidServices` entry class provides a method `getVersion` which reads the version from the JAR manifest file. You can test it as follows:
+
+```bash
+mvn clean package
+java -cp target/hid4java-develop-SNAPSHOT.jar org.hid4java.HidServices
+```
+The version will reflect what is in the `pom.zml` so will only be a numeric triplet on the `master` branch.
+
 ### Troubleshooting
 
 The following are known issues and their solutions or workarounds.
