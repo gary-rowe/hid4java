@@ -9,7 +9,7 @@ Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-centr
 
 ### Summary 
 
-The hid4java project supports USB HID devices through a common API which is provided here under the MIT license.
+The `hid4java` project supports USB HID devices through a common API which is provided here under the MIT license.
 The API is very simple but provides great flexibility such as support for feature reports and blocking reads with
 timeouts. Attach/detach events are provided to allow applications to respond instantly to device availability.
 
@@ -17,7 +17,8 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 
 ### Technologies
 
-* [hidapi](https://github.com/signal11/hidapi) - Native USB HID library for multiple platforms
+* [hidapi](https://github.com/libusb/hidapi) - Native USB HID library for multiple platforms
+* [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
 * Java 6+ - to remove dependencies on JVMs that have reached end of life
 
@@ -31,7 +32,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
   <dependency>
     <groupId>org.hid4java</groupId>
     <artifactId>hid4java</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
   </dependency>
 
 </dependencies>
@@ -90,7 +91,7 @@ and you're good to go. If you're in an IDE then you can use `src/test/java/org/h
 operation. From the command line:
 
 ```
- mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.UsbHidDeviceExample"
+mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.UsbHidDeviceExample"
 ```
 If you have a Trezor device attached you'll see a "Features" message appear as a big block of hex otherwise it will be
 just a simple enumeration of attached USB devices. You can plug various devices in and out to see messages.
@@ -99,14 +100,14 @@ Use CTRL+C to quit the example.
 
 ### Frequently asked questions (FAQ)
 
-#### What platforms do you support ?
+#### What platforms do you support?
 
 If you have a native version of `hidapi` for your platform then you'll be able to support it. 
 
 Pre-compiled versions for Windows (32/64), OS X (10.5+) and Linux (32/64) are provided and you
 must follow the JNA naming convention when adding new libraries.
 
-#### Why not just use usb4java ?
+#### Why not just use usb4java?
 
 The [usb4java](http://usb4java.org/) project, while superb, does not support HID devices on OS X 
 and apparently there are no plans to introduce HID support anytime soon.
@@ -116,7 +117,7 @@ you apply a workaround (such as adding a kernel extension) then it will still fa
 little later in the process. The bottom line is that you *must* use hidapi to communicate with HID
 devices on OS X.
 
-#### Is the latest code in Maven Central ?
+#### Is the latest code in Maven Central?
 
 Yes but not the older versions at present. If you need to use the older code for some
 reason, you'll need to add this to your project's `pom.xml`.
@@ -154,15 +155,48 @@ reason, you'll need to add this to your project's `pom.xml`.
 
 ```
  
-#### Can I just copy this code into my project ?
+#### Can I just copy this code into my project?
 
 Yes. Perhaps you'd prefer to use 
 
 ```
 git submodule add https://github.com/gary-rowe/hid4java hid4java 
 ```
-so that you can keep up to date with changes whilst still fixing the version. 
+so that you can keep up to date with changes whilst still fixing the version. The master branch always represents the latest released version.
 
+#### My platform isn't supported what can I do?
+
+The `hidapi` libraries can be compiled using the popular [dockcross](https://github.com/dockcross/dockcross) project. Essentially you use Docker containers that represent
+ the build environment you are targeting (e.g. Windows x86) and can then perform the build there. The resulting library can then be added under a suitably named sub-directory.
+ 
+For example, here is a typical process for cross-compiling a shared Windows x86 target (DLL) on OS X. It assumes that you have Docker running but have not installed `hidapi` or
+ `dockcross`.
+
+```bash
+# Clone the upstream repos
+git clone https://github.com/libusb/hidapi.git
+git clone https://github.com/dockcross/dockcross.git 
+
+# Configure dockcross Docker script for Windows x86 so it is executable and on path
+cd dockcross
+docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
+chmod +x ./dockcross-windows-shared-x86
+mv ./dockcross-windows-shared-x86 /usr/local/bin
+
+# Cross-copmile hidapi
+cd ../hidapi
+dockcross-windows-shared-x86 bash -c 'sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make'
+
+# Examine the output (hidtest is not required)
+cd windows/.libs
+file libhidapi-0.dll  
+
+# Move and rename the DLL into hid4java structure
+mv libhidapi-0.dll ~/src/hid4java/src/main/resources/win32-x86/hidapi.dll
+```
+
+Some of the older versions of the `hidapi` native libraries have been removed in version 0.6.0, so if you have a particular requirement and can demonstrate a good case to
+ include it in the standard build, please raise an issue to get it looked at.
 
 ### Troubleshooting
 
@@ -184,20 +218,20 @@ To compensate for this, hid4java will detect when it is running on Windows with 
 the `data` unmodified to the write buffer. In all other cases it will prepend the report ID to the data before submitting
 it to hidapi.
 
-If you're seeing this then it may be that your code is attempting to second guess hid4java.
+If you're seeing this then it may be that your code is attempting to second guess `hid4java`.
 
-#### The hidapi library doesn't load
+#### The `hidapi` library doesn't load
 
-On startup hid4java will search the classpath looking for a library that matches the machine OS and architecture (e.g. Windows running on AMD64). It uses the JNA naming conventions to do this and will report the expected path if it fails. You can add your own entry under `src/main/resources` and it should get picked up. Ideally you should [raise an issue](https://github.com/gary-rowe/hid4java/issues) on the hid4java repo so that the proper library can be put into the project so that others can avoid this problem.
+On startup `hid4java` will search the classpath looking for a library that matches the machine OS and architecture (e.g. Windows running on AMD64). It uses the JNA naming conventions to do this and will report the expected path if it fails. You can add your own entry under `src/main/resources` and it should get picked up. Ideally you should [raise an issue](https://github.com/gary-rowe/hid4java/issues) on the `hid4java` repo so that the proper library can be put into the project so that others can avoid this problem.
 
-#### The hidapi library loads but takes a long time on Windows
+#### The `hidapi` library loads but takes a long time on Windows
 
 You have probably terminated the JVM using a `kill -9` rather than a clean shutdown. This will have left the `HidApi` process lock on the DLL still in force and Windows will continuously check to see if it can share it with a new instance.
 Just detach and re-attach the device to clear it.
 
 #### I'm seeing spurious attach/detach events occurring on Windows
 
-This was a device enumeration bug in early versions of hid4java. Use 0.3.1 or higher.
+This was a device enumeration bug in early versions of `hid4java`. Use version 0.3.1 or higher.
 
 #### My device doesn't work on Linux
 
@@ -242,3 +276,5 @@ cannot establish its own connection to them. You will need to use the lower leve
 All trademarks and copyrights are acknowledged.
 
 Many thanks to victorix who provided the basis for this library. Please see the inspiration <a href="http://developer.mbed.org/cookbook/USBHID-bindings-">on the mbed.org site.</a></p>
+
+Thanks also go to everyone who has contributed their knowledge and advice during the creation and subsequent improvement of this library.
