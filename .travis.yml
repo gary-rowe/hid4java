@@ -1,4 +1,5 @@
 language: java
 
 jdk:
-  - openjdk7
+  # Test on Open JDK 11 on Travis due to EOL issues
+  - openjdk11
