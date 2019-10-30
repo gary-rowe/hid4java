@@ -6,7 +6,7 @@ eval "$(docker-machine env default)"
 
 cd ~/Workspaces/Docker/dockcross
 
-# Windows environments
+echo -e "\033[32mWindows environments\033[0m"
 
 # 64-bit
 docker run --rm dockcross/windows-shared-x64 > ./dockcross-windows-shared-x64
@@ -18,7 +18,7 @@ docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
 mv ./dockcross-windows-shared-x86 /usr/local/bin
 
-# Linux environments
+echo -e "\033[32mLinux environments\033[0m"
 
 # 64 bit
 docker run --rm dockcross/linux-x64 > ./dockcross-linux-x64
@@ -52,18 +52,17 @@ cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources
 # Linux environments (require libudev and libusb to be installed)
 
 # 64-bit
-dockcross-linux-x64 bash -c 'sudo make clean && sudo apt-get --force-yes --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure && sudo make'
+dockcross-linux-x64 bash -c 'sudo make clean && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure && sudo make'
 cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
 cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
 
 # 32-bit
-dockcross-linux-x86 bash -c 'sudo make clean && sudo apt-get --force-yes --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure && sudo make'
+dockcross-linux-x86 bash -c 'sudo make clean && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure && sudo make'
 cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
 
 # Raspberry Pi (ARMv6) - broken
-#dockcross-linux-armv6 bash -c 'sudo make clean && sudo apt-get --force-yes --yes install libudev-dev libusb-1.0-dev && sudo ./bootstrap && sudo ./configure --host=arm-linux &&
-# sudo make'
-#cp linux/.libs/libhidapi-0.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
+dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
+cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
 
 # OS X environments
 

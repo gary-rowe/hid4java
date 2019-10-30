@@ -121,6 +121,7 @@ devices on OS X.
 
 Yes but not the older versions at present. If you need to use the older code for some
 reason, you'll need to add this to your project's `pom.xml`.
+
 ```xml
 <repositories>
 
@@ -129,6 +130,27 @@ reason, you'll need to add this to your project's `pom.xml`.
     <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/releases</url>
     <releases/>
   </repository>
+
+</repositories>
+
+<dependencies>
+
+  <!-- hid4java for cross-platform HID USB -->
+  <dependency>
+    <groupId>org.hid4java</groupId>
+    <artifactId>hid4java</artifactId>
+    <version>0.6.0</version>
+  </dependency>
+
+</dependencies>
+
+```
+#### I want to try the latest snapshot release - I know the risks
+
+OK, add the following to your project's `pom.xml`:
+
+```xml
+<repositories>
 
   <!-- Only include the snapshot repo if you're working with the latest hid4java on develop -->
   <repository>
@@ -148,7 +170,7 @@ reason, you'll need to add this to your project's `pom.xml`.
   <dependency>
     <groupId>org.hid4java</groupId>
     <artifactId>hid4java</artifactId>
-    <version>0.5.0</version>
+    <version>develop-SNAPSHOT</version>
   </dependency>
 
 </dependencies>
@@ -280,6 +302,14 @@ Thanks to @MaxRoma for that one!
 
 Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
 cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
+
+### Release procedure
+
+The release procedure is as follows:
+
+1. Finalise all development on the `develop` branch.
+2. Run the `./release.sh` script to verify release conditions and perform the merge to `master` with appropriate tagging. Code will be pushed upstream.
+3. Run `mvn clean deploy` to push the release artifacts to Maven Central.
 
 ### Closing notes
 
