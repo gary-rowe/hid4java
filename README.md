@@ -32,7 +32,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
   <dependency>
     <groupId>org.hid4java</groupId>
     <artifactId>hid4java</artifactId>
-    <version>0.6.0</version>
+    <version>0.5.0</version>
   </dependency>
 
 </dependencies>
