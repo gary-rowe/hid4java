@@ -7,6 +7,23 @@ Release: Available for production work
 Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java)
 [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
 
+#### A note on time commitment
+
+When `hid4java` was first created it was because I was working on a project that required a multi-platform USB HID library. That project
+was mothballed in 2017 leaving `hid4java` on the back burner of my activities. This is a shame because it was originally intended to be
+a general purpose library to help other developers access HID devices through an easy to use API in Java. 
+
+Seeing that the project remains in use by developers all over the world I have decided to continue maintaining `hid4java` as a hobby and
+will be dedicating roughly an evening a week (probably a Wednesday in the GMT timezone) to keeping on top of issues and releases.
+
+I'd really appreciate it if other developers with more experience of USB than myself can help out with pull requests or perhaps testing
+agains a range of devices on operating systems that I don't have easy access to. 
+
+#### Telegram group
+
+If you want to discuss `hid4java` in general please use [the Telegram chat](https://t.me/joinchat/CtU4ZBltWCAFBAjwM5KLLw). I can't guarantee
+an instant response but I'm usually active on Telegram during office hours in the GMT timezone.
+
 ### Summary 
 
 The `hid4java` project supports USB HID devices through a common API which is provided here under the MIT license.
@@ -270,6 +287,7 @@ This was a device enumeration bug in early versions of `hid4java`. Use version 0
 Different flavours of Linux require different settings:
 
 ##### Ubuntu
+
 Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under `/etc/udev/rules.d`:
 ```
 sudo gedit /etc/udev/rules.d/99-myhid.rules
@@ -286,6 +304,7 @@ sudo addgroup yourusername plugdev
 ```
 
 ##### Slackware
+
 Edit the USB udev rules `/etc/udev/rules.d` as follows:
 ```
 MODE="0666", GROUP="dialout"
