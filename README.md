@@ -210,23 +210,34 @@ For example, here is a typical process for cross-compiling a shared Windows x86 
  `dockcross`.
 
 ```bash
-# Clone the upstream repos
-git clone https://github.com/libusb/hidapi.git
+# Start your Docker environment
+docker-machine start default
+eval "$(docker-machine env default)"
+
+# Swap to your general working directory
+cd workspaces/docker
+
+# Clone the Dockcross project
 git clone https://github.com/dockcross/dockcross.git 
 
-# Configure dockcross Docker script for Windows x86 so it is executable and on path
+# Configure Dockcross Docker script for Windows x86 so it is executable and on path
 cd dockcross
 docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
 mv ./dockcross-windows-shared-x86 /usr/local/bin
 
-# Cross-copmile hidapi
+# Clone the native hidapi project (contains native code for a variety of OSes)
+git clone https://github.com/libusb/hidapi.git
+
+# Cross-copmile hidapi (the Docker container will work with the "external" hidapi directory and place build artifacts within it)
 cd ../hidapi
 dockcross-windows-shared-x86 bash -c 'sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make'
 
 # Examine the output (hidtest is not required)
 cd windows/.libs
 file libhidapi-0.dll  
+# Output:
+# libhidapi-0.dll: PE32 executable (DLL) (console) Intel 80386, for MS Windows
 
 # Move and rename the DLL into hid4java structure
 mv libhidapi-0.dll ~/src/hid4java/src/main/resources/win32-x86/hidapi.dll
