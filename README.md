@@ -1,13 +1,13 @@
 Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java)
 
-### Project status
+# Project status
 
 Release: Available for production work
 
 Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java)
 [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
 
-#### A note on time commitment
+## A note on time commitment
 
 When `hid4java` was first created it was because I was working on a project that required a multi-platform USB HID library. That project
 was mothballed in 2017 leaving `hid4java` on the back burner of my activities. This is a shame because it was originally intended to be
@@ -19,12 +19,12 @@ will be dedicating roughly an evening a week (probably a Wednesday in the GMT ti
 I'd really appreciate it if other developers with more experience of USB than myself can help out with pull requests or perhaps testing
 agains a range of devices on operating systems that I don't have easy access to. 
 
-#### Telegram group
+## Telegram group
 
 If you want to discuss `hid4java` in general please use [the Telegram chat](https://t.me/joinchat/CtU4ZBltWCAFBAjwM5KLLw). I can't guarantee
 an instant response but I'm usually active on Telegram during office hours in the GMT timezone.
 
-### Summary 
+# Summary 
 
 The `hid4java` project supports USB HID devices through a common API which is provided here under the MIT license.
 The API is very simple but provides great flexibility such as support for feature reports and blocking reads with
@@ -32,14 +32,14 @@ timeouts. Attach/detach events are provided to allow applications to respond ins
 
 The wiki provides a [guide to building the project](https://github.com/gary-rowe/hid4java/wiki/How-to-build-the-project).
 
-### Technologies
+# Technologies
 
 * [hidapi](https://github.com/libusb/hidapi) - Native USB HID library for multiple platforms
 * [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
 * Java 6+ - to remove dependencies on JVMs that have reached end of life
 
-### Maven dependency
+# Maven dependency
 
 ```xml
 
@@ -55,9 +55,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 </dependencies>
 
 ```
-
-
-### Code example
+# Code example
 
 Taken from [UsbHidTrezorV1Example](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/UsbHidDeviceExample.java) which
 provides more details. See later for how to run it from the command line.
@@ -93,7 +91,7 @@ hidServices.shutdown();
     
 ```
  
-### Getting started
+# Getting started
 
 If you're unfamiliar with Maven and git the wiki provides [an easy guide to creating a development environment](https://github.com/gary-rowe/hid4java/wiki/How-to-build-the-project).
 
@@ -115,16 +113,16 @@ just a simple enumeration of attached USB devices. You can plug various devices 
 
 Use CTRL+C to quit the example.
 
-### Frequently asked questions (FAQ)
+# Frequently asked questions (FAQ)
 
-#### What platforms do you support?
+## What platforms do you support?
 
 If you have a native version of `hidapi` for your platform then you'll be able to support it. 
 
 Pre-compiled versions for Windows (32/64), OS X (10.5+) and Linux (32/64) are provided and you
 must follow the JNA naming convention when adding new libraries.
 
-#### Why not just use usb4java?
+## Why not just use usb4java?
 
 The [usb4java](http://usb4java.org/) project, while superb, does not support HID devices on OS X 
 and apparently there are no plans to introduce HID support anytime soon.
@@ -134,7 +132,7 @@ you apply a workaround (such as adding a kernel extension) then it will still fa
 little later in the process. The bottom line is that you *must* use hidapi to communicate with HID
 devices on OS X.
 
-#### Is the latest code in Maven Central?
+## Is the latest code in Maven Central?
 
 Yes but not the older versions at present. If you need to use the older code for some
 reason, you'll need to add this to your project's `pom.xml`.
@@ -162,7 +160,7 @@ reason, you'll need to add this to your project's `pom.xml`.
 </dependencies>
 
 ```
-#### I want to try the latest snapshot release - I know the risks
+## I want to try the latest snapshot release - I know the risks
 
 OK, add the following to your project's `pom.xml`:
 
@@ -194,7 +192,7 @@ OK, add the following to your project's `pom.xml`:
 
 ```
  
-#### Can I just copy this code into my project?
+## Can I just copy this code into my project?
 
 Yes. Perhaps you'd prefer to use 
 
@@ -203,7 +201,7 @@ git submodule add https://github.com/gary-rowe/hid4java hid4java
 ```
 so that you can keep up to date with changes whilst still fixing the version. The master branch always represents the latest released version.
 
-#### My platform isn't supported what can I do?
+## My platform isn't supported what can I do?
 
 The `hidapi` libraries can be compiled using the popular [dockcross](https://github.com/dockcross/dockcross) project. Essentially you use Docker containers that represent
  the build environment you are targeting (e.g. Windows x86) and can then perform the build there. The resulting library can then be added under a suitably named sub-directory.
@@ -237,7 +235,7 @@ mv libhidapi-0.dll ~/src/hid4java/src/main/resources/win32-x86/hidapi.dll
 Some of the older versions of the `hidapi` native libraries have been removed in version 0.6.0, so if you have a particular requirement and can demonstrate a good case to
  include it in the standard build, please raise an issue to get it looked at.
 
-#### How can I know the version of this library programmatically?
+## How can I know the version of this library programmatically?
 
 The `HidServices` entry class provides a method `getVersion` which reads the version from the JAR manifest file. You can test it as follows:
 
@@ -247,11 +245,11 @@ java -cp target/hid4java-develop-SNAPSHOT.jar org.hid4java.HidServices
 ```
 The version will reflect what is in the `pom.zml` so will only be a numeric triplet on the `master` branch.
 
-### Troubleshooting
+# Troubleshooting
 
 The following are known issues and their solutions or workarounds.
 
-#### I get a `SIGSEGV (0xb)` when starting up
+## I get a `SIGSEGV (0xb)` when starting up
 
 This shouldn't occur unless you've been changing the code.
 
@@ -260,7 +258,7 @@ Another cause is if a `Structure` has not been initialised and is being deferenc
 
 There is also the possibility that using the built-in `HidDeviceManager` code can cause problems in some applications.
 
-#### I get a "The parameter is incorrect" when writing
+## I get a "The parameter is incorrect" when writing
 
 There is a special case on Windows for report ID `0x00` which can cause a misalignment during a hidapi `write()`.
 To compensate for this, hid4java will detect when it is running on Windows with a report ID of `0x00` and simply copy
@@ -269,24 +267,24 @@ it to hidapi.
 
 If you're seeing this then it may be that your code is attempting to second guess `hid4java`.
 
-#### The `hidapi` library doesn't load
+## The `hidapi` library doesn't load
 
 On startup `hid4java` will search the classpath looking for a library that matches the machine OS and architecture (e.g. Windows running on AMD64). It uses the JNA naming conventions to do this and will report the expected path if it fails. You can add your own entry under `src/main/resources` and it should get picked up. Ideally you should [raise an issue](https://github.com/gary-rowe/hid4java/issues) on the `hid4java` repo so that the proper library can be put into the project so that others can avoid this problem.
 
-#### The `hidapi` library loads but takes a long time on Windows
+## The `hidapi` library loads but takes a long time on Windows
 
 You have probably terminated the JVM using a `kill -9` rather than a clean shutdown. This will have left the `HidApi` process lock on the DLL still in force and Windows will continuously check to see if it can share it with a new instance.
 Just detach and re-attach the device to clear it.
 
-#### I'm seeing spurious attach/detach events occurring on Windows
+## I'm seeing spurious attach/detach events occurring on Windows
 
 This was a device enumeration bug in early versions of `hid4java`. Use version 0.3.1 or higher.
 
-#### My device doesn't work on Linux
+## My device doesn't work on Linux
 
 Different flavours of Linux require different settings:
 
-##### Ubuntu
+### Ubuntu
 
 Out of the box Ubuntu classifies HID devices as belonging to root. You can override this rule by creating your own under `/etc/udev/rules.d`:
 ```
@@ -303,26 +301,26 @@ sudo addgroup plugdev
 sudo addgroup yourusername plugdev
 ```
 
-##### Slackware
+### Slackware
 
 Edit the USB udev rules `/etc/udev/rules.d` as follows:
 ```
 MODE="0666", GROUP="dialout"
 ```
 
-##### ARM
+### ARM
 Running on ARM machines you may encounter problems due to a missing library. This is just a naming issue for the `udev` library and can be resolved using the following command (or equivalent for your system):
 ```
 sudo ln -sf /lib/arm-linux-gnueabihf/libudev.so.1 /lib/arm-linux-gnueabihf/libudev.so.0
 ```
 Thanks to @MaxRoma for that one!
 
-#### My device doesn't work on Windows
+## My device doesn't work on Windows
 
 Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
 cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
 
-### Release procedure
+# Release procedure
 
 The release procedure is as follows:
 
@@ -330,10 +328,10 @@ The release procedure is as follows:
 2. Run the `./release.sh` script to verify release conditions and perform the merge to `master` with appropriate tagging. Code will be pushed upstream.
 3. Run `mvn clean deploy` to push the release artifacts to Maven Central.
 
-### Closing notes
+# Closing notes
 
 All trademarks and copyrights are acknowledged.
 
-Many thanks to victorix who provided the basis for this library. Please see the inspiration <a href="http://developer.mbed.org/cookbook/USBHID-bindings-">on the mbed.org site.</a></p>
+Many thanks to `victorix` who provided the basis for this library. Please [see the inspiration on the mbed.org site](http://developer.mbed.org/cookbook/USBHID-bindings-).
 
 Thanks also go to everyone who has contributed their knowledge and advice during the creation and subsequent improvement of this library.
