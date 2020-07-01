@@ -76,10 +76,6 @@ public class UsbHidDeviceExample implements HidServicesListener {
     // Open the device device by Vendor ID and Product ID with wildcard serial number
     HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, SERIAL_NUMBER);
     if (hidDevice != null) {
-      // Consider overriding dropReportIdZero on Windows
-      // if you see "The parameter is incorrect"
-      // HidApi.dropReportIdZero = true;
-
       // Device is already attached and successfully opened so send message
       sendMessage(hidDevice);
     }
