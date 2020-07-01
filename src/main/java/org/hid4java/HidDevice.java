@@ -44,16 +44,16 @@ public class HidDevice {
   private final HidDeviceManager hidDeviceManager;
   private HidDeviceStructure hidDeviceStructure;
 
-  private String path;
-  private short vendorId;
-  private short productId;
+  private final String path;
+  private final short vendorId;
+  private final short productId;
   private String serialNumber;
-  private int releaseNumber;
+  private final int releaseNumber;
   private String manufacturer;
   private String product;
-  private int usagePage;
-  private int usage;
-  private int interfaceNumber;
+  private final int usagePage;
+  private final int usage;
+  private final int interfaceNumber;
 
   /**
    * @param infoStructure The HID device info structure providing details
@@ -226,7 +226,7 @@ public class HidDevice {
    *
    * @return a Byte array of the read data
    */
-  public Byte [] read(int amountToRead, int timeoutMillis) {
+  public Byte[] read(int amountToRead, int timeoutMillis) {
     if (!isOpen()) {
       throw new IllegalStateException("Device has not been opened");
     }
@@ -235,10 +235,11 @@ public class HidDevice {
 	int read = HidApi.read(hidDeviceStructure, bytes, timeoutMillis);
     Byte [] retData = new Byte[read];
     for(int i=0;i<read;i++){
-    	retData[i] = new Byte(bytes[i]);
+    	retData[i] = bytes[i];
     }
     return retData;
   }
+
   /**
    * <p>
    * Read an Input report from a HID device
@@ -253,7 +254,7 @@ public class HidDevice {
    *
    * @return a Byte array of the read data
    */
-  public Byte [] read(int amountToRead) {
+  public Byte[] read(int amountToRead) {
     if (!isOpen()) {
       throw new IllegalStateException("Device has not been opened");
     }
@@ -262,7 +263,7 @@ public class HidDevice {
 	int read = HidApi.read(hidDeviceStructure, bytes);
     Byte [] retData = new Byte[read];
     for(int i=0;i<read;i++){
-    	retData[i] = new Byte(bytes[i]);
+    	retData[i] = bytes[i];
     }
     return retData;
   }
@@ -276,10 +277,9 @@ public class HidDevice {
    * reports
    * </p>
    *
-   *
    * @return a Byte array of the read data
    */
-  public Byte [] read() {
+  public Byte[] read() {
 	  return read(64, 1000);
   }
   /**
@@ -397,7 +397,7 @@ public class HidDevice {
    * @param productId    The product ID
    * @param serialNumber The serial number
    *
-   * @return True if the device matches the given the combination
+   * @return True if the device matches the given the combination with vendorId, productId being zero acting as a wildcard
    */
   public boolean isVidPidSerial(int vendorId, int productId, String serialNumber) {
     if(serialNumber == null)
