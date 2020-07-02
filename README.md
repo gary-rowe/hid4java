@@ -169,8 +169,8 @@ OK, add the following to your project's `pom.xml`:
 
   <!-- Only include the snapshot repo if you're working with the latest hid4java on develop -->
   <repository>
-    <id>mbhd-maven-snapshot</id>
-    <url>https://raw.github.com/bitcoin-solutions/mbhd-maven/master/snapshots</url>
+    <id>hid4java-snapshot</id>
+    <url>https://repo.maven.apache.org/maven2</url>
     <!-- These artifacts change frequently during development iterations -->
     <snapshots>
       <updatePolicy>always</updatePolicy>
