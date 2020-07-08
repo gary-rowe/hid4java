@@ -45,8 +45,8 @@ public class HidDevice {
   private HidDeviceStructure hidDeviceStructure;
 
   private final String path;
-  private final short vendorId;
-  private final short productId;
+  private final int vendorId;
+  private final int productId;
   private String serialNumber;
   private final int releaseNumber;
   private String manufacturer;
@@ -66,8 +66,14 @@ public class HidDevice {
     this.hidDeviceStructure = null;
 
     this.path = infoStructure.path;
-    this.vendorId = infoStructure.vendor_id;
-    this.productId = infoStructure.product_id;
+
+    // Note that the low-level HidDeviceInfoStructure is directly written to by
+    // the JNA library and implies an unsigned short which is not available in Java.
+    // The bitmask converts from [-32768, 32767] to [0,65535]
+    // In Java 8 Short.toUnsignedInt() is available.
+    this.vendorId = infoStructure.vendor_id & 0xffff;
+    this.productId = infoStructure.product_id & 0xffff;
+
     this.releaseNumber = infoStructure.release_number;
     if (infoStructure.serial_number != null) {
       this.serialNumber = infoStructure.serial_number.toString();
@@ -99,11 +105,17 @@ public class HidDevice {
     return path;
   }
 
-  public short getVendorId() {
+  /**
+   * @return Int version of vendor ID
+   */
+  public int getVendorId() {
     return vendorId;
   }
 
-  public short getProductId() {
+  /**
+   * @return Int version of product ID
+   */
+  public int getProductId() {
     return productId;
   }
 

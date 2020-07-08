@@ -169,6 +169,15 @@
       <artifactId>jna</artifactId>
       <version>4.2.2</version>
     </dependency>
+
+    <!-- JUnit -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>
