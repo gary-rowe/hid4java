@@ -58,7 +58,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 
 # Gradle dependency
 
-``groovy
+```gradle
 
 repositories {
     mavenCentral()
@@ -68,7 +68,8 @@ dependencies {
     implementation('org.hid4java:hid4java')
 }
 
-``
+```
+
 # Code example
 
 Taken from [UsbHidDeviceExample](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/UsbHidDeviceExample.java) which
@@ -232,7 +233,7 @@ nor has it been comprehensively reviewed. Use it at your own risk.
 
 ### Gradle project
 
-```groovy
+```gradle
 
 repositories {
     mavenCentral()
