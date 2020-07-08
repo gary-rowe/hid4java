@@ -37,7 +37,7 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 * [hidapi](https://github.com/libusb/hidapi) - Native USB HID library for multiple platforms
 * [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
-* Java 6+ - to remove dependencies on JVMs that have reached end of life
+* Java 7+ - to remove dependencies on JVMs that have reached end of life
 
 # Maven dependency
 
@@ -55,9 +55,23 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 </dependencies>
 
 ```
+
+# Gradle dependency
+
+``groovy
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('org.hid4java:hid4java')
+}
+
+``
 # Code example
 
-Taken from [UsbHidTrezorV1Example](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/UsbHidDeviceExample.java) which
+Taken from [UsbHidDeviceExample](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/UsbHidDeviceExample.java) which
 provides more details. See later for how to run it from the command line.
 
 ```java
@@ -98,12 +112,17 @@ If you're unfamiliar with Maven and git the wiki provides [an easy guide to crea
 The project uses the standard Maven build process and can be used without having external hardware attached. Just do the usual
 
 ```
-cd <project directory>
+cd <workspace>
+git clone https://github.com/gary-rowe/hid4java.git
+cd hid4java
 mvn clean install
 ```
 
-and you're good to go. If you're in an IDE then you can use `src/test/java/org/hid4java/UsbHidTrezorV1Example`) to verify correct
-operation. From the command line:
+and you're good to go. 
+
+## Testing data operation with a Trezor device
+
+If you're in an IDE then you can use `src/test/java/org/hid4java/UsbHidDeviceExample`) to verify correct operation. From the command line:
 
 ```
 mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.UsbHidDeviceExample"
@@ -119,8 +138,23 @@ Use CTRL+C to quit the example.
 
 If you have a native version of `hidapi` for your platform then you'll be able to support it. 
 
-Pre-compiled versions for Windows (32/64), OS X (10.5+) and Linux (32/64) are provided and you
-must follow the JNA naming convention when adding new libraries.
+Here is the current list of platform names with compiled binaries:
+
+* `darwin` - OS X 10.15
+* `linux-amd64` - Linux AMD 64-bit 
+* `linux-arm` - Raspberry Pi 
+* `linux-x86-64` - Linux x86_64
+* `win32-amd64` - Windows AMD 64-bit
+* `win32-x86` - Windows x86 32-bit
+* `win32-x86-64` - Windows x86 64-bit
+
+## What about Android?
+
+In the early days of the project there was some provision for Android but improvements to the accessibility
+of USB to the devices by the operating system have meant there is no real need for this library there.
+
+Here is [a USB HID driver](https://github.com/pazaan/600SeriesAndroidUploader/blob/master/app/src/main/java/info/nightscout/android/USB/UsbHidDriver.java) 
+provided by @Chakib-Temal with some discussion in [issue #83](https://github.com/gary-rowe/hid4java/issues/83#)
 
 ## Why not just use usb4java?
 
@@ -160,9 +194,13 @@ reason, you'll need to add this to your project's `pom.xml`.
 </dependencies>
 
 ```
-## I want to try the latest snapshot release - I know the risks
+## I want to try the latest snapshot release
 
-OK, add the following to your project's `pom.xml`:
+Updates to the `develop-SNAPSHOT` code are pushed fairly regularly to the `develop` branch and act as a 
+form of "pre-release" view of the upcoming code. In many cases the code contained is not production ready, 
+nor has it been comprehensively reviewed. Use it at your own risk.
+
+### Maven project
 
 ```xml
 <repositories>
@@ -189,6 +227,20 @@ OK, add the following to your project's `pom.xml`:
   </dependency>
 
 </dependencies>
+
+```
+
+### Gradle project
+
+```groovy
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('org.hid4java:hid4java:develop-SNAPSHOT')
+}
 
 ```
  
@@ -245,6 +297,24 @@ mv libhidapi-0.dll ~/src/hid4java/src/main/resources/win32-x86/hidapi.dll
 
 Some of the older versions of the `hidapi` native libraries have been removed in version 0.6.0, so if you have a particular requirement and can demonstrate a good case to
  include it in the standard build, please raise an issue to get it looked at.
+
+## I want to build all the `hidapi` libraries myself. Is there a script?
+
+Yes. The `build-hidapi.sh` script will enable you to cross-compile the various `hidapi` libraries locally. 
+
+It's not intended for general use so comes with hard-coded directory paths and only works on an OS X native 
+build machine. Dockcross does the heavy lifting to create compilation environments for other platforms.
+
+It expects a workspace directory layout as follows:
+
+```
++ ~/Workspaces
+  + /Docker/dockcross
+  + /Cpp/hidapi
+  + /Java/Personal/hid4java
++ 
+```
+If there is sufficient interest to make the script a bit more generic then raise an issue and I'll look into it.
 
 ## How can I know the version of this library programmatically?
 
@@ -331,9 +401,14 @@ Thanks to @MaxRoma for that one!
 Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
 cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
 
-# Release procedure
+# Deployment procedures
 
-The release procedure is as follows:
+## The snapshot procedure is as follows:
+
+1. Ensure `develop` branch is in reasonable shape.
+2. Run `mvn clean deploy` to push to Maven snapshot repository.
+
+## The release procedure is as follows:
 
 1. Finalise all development on the `develop` branch.
 2. Run the `./release.sh` script to verify release conditions and perform the merge to `master` with appropriate tagging. Code will be pushed upstream.
