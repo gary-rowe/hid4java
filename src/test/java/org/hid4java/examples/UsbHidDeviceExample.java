@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2016 Gary Rowe
+ * Copyright (c) 2014-2020 Gary Rowe
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,10 @@
  *
  */
 
-package org.hid4java;import org.hid4java.event.HidServicesEvent;
+package org.hid4java.examples;
+
+import org.hid4java.*;
+import org.hid4java.event.HidServicesEvent;
 
 import java.util.concurrent.TimeUnit;
 
@@ -77,7 +80,10 @@ public class UsbHidDeviceExample implements HidServicesListener {
     HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, SERIAL_NUMBER);
     if (hidDevice != null) {
       // Device is already attached and successfully opened so send message
+      System.out.println("Found required device...");
       sendMessage(hidDevice);
+    } else {
+      System.out.println("Required device not found.");
     }
 
     System.out.printf("Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n");
@@ -123,6 +129,8 @@ public class UsbHidDeviceExample implements HidServicesListener {
     if (!hidDevice.isOpen()) {
       hidDevice.open();
     }
+
+    System.out.println("Device is open, sending INITIALISE...");
 
     // Send the Initialise message
     byte[] message = new byte[PACKET_LENGTH];

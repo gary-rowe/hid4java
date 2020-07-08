@@ -121,17 +121,27 @@ mvn clean install
 
 and you're good to go. 
 
+## Testing device enumeration
+
+If you're in an IDE then you can use `src/test/java/org/hid4java/examples/UsbHidEnumerationExample`) to verify correct operation. From the command line:
+
+```
+mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.examples.UsbHidEnumerationExample"
+```
+
+Use CTRL+C to quit the example or wait 30s.
+
 ## Testing data operation with a Trezor device
 
 If you're in an IDE then you can use `src/test/java/org/hid4java/UsbHidDeviceExample`) to verify correct operation. From the command line:
 
 ```
-mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.UsbHidDeviceExample"
+mvn clean test exec:java -Dexec.classpathScope="test" -Dexec.mainClass="org.hid4java.examples.UsbHidDeviceExample"
 ```
 If you have a Trezor device attached you'll see a "Features" message appear as a big block of hex otherwise it will be
 just a simple enumeration of attached USB devices. You can plug various devices in and out to see messages.
 
-Use CTRL+C to quit the example.
+Use CTRL+C to quit the example or wait 30s.
 
 # Frequently asked questions (FAQ)
 
