@@ -153,7 +153,8 @@ Here is the current list of platform names with compiled binaries:
 
 * `darwin` - OS X 10.15
 * `linux-amd64` - Linux AMD 64-bit 
-* `linux-arm` - Raspberry Pi 
+* `linux-arm` - ARMv6 hard float (suitable for Raspberry Pi V1)
+* `linux-armel` - Reserved for future inclusion
 * `linux-x86-64` - Linux x86_64
 * `win32-amd64` - Windows AMD 64-bit
 * `win32-x86` - Windows x86 32-bit
