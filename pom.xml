@@ -167,14 +167,14 @@
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
-      <version>4.2.2</version>
+      <version>5.5.0</version>
     </dependency>
 
     <!-- JUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>RELEASE</version>
+      <version>5.7.0-M1</version>
       <scope>test</scope>
     </dependency>
 
