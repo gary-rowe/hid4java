@@ -25,6 +25,7 @@
 
 package org.hid4java.examples;
 
+import com.sun.jna.Platform;
 import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
 
@@ -48,6 +49,10 @@ public class UsbHidEnumerationExample implements HidServicesListener {
   }
 
   private void executeExample() throws HidException {
+
+    // System info to assist with library detection
+    System.out.println("Platform architecture: " + Platform.ARCH);
+    System.out.println("Resource prefix: " + Platform.RESOURCE_PREFIX);
 
     // Configure to use custom specification
     HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
