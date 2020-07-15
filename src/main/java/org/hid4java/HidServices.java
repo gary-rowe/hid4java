@@ -28,7 +28,11 @@ package org.hid4java;
 import org.hid4java.event.HidServicesListenerList;
 import org.hid4java.jna.HidApi;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * <p>JNA bridge class to provide the following to USB HID:</p>
@@ -53,6 +57,15 @@ public class HidServices {
   private final HidDeviceManager hidDeviceManager;
 
   /**
+   * Jar entry point to allow for version interrogation
+   *
+   * @param args Nothing required
+   */
+  public static void main(String[] args) {
+    System.out.println("Version: " + getVersion());
+  }
+
+  /**
    * Initialise with a default HID specification
    *
    * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, HidServicesSpecification)}
@@ -63,7 +76,6 @@ public class HidServices {
 
   /**
    * @param hidServicesSpecification Provides various parameters for configuring HID services
-   *
    * @throws HidException If something goes wrong (see {@link HidDeviceManager#HidDeviceManager(HidServicesListenerList, HidServicesSpecification)}
    */
   public HidServices(HidServicesSpecification hidServicesSpecification) {
@@ -141,7 +153,6 @@ public class HidServices {
    * @param vendorId     The vendor ID
    * @param productId    The product ID
    * @param serialNumber The serial number (use null for wildcard)
-   *
    * @return The device if attached, null if detached
    */
   public HidDevice getHidDevice(int vendorId, int productId, String serialNumber) {
@@ -149,14 +160,40 @@ public class HidServices {
     List<HidDevice> devices = hidDeviceManager.getAttachedHidDevices();
     for (HidDevice device : devices) {
       if (device.isVidPidSerial(vendorId, productId, serialNumber)) {
-        if (device.open()) {
-          return device;
-        } else {
-          return null;
-        }
+        device.open();
+        return device;
       }
     }
 
     return null;
+  }
+
+  /**
+   * @return The current library version from the manifest or 0.0.0 if an error occurs
+   */
+  public static String getVersion() {
+
+    Class clazz = HidServices.class;
+    String className = clazz.getSimpleName() + ".class";
+    String classPath = clazz.getResource(className).toString();
+    if (!classPath.startsWith("jar")) {
+      // Class not from JAR
+      return "0.0.1";
+    }
+    String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+      "/META-INF/MANIFEST.MF";
+    Manifest manifest;
+    try {
+      manifest = new Manifest(new URL(manifestPath).openStream());
+    } catch (IOException e) {
+      return "0.0.2";
+    }
+    Attributes attr = manifest.getMainAttributes();
+    String value = attr.getValue("Implementation-Version");
+    if (null == value) {
+      return "0.0.3";
+    } else {
+      return value;
+    }
   }
 }

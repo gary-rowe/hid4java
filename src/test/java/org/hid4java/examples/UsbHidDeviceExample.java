@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2016 Gary Rowe
+ * Copyright (c) 2014-2020 Gary Rowe
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,18 @@
  *
  */
 
-package org.hid4java;import org.hid4java.event.HidServicesEvent;
+package org.hid4java.examples;
+
+import com.sun.jna.Platform;
+import org.hid4java.*;
+import org.hid4java.event.HidServicesEvent;
 
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
- * <p>Demonstrate the USB HID interface using a production Bitcoin Trezor</p>
+ * <p>Demonstrate the USB HID interface using a Satoshi Labs Trezor</p>
  *
  * @since 0.0.1
  *  
@@ -40,7 +44,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
   private static final Integer VENDOR_ID = 0x534c;
   private static final Integer PRODUCT_ID = 0x01;
   private static final int PACKET_LENGTH = 64;
-  public static final String SERIAL_NUMBER = null;
+  private static final String SERIAL_NUMBER = null;
 
   public static void main(String[] args) throws HidException {
 
@@ -49,7 +53,11 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
   }
 
-  public void executeExample() throws HidException {
+  private void executeExample() throws HidException {
+
+    // System info to assist with library detection
+    System.out.println("Platform architecture: " + Platform.ARCH);
+    System.out.println("Resource prefix: " + Platform.RESOURCE_PREFIX);
 
     // Configure to use custom specification
     HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
@@ -76,18 +84,17 @@ public class UsbHidDeviceExample implements HidServicesListener {
     // Open the device device by Vendor ID and Product ID with wildcard serial number
     HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, SERIAL_NUMBER);
     if (hidDevice != null) {
-      // Consider overriding dropReportIdZero on Windows
-      // if you see "The parameter is incorrect"
-      // HidApi.dropReportIdZero = true;
-
       // Device is already attached and successfully opened so send message
+      System.out.println("Found required device...");
       sendMessage(hidDevice);
+    } else {
+      System.out.println("Required device not found.");
     }
 
     System.out.printf("Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n");
 
     // Stop the main thread to demonstrate attach and detach events
-    sleepUninterruptibly(30, TimeUnit.SECONDS);
+    sleepNoInterruption(30, TimeUnit.SECONDS);
 
     // Shut down and rely on auto-shutdown hook to clear HidApi resources
     hidServices.shutdown();
@@ -128,6 +135,8 @@ public class UsbHidDeviceExample implements HidServicesListener {
       hidDevice.open();
     }
 
+    System.out.println("Device is open, sending INITIALISE...");
+
     // Send the Initialise message
     byte[] message = new byte[PACKET_LENGTH];
     message[0] = 0x3f; // USB: Payload 63 bytes
@@ -145,7 +154,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     // Prepare to read a single data packet
     boolean moreData = true;
     while (moreData) {
-      byte data[] = new byte[PACKET_LENGTH];
+      byte[] data = new byte[PACKET_LENGTH];
       // This method will now block for 500ms or until data is read
       val = hidDevice.read(data, 500);
       switch (val) {
@@ -170,7 +179,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
    * Invokes {@code unit.}{@link java.util.concurrent.TimeUnit#sleep(long) sleep(sleepFor)}
    * uninterruptibly.
    */
-  public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
+  private static void sleepNoInterruption(long sleepFor, TimeUnit unit) {
     boolean interrupted = false;
     try {
       long remainingNanos = unit.toNanos(sleepFor);

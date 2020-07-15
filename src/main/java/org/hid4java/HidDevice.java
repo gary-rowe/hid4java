@@ -44,16 +44,16 @@ public class HidDevice {
   private final HidDeviceManager hidDeviceManager;
   private HidDeviceStructure hidDeviceStructure;
 
-  private String path;
-  private short vendorId;
-  private short productId;
+  private final String path;
+  private final int vendorId;
+  private final int productId;
   private String serialNumber;
-  private int releaseNumber;
+  private final int releaseNumber;
   private String manufacturer;
   private String product;
-  private int usagePage;
-  private int usage;
-  private int interfaceNumber;
+  private final int usagePage;
+  private final int usage;
+  private final int interfaceNumber;
 
   /**
    * @param infoStructure The HID device info structure providing details
@@ -66,8 +66,14 @@ public class HidDevice {
     this.hidDeviceStructure = null;
 
     this.path = infoStructure.path;
-    this.vendorId = infoStructure.vendor_id;
-    this.productId = infoStructure.product_id;
+
+    // Note that the low-level HidDeviceInfoStructure is directly written to by
+    // the JNA library and implies an unsigned short which is not available in Java.
+    // The bitmask converts from [-32768, 32767] to [0,65535]
+    // In Java 8 Short.toUnsignedInt() is available.
+    this.vendorId = infoStructure.vendor_id & 0xffff;
+    this.productId = infoStructure.product_id & 0xffff;
+
     this.releaseNumber = infoStructure.release_number;
     if (infoStructure.serial_number != null) {
       this.serialNumber = infoStructure.serial_number.toString();
@@ -99,11 +105,17 @@ public class HidDevice {
     return path;
   }
 
-  public short getVendorId() {
+  /**
+   * @return Int version of vendor ID
+   */
+  public int getVendorId() {
     return vendorId;
   }
 
-  public short getProductId() {
+  /**
+   * @return Int version of product ID
+   */
+  public int getProductId() {
     return productId;
   }
 
@@ -210,7 +222,78 @@ public class HidDevice {
     }
     return HidApi.read(hidDeviceStructure, data);
   }
+  
+  /**
+   * <p>
+   * Read an Input report from a HID device
+   * </p>
+   * <p>
+   * Input reports are returned to the host through the INTERRUPT IN endpoint.
+   * The first byte will contain the Report number if the device uses numbered
+   * reports
+   * </p>
+   *
+   * @param amountToRead the number of bytes to read
+   * @param timeoutMillis The number of milliseconds to wait before giving up
+   *
+   * @return a Byte array of the read data
+   */
+  public Byte[] read(int amountToRead, int timeoutMillis) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
+    
+    byte[] bytes=  new byte[amountToRead];
+	int read = HidApi.read(hidDeviceStructure, bytes, timeoutMillis);
+    Byte [] retData = new Byte[read];
+    for(int i=0;i<read;i++){
+    	retData[i] = bytes[i];
+    }
+    return retData;
+  }
 
+  /**
+   * <p>
+   * Read an Input report from a HID device
+   * </p>
+   * <p>
+   * Input reports are returned to the host through the INTERRUPT IN endpoint.
+   * The first byte will contain the Report number if the device uses numbered
+   * reports
+   * </p>
+   *
+   * @param amountToRead the number of bytes to read
+   *
+   * @return a Byte array of the read data
+   */
+  public Byte[] read(int amountToRead) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
+    
+    byte[] bytes=  new byte[amountToRead];
+	int read = HidApi.read(hidDeviceStructure, bytes);
+    Byte [] retData = new Byte[read];
+    for(int i=0;i<read;i++){
+    	retData[i] = bytes[i];
+    }
+    return retData;
+  }
+  /**
+   * <p>
+   * Read an Input report from a HID device
+   * </p>
+   * <p>
+   * Input reports are returned to the host through the INTERRUPT IN endpoint.
+   * The first byte will contain the Report number if the device uses numbered
+   * reports
+   * </p>
+   *
+   * @return a Byte array of the read data
+   */
+  public Byte[] read() {
+	  return read(64, 1000);
+  }
   /**
    * <p>
    * Read an Input report from a HID device with timeout
@@ -326,12 +409,16 @@ public class HidDevice {
    * @param productId    The product ID
    * @param serialNumber The serial number
    *
-   * @return True if the device matches the given the combination
+   * @return True if the device matches the given the combination with vendorId, productId being zero acting as a wildcard
    */
   public boolean isVidPidSerial(int vendorId, int productId, String serialNumber) {
-    return (vendorId == 0 || this.vendorId == vendorId)
+    if(serialNumber == null)
+      return (vendorId == 0 || this.vendorId == vendorId)
+        && (productId == 0 || this.productId == productId);
+    else
+       return (vendorId == 0 || this.vendorId == vendorId)
       && (productId == 0 || this.productId == productId)
-      && (serialNumber == null || this.serialNumber.equals(serialNumber));
+      && ( this.serialNumber.equals(serialNumber));
   }
 
   @Override
