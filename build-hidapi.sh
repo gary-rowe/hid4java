@@ -118,7 +118,9 @@ if [[ "$?" -ne 0 ]]
 fi
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
-# Raspberry Pi (ARMv6) - broken binary reported
+# ARM environments
+
+# ARMv6 - Hard float (Raspberry Pi Model 1)
 echo -e "\033[32mBuilding Raspberry Pi (ARMv6)\033[0m"
 dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
 if [[ "$?" -ne 0 ]]
@@ -146,21 +148,6 @@ if [[ "$?" -ne 0 ]]
   else
     echo -e "\033[32mOK\033[0m"
     cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
-fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
-
-# Android environments (require libudev and libusb to be installed)
-
-# 64-bit
-echo -e "\033[32mBuilding Android 64-bit\033[0m"
-dockcross-android-arm64 bash -c 'sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-android && sudo make'
-if [[ "$?" -ne 0 ]]
-  then
-    echo -e "\033[31mFailed\033[0m - Removing damaged targets"
-    rm ../../Java/Personal/hid4java/src/main/resources/android-arm64/libhidapi.so
-  else
-    echo -e "\033[32mOK\033[0m"
-    cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/android-arm64/libhidapi.so
 fi
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
@@ -193,17 +180,16 @@ file -b ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
 
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
+# ARM
+
+echo -e "\033[32mARM (hard float)\033[0m"
+echo -e "\033[32mlinux-arm\033[0m"
+file -b ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
+
 # OS X
 echo -e "\033[32mOS X\033[0m"
 echo -e "\033[32mdarwin\033[0m"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
-
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
-
-# Android
-echo -e "\033[32mAndroid\033[0m"
-echo -e "\033[32mandroid-arm64\033[0m"
-file -b ../../Java/Personal/hid4java/src/main/resources/android-arm64/libhidapi.so
 
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
