@@ -14,3 +14,4 @@
 # Maven
 log/
 target/
+/release.properties
