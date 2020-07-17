@@ -124,6 +124,8 @@ public class HidApi {
 
   /**
    * <p>Close a HID device</p>
+   *
+   * @param device The HID device structure
    */
   public static void close(HidDeviceStructure device) {
 
@@ -159,6 +161,8 @@ public class HidApi {
   }
 
   /**
+   * @param device The HID device structure
+   *
    * @return A string describing the last error which occurred
    */
   public static String getLastErrorMessage(HidDeviceStructure device) {
@@ -290,7 +294,7 @@ public class HidApi {
   /**
    * <p>Get a feature report from a HID device</p>
    *
-   * <h3>HID API notes</h3>
+   * <b>HID API notes</b>
    *
    * <p>Under the covers the HID library will set the first byte of data[] to the Report ID of the report to be read.
    * Upon return, the first byte will still contain the Report ID, and the report data will start in data[1]</p>
@@ -327,7 +331,7 @@ public class HidApi {
   /**
    * <p>Send a Feature report to the device using a simplified interface</p>
    *
-   * <h3>HID API notes</h3>
+   * <b>HID API notes</b>
    *
    * <p>Under the covers, feature reports are sent over the Control endpoint as a Set_Report transfer.
    * The first byte of data[] must contain the Report ID. For devices which only support a single report,
@@ -364,7 +368,7 @@ public class HidApi {
   /**
    * <p>Write an Output report to a HID device using a simplified interface</p>
    *
-   * <h3>HID API notes</h3>
+   * <b>HID API notes</b>
    *
    * <p>In USB HID the first byte of the data packet must contain the Report ID.
    * For devices which only support a single report, this must be set to 0x00.
