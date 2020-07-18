@@ -131,7 +131,7 @@ public class HidServices {
   /**
    * @param listener The listener to remove
    */
-  public void removeUsbServicesListener(final HidServicesListener listener) {
+  public void removeHidServicesListener(final HidServicesListener listener) {
     this.listeners.remove(listener);
   }
 
