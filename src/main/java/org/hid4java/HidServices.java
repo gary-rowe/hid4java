@@ -169,11 +169,11 @@ public class HidServices {
   }
 
   /**
-   * @return The current library version from the manifest or 0.0.0 if an error occurs
+   * @return The current library version from the manifest or 0.0.x if an error occurs
    */
   public static String getVersion() {
 
-    Class clazz = HidServices.class;
+    Class<HidServices> clazz = HidServices.class;
     String className = clazz.getSimpleName() + ".class";
     String classPath = clazz.getResource(className).toString();
     if (!classPath.startsWith("jar")) {
