@@ -50,7 +50,7 @@
   <scm>
     <connection>scm:git:git@github.com:gary-rowe/hid4java.git</connection>
     <developerConnection>scm:git:git@github.com:gary-rowe/hid4java.git</developerConnection>
-    <url>git@github.com:gary-rowe/hid4java.git/tree/master</url>
+    <url>git@github.com:gary-rowe/hid4java.git</url>
     <tag>HEAD</tag>
   </scm>
 
