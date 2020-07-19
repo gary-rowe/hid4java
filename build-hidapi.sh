@@ -20,6 +20,7 @@
 # linux-arm - Linux ARMv7 hard float 32-bit
 # linux-armel - Linux ARMv6 EABI 32-bit
 # linux-x86-64 - Linux x86 64-bit
+# linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
 # win32-x86-64 - Windows 64-bit
 #
@@ -118,12 +119,10 @@ if [[ "$1" == "all" ]] || [[ "$1" == "win32-x86-64" ]]
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
-        rm ../../Java/Personal/hid4java/src/main/resources/win32-amd64/hidapi.dll
         exit
       else
         echo -e "\033[32mOK\033[0m"
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
-        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-amd64/hidapi.dll
     fi
   else
     echo -e "\033[33mSkipping win32-x86-64\033[0m"
@@ -154,7 +153,8 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux-x86-64" ]]
   then
     echo -e "\033[32mBuilding Linux 64-bit\033[0m"
-    dockcross-linux-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
+    # Note the use of a double sudo apt-get update here
+    dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
@@ -174,7 +174,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux-x86" ]]
   then
     echo -e "\033[32mBuilding Linux 32-bit\033[0m"
-    dockcross-linux-x86 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
+    dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
@@ -275,9 +275,6 @@ echo -e "\033[32mWindows\033[0m"
 echo -e "\033[32mwin32-x86-64\033[0m"
 file -b ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
 
-echo -e "\033[32mwin32-amd64\033[0m"
-file -b  ../../Java/Personal/hid4java/src/main/resources/win32-amd64/hidapi.dll
-
 echo -e "\033[32mwin32-x86\033[0m"
 file -b ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
 
@@ -291,6 +288,9 @@ file -b ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.s
 
 echo -e "\033[32mlinux-amd64\033[0m"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
+
+echo -e "\033[32mlinux-x86\033[0m"
+file -b ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
 
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 

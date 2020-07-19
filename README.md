@@ -151,14 +151,15 @@ If you have a native version of `hidapi` for your platform then you'll be able t
 
 Here is the current list of platform names with compiled binaries:
 
-* `darwin` - OS X 10.15
-* `linux-amd64` - Linux AMD 64-bit 
-* `linux-arm` - ARMv6 hard float (suitable for Raspberry Pi V1)
-* `linux-armel` - Reserved for future inclusion
-* `linux-x86-64` - Linux x86_64
-* `win32-amd64` - Windows AMD 64-bit
-* `win32-x86` - Windows x86 32-bit
-* `win32-x86-64` - Windows x86 64-bit
+* darwin - OS X 64-bit
+* linux-aarch64 - Linux ARMv8 64-bit
+* linux-amd64 - Linux AMD 64-bit
+* linux-arm - Linux ARMv7 hard float 32-bit
+* linux-armel - Linux ARMv6 EABI 32-bit
+* linux-x86 - Linux x86 32-bit
+* linux-x86-64 - Linux x86 64-bit
+* win32-x86 - Windows 32-bit
+* win32-x86-64 - Windows 64-bit
 
 ## What about Android?
 
