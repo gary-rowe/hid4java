@@ -94,7 +94,7 @@ public class UsbHidDeviceExample implements HidServicesListener {
     System.out.printf("Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n");
 
     // Stop the main thread to demonstrate attach and detach events
-    sleepNoInterruption(30, TimeUnit.SECONDS);
+    sleepNoInterruption();
 
     // Shut down and rely on auto-shutdown hook to clear HidApi resources
     hidServices.shutdown();
@@ -177,12 +177,12 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
   /**
    * Invokes {@code unit.}{@link java.util.concurrent.TimeUnit#sleep(long) sleep(sleepFor)}
-   * uninterruptibly.
+   * without interruption.
    */
-  private static void sleepNoInterruption(long sleepFor, TimeUnit unit) {
+  private static void sleepNoInterruption() {
     boolean interrupted = false;
     try {
-      long remainingNanos = unit.toNanos(sleepFor);
+      long remainingNanos = TimeUnit.SECONDS.toNanos(30);
       long end = System.nanoTime() + remainingNanos;
       while (true) {
         try {

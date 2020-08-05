@@ -36,7 +36,7 @@ import com.sun.jna.WString;
  */
 public interface HidApiLibrary extends Library {
 
-  HidApiLibrary INSTANCE = (HidApiLibrary) Native.loadLibrary("hidapi", HidApiLibrary.class);
+  HidApiLibrary INSTANCE = Native.load("hidapi", HidApiLibrary.class);
 
   /**
    * <p>Initialize the HIDAPI library.</p>
@@ -168,7 +168,7 @@ public interface HidApiLibrary extends Library {
    *
    * @param device The device handle
    * @param data   The data to send, including the report number as the first byte
-   * @param length The length inbytes of the data to send, including the report number
+   * @param length The length in bytes of the data to send, including the report number
    *
    * @return The actual number of bytes written, -1 on error
    */
@@ -195,6 +195,7 @@ public interface HidApiLibrary extends Library {
    *
    * @return 0 on success, -1 on failure
    */
+  @SuppressWarnings("UnusedReturnValue")
   int hid_get_manufacturer_string(Pointer device, WideStringBuffer.ByReference str, int len);
 
   /**
@@ -206,6 +207,7 @@ public interface HidApiLibrary extends Library {
    *
    * @return 0 on success, -1 on failure
    */
+  @SuppressWarnings("UnusedReturnValue")
   int hid_get_product_string(Pointer device, WideStringBuffer.ByReference str, int len);
 
   /**
@@ -217,6 +219,7 @@ public interface HidApiLibrary extends Library {
    *
    * @return 0 on success, -1 on failure
    */
+  @SuppressWarnings("UnusedReturnValue")
   int hid_get_serial_number_string(Pointer device, WideStringBuffer.ByReference str, int len);
 
   /**
