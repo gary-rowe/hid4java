@@ -96,7 +96,7 @@ public class HidDeviceInfoStructure extends Structure implements Structure.ByRef
   }
 
   @Override
-  protected List getFieldOrder() {
+  protected List<String> getFieldOrder() {
 
     // If this precise order is not specified you get "SIGSEGV (0xb)"
     return Arrays.asList(
