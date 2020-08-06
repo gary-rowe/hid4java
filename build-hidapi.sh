@@ -162,8 +162,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux-x86-64" ]]
         rm ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
       else
         echo -e "\033[32mOK\033[0m"
-        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
-        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
+        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
+        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
     fi
   else
     echo -e "\033[33mSkipping linux-x86-64\033[0m"
