@@ -25,6 +25,7 @@
 
 package org.hid4java.jna;
 
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
@@ -55,7 +56,7 @@ public class HidApi {
   private static final int DEVICE_ERROR = -2;
 
   /**
-   * <p>Enables use of the Linux libusb variant of the hidapi native library.</p>
+   * <p>Enables use of the libusb variant of the hidapi native library when running on a Linux platform.</p>
    *
    * <p>The default is hidraw which enables Bluetooth devices but requires udev rules.</p>
    */
@@ -67,7 +68,7 @@ public class HidApi {
   private static final HidApiLibrary hidApiLibrary;
   static {
     //noinspection ConstantConditions
-    if (useLibUsbVariant) {
+    if (useLibUsbVariant && Platform.getOSType() == Platform.LINUX) {
       hidApiLibrary = LibusbHidApiLibrary.INSTANCE;
     } else {
       hidApiLibrary = HidrawHidApiLibrary.INSTANCE;
