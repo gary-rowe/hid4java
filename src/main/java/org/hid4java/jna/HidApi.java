@@ -65,15 +65,7 @@ public class HidApi {
   /**
    * The HID API library
    */
-  private static final HidApiLibrary hidApiLibrary;
-  static {
-    //noinspection ConstantConditions
-    if (useLibUsbVariant && Platform.getOSType() == Platform.LINUX) {
-      hidApiLibrary = LibusbHidApiLibrary.INSTANCE;
-    } else {
-      hidApiLibrary = HidrawHidApiLibrary.INSTANCE;
-    }
-  }
+  private static HidApiLibrary hidApiLibrary;
 
   /**
    * <p>Open a HID device using a Vendor ID (VID), Product ID (PID) and optionally a serial number</p>
@@ -103,11 +95,16 @@ public class HidApi {
   }
 
   /**
-   * <p>Initialise the HID API library</p>
-   * <p>Required if the consuming application is using multiple threads
-   * containing device handles.</p>
+   * <p>Initialise the HID API library. Should always be called before using any other API calls.</p>
    */
   public static void init() {
+
+    if (useLibUsbVariant && Platform.isLinux()) {
+      hidApiLibrary = LibusbHidApiLibrary.INSTANCE;
+    } else {
+      hidApiLibrary = HidrawHidApiLibrary.INSTANCE;
+    }
+
     hidApiLibrary.hid_init();
   }
 

@@ -54,6 +54,7 @@ public class LibusbEnumerationExample implements HidServicesListener {
     // System info to assist with library detection
     System.out.println("Platform architecture: " + Platform.ARCH);
     System.out.println("Resource prefix: " + Platform.RESOURCE_PREFIX);
+    System.out.println("Libusb activation: " + Platform.isLinux());
 
     // Configure to use custom specification
     HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
