@@ -85,7 +85,7 @@ for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
   System.out.println(hidDevice);
 }
 
-// Open a Bitcoin Trezor device by Vendor ID and Product ID with wildcard serial number
+// Open a Satoshi Labs Trezor device by Vendor ID and Product ID with wildcard serial number
 HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);
 
 // Send the Initialise message
@@ -374,6 +374,17 @@ Just detach and re-attach the device to clear it.
 
 This was a device enumeration bug in early versions of `hid4java`. Use version 0.3.1 or higher.
 
+## I want to choose between `libusb` and `hidraw` variants on Linux
+
+The `hidapi` support library is available in two variants: `libusb` and `hidraw`. In general the `hidraw` variant is the 
+most flexible and it allows Bluetooth interfaces to be addressed. However, you can force the use of `libusb` as follows:
+
+```java
+HidApi.useLibUsbVariant = true
+``` 
+
+Setting this parameter will enable `libusb` libraries (which have slightly different behaviour) when executing on a Linux platform.
+
 ## My device doesn't work on Linux
 
 Different flavours of Linux require different settings:
@@ -411,8 +422,8 @@ Thanks to @MaxRoma for that one!
 
 ## My device doesn't work on Windows
 
-Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
-cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
+Check that the usage page is not `0x06` which is reserved for keyboards and mice. 
+[Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus `hid4java` cannot establish its own connection to them. You will need to use the lower level `usb4java` library for this.
 
 # Deployment procedures
 
