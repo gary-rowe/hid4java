@@ -1,8 +1,6 @@
-Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java)
-
 # Project status
 
-Release: Available for production work
+Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java)
 
 Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java)
 [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
@@ -35,8 +33,8 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 # Technologies
 
 * [hidapi](https://github.com/libusb/hidapi) - Native USB HID library for multiple platforms
-* [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
+* [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * Java 7+ - to remove dependencies on JVMs that have reached end of life
 
 # Maven dependency
@@ -377,7 +375,7 @@ This was a device enumeration bug in early versions of `hid4java`. Use version 0
 ## I want to choose between `libusb` and `hidraw` variants on Linux
 
 The `hidapi` support library is available in two variants: `libusb` and `hidraw`. In general the `hidraw` variant is the 
-most flexible and it allows Bluetooth interfaces to be addressed. However, you can force the use of `libusb` as follows:
+most flexible and it allows Bluetooth interfaces to be addressed. However, you can force the use of the older `libusb` as follows:
 
 ```java
 HidApi.useLibUsbVariant = true
@@ -395,7 +393,7 @@ Out of the box Ubuntu classifies HID devices as belonging to root. You can overr
 ```
 sudo gedit /etc/udev/rules.d/99-myhid.rules
 ```
-Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor`):
+Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor` in lowercase):
 ```
 # My HID device
 ATTRS{idProduct}=="0001", ATTRS{idVendor}=="abcd", MODE="0660", GROUP="plugdev"
