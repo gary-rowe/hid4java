@@ -25,21 +25,16 @@
 
 package org.hid4java.examples;
 
-import com.sun.jna.Platform;
 import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
-
-import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * <p>Demonstrate the USB HID interface using a Satoshi Labs Trezor</p>
  *
  * @since 0.0.1
- *  
+ *
  */
-public class UsbHidDeviceExample implements HidServicesListener {
+public class UsbHidDeviceExample extends BaseExample {
 
   private static final Integer VENDOR_ID = 0x534c;
   private static final Integer PRODUCT_ID = 0x01;
@@ -55,24 +50,17 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
   private void executeExample() throws HidException {
 
-    // System info to assist with library detection
-    System.out.println("Platform architecture: " + Platform.ARCH);
-    System.out.println("Resource prefix: " + Platform.RESOURCE_PREFIX);
+    printPlatform();
 
     // Configure to use custom specification
     HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
-    hidServicesSpecification.setAutoShutdown(true);
-    hidServicesSpecification.setScanInterval(500);
-    hidServicesSpecification.setPauseInterval(5000);
+    // Use the fixed interval with pause after write to allow device to process data
+    // without being interrupted by enumeration requests
     hidServicesSpecification.setScanMode(ScanMode.SCAN_AT_FIXED_INTERVAL_WITH_PAUSE_AFTER_WRITE);
 
     // Get HID services using custom specification
     HidServices hidServices = HidManager.getHidServices(hidServicesSpecification);
     hidServices.addHidServicesListener(this);
-
-    // Start the services
-    System.out.println("Starting HID services.");
-    hidServices.start();
 
     System.out.println("Enumerating attached devices...");
 
@@ -83,48 +71,30 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
     // Open the device device by Vendor ID and Product ID with wildcard serial number
     HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, SERIAL_NUMBER);
-    if (hidDevice != null) {
+    if (hidDevice != null && hidDevice.getUsagePage() == 0xffffff00) {
       // Device is already attached and successfully opened so send message
-      System.out.println("Found required device...");
+      System.out.println(ANSI_GREEN+ "Found required interface on device..." + ANSI_RESET);
       sendMessage(hidDevice);
     } else {
-      System.out.println("Required device not found.");
+      System.out.println(ANSI_YELLOW + "Required device not found." + ANSI_RESET);
     }
 
-    System.out.printf("Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n");
-
-    // Stop the main thread to demonstrate attach and detach events
-    sleepNoInterruption();
-
-    // Shut down and rely on auto-shutdown hook to clear HidApi resources
-    hidServices.shutdown();
+    waitAndShutdown(hidServices);
 
   }
 
   @Override
   public void hidDeviceAttached(HidServicesEvent event) {
 
-    System.out.println("Device attached: " + event);
+    super.hidDeviceAttached(event);
 
     // Add serial number when more than one device with the same
     // vendor ID and product ID will be present at the same time
-    if (event.getHidDevice().isVidPidSerial(VENDOR_ID, PRODUCT_ID, null)) {
+    // Add usage page when more than one interface is available (e.g. FIDO)
+    if (event.getHidDevice().isVidPidSerial(VENDOR_ID, PRODUCT_ID, null)
+      && event.getHidDevice().getUsagePage() == 0xffffff00) {
       sendMessage(event.getHidDevice());
     }
-
-  }
-
-  @Override
-  public void hidDeviceDetached(HidServicesEvent event) {
-
-    System.err.println("Device detached: " + event);
-
-  }
-
-  @Override
-  public void hidFailure(HidServicesEvent event) {
-
-    System.err.println("HID failure: " + event);
 
   }
 
@@ -146,9 +116,9 @@ public class UsbHidDeviceExample implements HidServicesListener {
 
     int val = hidDevice.write(message, PACKET_LENGTH, (byte) 0x00);
     if (val >= 0) {
-      System.out.println("> [" + val + "]");
+      System.out.println(ANSI_CYAN + "> [" + val + "]" + ANSI_RESET);
     } else {
-      System.err.println(hidDevice.getLastErrorMessage());
+      System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
     }
 
     // Prepare to read a single data packet
@@ -159,44 +129,18 @@ public class UsbHidDeviceExample implements HidServicesListener {
       val = hidDevice.read(data, 500);
       switch (val) {
         case -1:
-          System.err.println(hidDevice.getLastErrorMessage());
+          System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
           break;
         case 0:
           moreData = false;
           break;
         default:
-          System.out.print("< [");
+          System.out.print(ANSI_PURPLE + "< [");
           for (byte b : data) {
             System.out.printf(" %02x", b);
           }
-          System.out.println("]");
+          System.out.println("]" + ANSI_RESET);
           break;
-      }
-    }
-  }
-
-  /**
-   * Invokes {@code unit.}{@link java.util.concurrent.TimeUnit#sleep(long) sleep(sleepFor)}
-   * without interruption.
-   */
-  private static void sleepNoInterruption() {
-    boolean interrupted = false;
-    try {
-      long remainingNanos = TimeUnit.SECONDS.toNanos(30);
-      long end = System.nanoTime() + remainingNanos;
-      while (true) {
-        try {
-          // TimeUnit.sleep() treats negative timeouts just like zero.
-          NANOSECONDS.sleep(remainingNanos);
-          return;
-        } catch (InterruptedException e) {
-          interrupted = true;
-          remainingNanos = end - System.nanoTime();
-        }
-      }
-    } finally {
-      if (interrupted) {
-        Thread.currentThread().interrupt();
       }
     }
   }

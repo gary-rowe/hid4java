@@ -25,22 +25,16 @@
 
 package org.hid4java.examples;
 
-import com.sun.jna.Platform;
 import org.hid4java.*;
-import org.hid4java.event.HidServicesEvent;
 import org.hid4java.jna.HidApi;
 
-import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 /**
- * <p>Demonstrate the USB HID interface using a Satoshi Labs Trezor with libusb library variant</p>
+ * <p>Demonstrate the USB HID interface with older libusb Linux library variant</p>
  *
- * @since 0.0.1
- *  
+ * @since 0.7.0
+ *
  */
-public class LibusbEnumerationExample implements HidServicesListener {
+public class LibusbEnumerationExample extends BaseExample {
 
   public static void main(String[] args) throws HidException {
 
@@ -51,92 +45,27 @@ public class LibusbEnumerationExample implements HidServicesListener {
 
   private void executeExample() throws HidException {
 
-    // System info to assist with library detection
-    System.out.println("Platform architecture: " + Platform.ARCH);
-    System.out.println("Resource prefix: " + Platform.RESOURCE_PREFIX);
-    System.out.println("Libusb activation: " + Platform.isLinux());
+    printPlatform();
 
-    // Configure to use custom specification
+    // Configure to use default specification
     HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
-    hidServicesSpecification.setAutoShutdown(true);
-    hidServicesSpecification.setScanInterval(500);
-    hidServicesSpecification.setPauseInterval(5000);
-    hidServicesSpecification.setScanMode(ScanMode.SCAN_AT_FIXED_INTERVAL_WITH_PAUSE_AFTER_WRITE);
 
-    // Set the libusb variant (only applies to Linux platforms)
+    // Set the libusb variant (only needed for older Linux platforms)
     HidApi.useLibUsbVariant = true;
 
     // Get HID services using custom specification
     HidServices hidServices = HidManager.getHidServices(hidServicesSpecification);
     hidServices.addHidServicesListener(this);
 
-    // Start the services
-    System.out.println("Starting HID services.");
-    hidServices.start();
-
-    System.out.println("Enumerating attached devices...");
+    System.out.println(ANSI_GREEN + "Enumerating attached devices..." + ANSI_RESET);
 
     // Provide a list of attached devices
     for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
       System.out.println(hidDevice);
     }
 
-    System.out.printf("Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n");
+    waitAndShutdown(hidServices);
 
-    // Stop the main thread to demonstrate attach and detach events
-    sleepNoInterruption();
-
-    // Shut down and rely on auto-shutdown hook to clear HidApi resources
-    hidServices.shutdown();
-
-  }
-
-  @Override
-  public void hidDeviceAttached(HidServicesEvent event) {
-
-    System.out.println("Device attached: " + event);
-
-  }
-
-  @Override
-  public void hidDeviceDetached(HidServicesEvent event) {
-
-    System.err.println("Device detached: " + event);
-
-  }
-
-  @Override
-  public void hidFailure(HidServicesEvent event) {
-
-    System.err.println("HID failure: " + event);
-
-  }
-
-
-  /**
-   * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
-   * uninterruptibly.
-   */
-  private static void sleepNoInterruption() {
-    boolean interrupted = false;
-    try {
-      long remainingNanos = TimeUnit.SECONDS.toNanos(30);
-      long end = System.nanoTime() + remainingNanos;
-      while (true) {
-        try {
-          // TimeUnit.sleep() treats negative timeouts just like zero.
-          NANOSECONDS.sleep(remainingNanos);
-          return;
-        } catch (InterruptedException e) {
-          interrupted = true;
-          remainingNanos = end - System.nanoTime();
-        }
-      }
-    } finally {
-      if (interrupted) {
-        Thread.currentThread().interrupt();
-      }
-    }
   }
 
 }
