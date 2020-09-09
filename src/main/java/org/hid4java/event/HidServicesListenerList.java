@@ -97,7 +97,7 @@ public class HidServicesListenerList {
    * @return Array with registered listeners.
    */
   public HidServicesListener[] toArray() {
-    return getListeners().toArray(new HidServicesListener[getListeners().size()]);
+    return getListeners().toArray(new HidServicesListener[0]);
   }
 
   /**
