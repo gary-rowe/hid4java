@@ -1,8 +1,6 @@
-Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java)
-
 # Project status
 
-Release: Available for production work
+Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java)
 
 Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java)
 [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
@@ -35,8 +33,8 @@ The wiki provides a [guide to building the project](https://github.com/gary-rowe
 # Technologies
 
 * [hidapi](https://github.com/libusb/hidapi) - Native USB HID library for multiple platforms
-* [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * [JNA](https://github.com/twall/jna) - to remove the need for Java Native Interface (JNI) and greatly simplify the project
+* [dockcross](https://github.com/dockcross/dockcross) - Cross-compilation environments for multiple platforms to create hidapi libraries
 * Java 7+ - to remove dependencies on JVMs that have reached end of life
 
 # Maven dependency
@@ -85,7 +83,7 @@ for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
   System.out.println(hidDevice);
 }
 
-// Open a Bitcoin Trezor device by Vendor ID and Product ID with wildcard serial number
+// Open a Satoshi Labs Trezor device by Vendor ID and Product ID with wildcard serial number
 HidDevice trezor = hidServices.getHidDevice(0x534c, 0x01, null);
 
 // Send the Initialise message
@@ -374,6 +372,17 @@ Just detach and re-attach the device to clear it.
 
 This was a device enumeration bug in early versions of `hid4java`. Use version 0.3.1 or higher.
 
+## I want to choose between `libusb` and `hidraw` variants on Linux
+
+The `hidapi` support library is available in two variants: `libusb` and `hidraw`. In general the `hidraw` variant is the 
+most flexible and it allows Bluetooth interfaces to be addressed. However, you can force the use of the older `libusb` as follows:
+
+```java
+HidApi.useLibUsbVariant = true
+``` 
+
+Setting this parameter will enable `libusb` libraries (which have slightly different behaviour) when executing on a Linux platform.
+
 ## My device doesn't work on Linux
 
 Different flavours of Linux require different settings:
@@ -384,7 +393,7 @@ Out of the box Ubuntu classifies HID devices as belonging to root. You can overr
 ```
 sudo gedit /etc/udev/rules.d/99-myhid.rules
 ```
-Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor`):
+Make the content of this file as below (using your own discovered hex values for `idProduct` and `idVendor` in lowercase):
 ```
 # My HID device
 ATTRS{idProduct}=="0001", ATTRS{idVendor}=="abcd", MODE="0660", GROUP="plugdev"
@@ -411,8 +420,8 @@ Thanks to @MaxRoma for that one!
 
 ## My device doesn't work on Windows
 
-Check that the usage page is not `0x06` which is reserved for keyboards and mice. [Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus hid4java
-cannot establish its own connection to them. You will need to use the lower level usb4java library for this.
+Check that the usage page is not `0x06` which is reserved for keyboards and mice. 
+[Windows opens these devices for its exclusive use](https://msdn.microsoft.com/en-us/library/windows/hardware/jj128406%28v=vs.85%29.aspx) and thus `hid4java` cannot establish its own connection to them. You will need to use the lower level `usb4java` library for this.
 
 # Deployment procedures
 

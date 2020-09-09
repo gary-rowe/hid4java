@@ -26,7 +26,6 @@
 package org.hid4java.jna;
 
 import com.sun.jna.Library;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
@@ -35,8 +34,6 @@ import com.sun.jna.WString;
  * <p>This approach removes the need for any JNI or native code</p>
  */
 public interface HidApiLibrary extends Library {
-
-  HidApiLibrary INSTANCE = Native.load("hidapi", HidApiLibrary.class);
 
   /**
    * <p>Initialize the HIDAPI library.</p>

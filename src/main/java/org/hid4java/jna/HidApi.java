@@ -25,6 +25,7 @@
 
 package org.hid4java.jna;
 
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
@@ -42,7 +43,7 @@ public class HidApi {
   /**
    * Default length for wide string buffer
    */
-  private static int WSTR_LEN = 512;
+  private static final int WSTR_LEN = 512;
 
   /**
    * Error message if device is not initialised
@@ -55,17 +56,16 @@ public class HidApi {
   private static final int DEVICE_ERROR = -2;
 
   /**
-   * The HID API library
+   * <p>Enables use of the libusb variant of the hidapi native library when running on a Linux platform.</p>
+   *
+   * <p>The default is hidraw which enables Bluetooth devices but requires udev rules.</p>
    */
-  private static final HidApiLibrary hidApiLibrary = HidApiLibrary.INSTANCE;
+  public static boolean useLibUsbVariant = false;
 
   /**
-   * <p>After analysis by Satoshi Labs this workaround has been fixed and is no longer required. It will be removed in the next release.</p>
-   *
-   * <p>See https://github.com/gary-rowe/hid4java/pull/43# for more information.</p>
+   * The HID API library
    */
-  @Deprecated
-  public static boolean dropReportIdZero = false;
+  private static HidApiLibrary hidApiLibrary;
 
   /**
    * <p>Open a HID device using a Vendor ID (VID), Product ID (PID) and optionally a serial number</p>
@@ -95,11 +95,16 @@ public class HidApi {
   }
 
   /**
-   * <p>Initialise the HID API library</p>
-   * <p>Required if the consuming application is using multiple threads
-   * containing device handles.</p>
+   * <p>Initialise the HID API library. Should always be called before using any other API calls.</p>
    */
   public static void init() {
+
+    if (useLibUsbVariant && Platform.isLinux()) {
+      hidApiLibrary = LibusbHidApiLibrary.INSTANCE;
+    } else {
+      hidApiLibrary = HidrawHidApiLibrary.INSTANCE;
+    }
+
     hidApiLibrary.hid_init();
   }
 
