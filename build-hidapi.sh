@@ -50,56 +50,50 @@ plain="\033[0m"
 echo -e "${green}------------------------------------------------------------------------${plain}"
 echo -e "${yellow}Target build for HIDAPI is $1${plain}"
 
-# Dockcross latest release
+echo -e "${green}------------------------------------------------------------------------${plain}"
+
+# Always use Dockcross latest release
 
 echo -e "${green}Configuring Dockcross${plain}"
 cd ~/Workspaces/Docker/dockcross/ || exit
 git checkout master
 git pull
 
-echo -e "${green}------------------------------------------------------------------------${plain}"
-
 # Windows cross compilers
 
-# 64-bit
+# 64-bit (Intel)
 echo -e "${green}Configuring Windows 64-bit${plain}"
 docker run --rm dockcross/windows-shared-x64 > ./dockcross-windows-shared-x64
 chmod +x ./dockcross-windows-shared-x64
-mv ./dockcross-windows-shared-x64 /usr/local/bin
+mv ./dockcross-windows-shared-x64 ~/bin
 
-# 32-bit
+# 32-bit (Intel)
 echo -e "${green}Configuring Windows 32-bit${plain}"
 docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
-mv ./dockcross-windows-shared-x86 /usr/local/bin
-
-# 64-bit (ARMv7)
-echo -e "${green}Configuring Windows 64-bit ARMv7{plain}"
-docker run --rm dockcross/windows-armv7 > ./dockcross/windows-armv7
-chmod +x ./dockcross/windows-armv7
-mv ./dockcross/windows-armv7 /usr/local/bin
+mv ./dockcross-windows-shared-x86 ~/bin
 
 # 64-bit (ARM64)
-echo -e "${green}Configuring Windows 64-bit ARM64 (aarch64){plain}"
-docker run --rm dockcross/windows-arm64 > ./dockcross/windows-arm64
-chmod +x ./dockcross/windows-arm64
-mv ./dockcross/windows-arm64 /usr/local/bin
+echo -e "${green}Configuring Windows 64-bit ARM64 (aarch64)${plain}"
+docker run --rm dockcross/windows-arm64 > ./dockcross-windows-arm64
+chmod +x ./dockcross-windows-arm64
+mv ./dockcross-windows-arm64 ~/bin
 
 echo -e "${green}Configuring Linux environments${plain}"
 
 # Linux cross compilers
 
-# 64 bit
+# 64 bit (Intel)
 echo -e "${green}Configuring Linux 64-bit${plain}"
 docker run --rm dockcross/linux-x64 > ./dockcross-linux-x64
 chmod +x ./dockcross-linux-x64
-mv ./dockcross-linux-x64 /usr/local/bin
+mv ./dockcross-linux-x64 ~/bin
 
-# 32 bit
+# 32 bit (Intel)
 echo -e "${green}Configuring Linux 32-bit${plain}"
 docker run --rm dockcross/linux-x86 > ./dockcross-linux-x86
 chmod +x ./dockcross-linux-x86
-mv ./dockcross-linux-x86 /usr/local/bin
+mv ./dockcross-linux-x86 ~/bin
 
 # ARM cross compilers
 
@@ -107,19 +101,19 @@ mv ./dockcross-linux-x86 /usr/local/bin
 echo -e "${green}Configuring ARMv6 EABI 32-bit${plain}"
 docker run --rm dockcross/linux-armv6 > ./dockcross-linux-armv6
 chmod +x ./dockcross-linux-armv6
-mv ./dockcross-linux-armv6 /usr/local/bin
+mv ./dockcross-linux-armv6 ~/bin
 
 # 32-bit ARMv7 hard float
 echo -e "${green}Configuring ARMv7 32-bit${plain}"
 docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
 chmod +x ./dockcross-linux-armv7
-mv ./dockcross-linux-armv7 /usr/local/bin
+mv ./dockcross-linux-armv7 ~/bin
 
 # 64-bit (arm64, aarch64)
 echo -e "${green}Configuring ARM 64-bit${plain}"
 docker run --rm dockcross/linux-arm64 > ./dockcross-linux-arm64
 chmod +x ./dockcross-linux-arm64
-mv ./dockcross-linux-arm64 /usr/local/bin
+mv ./dockcross-linux-arm64 ~/bin
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
@@ -154,29 +148,16 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit ARM win32-aarch64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
-    echo -e "${green}Building Windows 64-bit ARM64${plain}"
-#    llvm_mingw="https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-ubuntu-18.04.tar.xz"
-#    download_extract='sudo mkdir -p /usr/src/mxe && wget -qO- '$llvm_mingw' | sudo tar xJvf - --strip 1 -C /usr/src/mxe/ > /dev/null && export PATH=/usr/src/mxe/bin:$PATH'
-#    unsets='unset CC CPP CXX LD FC'
-#    if ! dockcross-linux-x64-clang bash -c "$unsets && $download_extract"' && sudo apt-get install --yes clang && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
-#      then
-#        echo -e "${red}Failed${plain} - Removing damaged targets"
-#        rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
-#        exit
-#      else
-#        echo -e "${green}OK${plain}"
-#        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
-#    fi
-    if ! dockcross-windows-shared-armv7 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make';
+    echo -e "${green}Building Windows 64-bit ARM64 (aarch64)${plain}"
+    if ! dockcross-windows-arm64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
-        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarxh64/hidapi.dll
+        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
     fi
-
   else
     echo -e "${yellow}Skipping win32-aarch64${plain}"
 fi
@@ -304,7 +285,7 @@ echo -e "${green}---------------------------------------------------------------
 
 # OS X environments
 
-# Darwin
+# Darwin Intel (local)
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
   then
     echo -e "${green}Building OS X Darwin${plain}"
@@ -380,6 +361,9 @@ echo -e "${green}OS X${plain}"
 
 echo -e "${green}darwin${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
+
+echo -e "${green}darwin-aarch64${plain}"
+file -b ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
