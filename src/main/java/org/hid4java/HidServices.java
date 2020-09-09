@@ -80,7 +80,13 @@ public class HidServices {
    */
   public HidServices(HidServicesSpecification hidServicesSpecification) {
     hidDeviceManager = new HidDeviceManager(listeners, hidServicesSpecification);
-    hidDeviceManager.start();
+
+    // Check for automatic start (default behaviour for 0.6.0 and below)
+    // which will prevent an attachment event firing if the device is already
+    // attached since listeners will not have been registered at this point
+    if (hidServicesSpecification.isAutoStart()) {
+      hidDeviceManager.start();
+    }
 
     if (hidServicesSpecification.isAutoShutdown()) {
       // Ensure we release resources during shutdown

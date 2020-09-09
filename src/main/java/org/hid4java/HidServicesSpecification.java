@@ -40,6 +40,7 @@ public class HidServicesSpecification {
   private boolean autoShutdown = true;
   private int scanInterval = 500;
   private int pauseInterval = 5000;
+  private boolean autoStart = true;
 
   public ScanMode getScanMode() {
     return scanMode;
@@ -93,5 +94,18 @@ public class HidServicesSpecification {
    */
   public void setAutoShutdown(boolean autoShutdown) {
     this.autoShutdown = autoShutdown;
+  }
+
+
+  public boolean isAutoStart() {
+    return autoStart;
+  }
+
+  /**
+   *
+   * @param autoStart True if the HidServices should start before any listeners are registered (default is backwards compatible to 0.6.0 and below)
+   */
+  public void setAutoStart(boolean autoStart) {
+    this.autoStart = autoStart;
   }
 }
