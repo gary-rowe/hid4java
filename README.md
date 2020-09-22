@@ -57,7 +57,7 @@ dependencies {
 
 ## Code example
 
-Taken from [UsbHidEnumerationExample](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/UsbHidEnumerationExample.java) which
+Taken from [UsbHidEnumerationExample](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/examples/UsbHidEnumerationExample.java) which
 provides more details. 
 
 ```java
