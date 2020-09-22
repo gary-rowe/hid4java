@@ -41,7 +41,7 @@ Remember to [check the Wiki first](https://github.com/gary-rowe/hid4java/wiki/Ho
 
 ```
 
-# Gradle dependency
+## Gradle dependency
 
 ```gradle
 
@@ -98,7 +98,7 @@ and you're good to go.
 
 # More information
 
-Much of the information previously in this README has been migrated to the project Wiki so that it doesn't get too overwhelming. Here are some useful jumping off points that may help:
+Much of the information previously in this README has been migrated to the project Wiki as it was getting rather long. Here are some useful jumping off points that should help:
 
 * [Home](https://github.com/gary-rowe/hid4java/wiki/Home) - The wiki Home page with lots of useful launch points
 * [FAQ](https://github.com/gary-rowe/hid4java/wiki/FAQ) - Frequently asked questions
