@@ -1,12 +1,8 @@
 # Project status
 
-* Build Status: [![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java)
+[![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java) [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java) [[!Vulnerabilities](https://snyk.io/test/github/dwyl/hapi-auth-jwt2?targetFile=package.json)]
 
-* Latest release: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java)
-
-* Javadocs: [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
-
-# Summary 
+# 🌟 Summary 
 
 The `hid4java` project supports USB HID devices through a common API which is provided here under the MIT license. The API is very simple but provides great flexibility such as support for feature reports and blocking reads with timeouts. Attach/detach events are provided to allow applications to respond instantly to device availability.
 
@@ -55,7 +51,7 @@ dependencies {
 
 ```
 
-## Code example
+## 🚀 Code example
 
 Taken from [UsbHidEnumerationExample](https://github.com/gary-rowe/hid4java/blob/develop/src/test/java/org/hid4java/examples/UsbHidEnumerationExample.java) which
 provides more details. 
@@ -81,7 +77,7 @@ for (HidDevice hidDevice : hidServices.getAttachedHidDevices()) {
     
 ```
 
-# Local build
+# ⚙ Local build
 
 If you're unfamiliar with Maven and git the wiki provides [an easy guide to creating a development environment](https://github.com/gary-rowe/hid4java/wiki/How-to-set-up-a-build-environment-from-scratch).
 
@@ -96,7 +92,7 @@ mvn clean install
 
 and you're good to go. 
 
-# More information
+# 🤔 More information
 
 Much of the information previously in this README has been migrated to the project Wiki as it was getting rather long. Here are some useful jumping off points that should help:
 
@@ -105,7 +101,7 @@ Much of the information previously in this README has been migrated to the proje
 * [Examples](https://github.com/gary-rowe/hid4java/wiki/Examples) - Using the examples to kickstart your own project
 * [Troubleshooting](https://github.com/gary-rowe/hid4java/wiki/Troubleshooting) - A comprehensive troubleshooting guide
 
-# Closing notes
+# 📕 Closing notes
 
 All trademarks and copyrights are acknowledged.
 
