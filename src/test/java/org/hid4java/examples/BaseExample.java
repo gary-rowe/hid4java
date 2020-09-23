@@ -57,7 +57,7 @@ public abstract class BaseExample implements HidServicesListener {
 
   public void waitAndShutdown(HidServices hidServices) {
 
-    System.out.printf(ANSI_GREEN + "Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n" + ANSI_RESET);
+    System.out.printf(ANSI_YELLOW + "Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n" + ANSI_RESET);
 
     // Stop the main thread to demonstrate attach and detach events
     sleepNoInterruption();
