@@ -29,10 +29,9 @@ import org.hid4java.*;
 import org.hid4java.jna.HidApi;
 
 /**
- * <p>Demonstrate the USB HID interface with older libusb Linux library variant</p>
+ * Demonstrate the USB HID interface with older libusb Linux library variant
  *
  * @since 0.7.0
- *
  */
 public class LibusbEnumerationExample extends BaseExample {
 

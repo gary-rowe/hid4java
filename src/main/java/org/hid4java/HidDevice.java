@@ -32,14 +32,13 @@ import org.hid4java.jna.HidDeviceStructure;
 import java.util.Arrays;
 
 /**
- * <p>
  * High level wrapper to provide the following to API consumers:
- * </p>
+ *
  * <ul>
  * <li>Simplified access to the underlying JNA HidDeviceStructure</li>
  * </ul>
  *
- * @since 0.0.1  
+ * @since 0.0.1
  */
 public class HidDevice {
 
@@ -95,7 +94,7 @@ public class HidDevice {
   /**
    * The "path" is well-supported across Windows, Mac and Linux so makes a
    * better choice for a unique ID
-   * <p>
+   *
    * See #8 for details
    *
    * @return A unique device ID made up from vendor ID, product ID and serial number
@@ -182,7 +181,7 @@ public class HidDevice {
   }
 
   /**
-   * <p>Open this device and obtain a device structure</p>
+   * Open this device and obtain a device structure
    *
    * @return True if the device was successfully opened
    * @since 0.1.0
@@ -201,7 +200,7 @@ public class HidDevice {
   }
 
   /**
-   * <p>Close this device freeing the HidApi resources</p>
+   * Close this device freeing the HidApi resources
    *
    * @since 0.1.0
    */
@@ -214,19 +213,19 @@ public class HidDevice {
   }
 
   /**
-   * <p>
-   * Set the device handle to be non-blocking
-   * </p>
    *
-   * <p>
+   * Set the device handle to be non-blocking
+   *
+   *
+   *
    * In non-blocking mode calls to hid_read() will return immediately with a
    * value of 0 if there is no data to be read. In blocking mode, hid_read()
    * will wait (block) until there is data to read before returning
-   * </p>
    *
-   * <p>
+   *
+   *
    * Non-blocking can be turned on and off at any time
-   * </p>
+   *
    *
    * @param nonBlocking True if non-blocking mode is required
    * @since 0.1.0
@@ -239,14 +238,14 @@ public class HidDevice {
   }
 
   /**
-   * <p>
+   *
    * Read an Input report from a HID device
-   * </p>
-   * <p>
+   *
+   *
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
    * reports
-   * </p>
+   *
    *
    * @param data The buffer to read into
    * @return The actual number of bytes read and -1 on error. If no packet was
@@ -262,14 +261,14 @@ public class HidDevice {
   }
 
   /**
-   * <p>
+   *
    * Read an Input report from a HID device
-   * </p>
-   * <p>
+   *
+   *
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
    * reports
-   * </p>
+   *
    *
    * @param amountToRead  the number of bytes to read
    * @param timeoutMillis The number of milliseconds to wait before giving up
@@ -291,12 +290,12 @@ public class HidDevice {
   }
 
   /**
-   * <p>Read an Input report from a HID device</p>
+   * Read an Input report from a HID device
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
    * reports
    *
-   * @param amountToRead the number of bytes to read. If -1 then read until no more bytes are available.
+   * @param amountToRead the number of bytes to read.
    * @return a Byte array of the read data
    * @since 0.1.0
    */
@@ -315,14 +314,12 @@ public class HidDevice {
   }
 
   /**
-   * <p>
    * Read an Input report from a HID device
-   * </p>
-   * <p>
+   *
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
    * reports
-   * </p>
+   *
    *
    * @return a Byte array of the read data
    * @since 0.1.0
@@ -332,9 +329,7 @@ public class HidDevice {
   }
 
   /**
-   * <p>
    * Read an Input report from a HID device with timeout
-   * </p>
    *
    * @param bytes         The buffer to read into
    * @param timeoutMillis The number of milliseconds to wait before giving up
@@ -351,17 +346,17 @@ public class HidDevice {
   }
 
   /**
-   * <p>
+   *
    * Get a feature report from a HID device
-   * </p>
-   * <p>
+   *
+   *
    * Under the covers the HID library will set the first byte of data[] to the
    * Report ID of the report to be read. Upon return, the first byte will
    * still contain the Report ID, and the report data will start in data[1]
-   * </p>
-   * <p>
+   *
+   *
    * This method handles all the wide string and array manipulation for you
-   * </p>
+   *
    *
    * @param data     The buffer to contain the report
    * @param reportId The report ID (or (byte) 0x00)
@@ -377,28 +372,28 @@ public class HidDevice {
   }
 
   /**
-   * <p>
-   * Send a Feature report to the device
-   * </p>
    *
-   * <p>
+   * Send a Feature report to the device
+   *
+   *
+   *
    * Under the covers, feature reports are sent over the Control endpoint as a
    * Set_Report transfer. The first byte of data[] must contain the Report ID.
    * For devices which only support a single report, this must be set to 0x0.
    * The remaining bytes contain the report data
-   * </p>
-   * <p>
+   *
+   *
    * Since the Report ID is mandatory, calls to hid_send_feature_report() will
    * always contain one more byte than the report contains. For example, if a
    * hid report is 16 bytes long, 17 bytes must be passed to
    * hid_send_feature_report(): the Report ID (or 0x0, for devices which do
    * not use numbered reports), followed by the report data (16 bytes). In
    * this example, the length passed in would be 17
-   * </p>
    *
-   * <p>
+   *
+   *
    * This method handles all the array manipulation for you
-   * </p>
+   *
    *
    * @param data     The feature report data (will be widened and have the report
    *                 ID pre-pended)
@@ -415,9 +410,9 @@ public class HidDevice {
   }
 
   /**
-   * <p>
+   *
    * Get a string from a HID device, based on its string index
-   * </p>
+   *
    *
    * @param index The index
    * @return The string
@@ -428,9 +423,9 @@ public class HidDevice {
   }
 
   /**
-   * <p>Write the message to the HID API without zero byte padding.</p>
+   * Write the message to the HID API without zero byte padding.
    *
-   * <p>Note that the report ID will be prefixed to the HID packet as per HID rules.</p>
+   * Note that the report ID will be prefixed to the HID packet as per HID rules.
    *
    * @param message      The message
    * @param packetLength The packet length
@@ -443,9 +438,9 @@ public class HidDevice {
   }
 
   /**
-   * <p>Write the message to the HID API with optional zero byte padding to packet length.</p>
+   * Write the message to the HID API with optional zero byte padding to packet length.
    *
-   * <p>Note that the report ID will be prefixed to the HID packet as per HID rules.</p>
+   * Note that the report ID will be prefixed to the HID packet as per HID rules.
    *
    * @param message      The message
    * @param packetLength The packet length

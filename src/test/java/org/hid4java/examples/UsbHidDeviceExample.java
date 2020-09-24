@@ -29,10 +29,9 @@ import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
 
 /**
- * <p>Demonstrate the USB HID interface using a Satoshi Labs Trezor</p>
+ * Demonstrate the USB HID interface using a Satoshi Labs Trezor
  *
  * @since 0.0.1
- *
  */
 public class UsbHidDeviceExample extends BaseExample {
 

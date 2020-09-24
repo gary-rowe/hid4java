@@ -30,13 +30,12 @@ import org.hid4java.event.HidServicesEvent;
 import java.util.EventListener;
 
 /**
- * <p>Interface to provide the following to API consumers:</p>
+ * Interface to provide the following to API consumers:
  * <ul>
  * <li>Notification of a HID event</li>
  * </ul>
  *
  * @since 0.0.1
- *  
  */
 public interface HidServicesListener extends EventListener {
   /**

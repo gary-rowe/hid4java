@@ -36,10 +36,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * <p>HID services listener list</p>
+ * HID services listener list
  *
  * @since 0.0.1
- *  
  */
 public class HidServicesListenerList {
 
@@ -101,7 +100,7 @@ public class HidServicesListenerList {
   }
 
   /**
-   * <p>Fire the HID device attached event</p>
+   * Fire the HID device attached event
    *
    * @param hidDevice The device that was attached
    */
@@ -125,7 +124,7 @@ public class HidServicesListenerList {
   }
 
   /**
-   * <p>Fire the HID device detached event</p>
+   * Fire the HID device detached event
    *
    * @param hidDevice The device that was detached
    */
@@ -149,7 +148,7 @@ public class HidServicesListenerList {
   }
 
   /**
-   * <p>Fire the HID failure event</p>
+   * Fire the HID failure event
    *
    * @param hidDevice The device that caused the error if known
    */

@@ -32,7 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <p>Value object to provide HID device information</p>
+ * Value object to provide HID device information
+ * @since 0.1.0
  */
 public class HidDeviceInfoStructure extends Structure implements Structure.ByReference {
 

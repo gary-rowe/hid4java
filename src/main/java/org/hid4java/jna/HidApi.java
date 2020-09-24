@@ -30,13 +30,12 @@ import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
 /**
- * <p>JNA utility class to provide the following to low level operations:</p>
+ * JNA utility class to provide the following to low level operations:
  * <ul>
  * <li>Direct access to the HID API library through JNA</li>
  * </ul>
  *
  * @since 0.0.1
- *  
  */
 public class HidApi {
 
@@ -56,19 +55,19 @@ public class HidApi {
   private static final int DEVICE_ERROR = -2;
 
   /**
-   * <p>Enables use of the libusb variant of the hidapi native library when running on a Linux platform.</p>
-   *
-   * <p>The default is hidraw which enables Bluetooth devices but requires udev rules.</p>
+   * Enables use of the libusb variant of the hidapi native library when running on a Linux platform.
+   * <p>
+   * The default is hidraw which enables Bluetooth devices but requires udev rules.
    */
   public static boolean useLibUsbVariant = false;
 
   /**
-   * <p>Enables HID traffic logging to stdout to assist debugging. This will show all bytes (including the extra report ID)
-   * that were sent or received via HIDAPI buffers. It does not log direct string calls (e.g. getEnumeratedString()).</p>
+   * Enables HID traffic logging to stdout to assist debugging. This will show all bytes (including the extra report ID)
+   * that were sent or received via HIDAPI buffers. It does not log direct string calls (e.g. getEnumeratedString()).
    *
-   * <p>Format is '>' for host to device then '[count]' then hex bytes.</p>
+   * Format is '>' for host to device then '[count]' then hex bytes.
    *
-   * <p>This may present a security issue if left enabled in production, although a packet sniffer would see the same data.</p>
+   * This may present a security issue if left enabled in production, although a packet sniffer would see the same data.
    */
   public static boolean logTraffic = false;
 
@@ -78,7 +77,7 @@ public class HidApi {
   private static HidApiLibrary hidApiLibrary;
 
   /**
-   * <p>Open a HID device using a Vendor ID (VID), Product ID (PID) and optionally a serial number</p>
+   * Open a HID device using a Vendor ID (VID), Product ID (PID) and optionally a serial number
    *
    * @param vendor       The vendor ID
    * @param product      The product ID
@@ -105,7 +104,7 @@ public class HidApi {
   }
 
   /**
-   * <p>Initialise the HID API library. Should always be called before using any other API calls.</p>
+   * Initialise the HID API library. Should always be called before using any other API calls.
    */
   public static void init() {
 
@@ -119,14 +118,14 @@ public class HidApi {
   }
 
   /**
-   * <p>Finalise the HID API library</p>
+   * Finalise the HID API library
    */
   public static void exit() {
     hidApiLibrary.hid_exit();
   }
 
   /**
-   * <p>Open a HID device by its path name</p>
+   * Open a HID device by its path name
    *
    * @param path The device path (e.g. "0003:0002:00")
    *
@@ -138,7 +137,7 @@ public class HidApi {
   }
 
   /**
-   * <p>Close a HID device</p>
+   * Close a HID device
    *
    * @param device The HID device structure
    */
@@ -151,7 +150,7 @@ public class HidApi {
   }
 
   /**
-   * <p>Enumerate the attached HID devices</p>
+   * Enumerate the attached HID devices
    *
    * @param vendor  The vendor ID
    * @param product The product ID
@@ -165,7 +164,7 @@ public class HidApi {
   }
 
   /**
-   * <p>Free an enumeration linked list</p>
+   * Free an enumeration linked list
    *
    * @param list The list to free
    */
@@ -244,12 +243,12 @@ public class HidApi {
   }
 
   /**
-   * <p>Set the device handle to be non-blocking</p>
+   * Set the device handle to be non-blocking
    *
-   * <p>In non-blocking mode calls to hid_read() will return immediately with a value of 0 if there is no data to be read.
-   * In blocking mode, hid_read() will wait (block) until there is data to read before returning</p>
+   * In non-blocking mode calls to hid_read() will return immediately with a value of 0 if there is no data to be read.
+   * In blocking mode, hid_read() will wait (block) until there is data to read before returning
    *
-   * <p>Non-blocking can be turned on and off at any time</p>
+   * Non-blocking can be turned on and off at any time
    *
    * @param device      The HID device
    * @param nonBlocking True if non-blocking mode is required
@@ -263,9 +262,9 @@ public class HidApi {
   }
 
   /**
-   * <p>Read an Input report from a HID device</p>
-   * <p>Input reports are returned to the host through the INTERRUPT IN endpoint. The first byte
-   * will contain the Report ID if the device uses numbered reports.</p>
+   * Read an Input report from a HID device
+   * Input reports are returned to the host through the INTERRUPT IN endpoint. The first byte
+   * will contain the Report ID if the device uses numbered reports.
    *
    * @param device The HID device
    * @param buffer The buffer to read into (allow an extra byte if device supports multiple report IDs)
@@ -290,7 +289,7 @@ public class HidApi {
   }
 
   /**
-   * <p>Read an Input report from a HID device with timeout</p>
+   * Read an Input report from a HID device with timeout
    *
    * @param device        The HID device
    * @param buffer        The buffer to read into
@@ -316,13 +315,13 @@ public class HidApi {
   }
 
   /**
-   * <p>Get a feature report from a HID device</p>
+   * Get a feature report from a HID device
    *
    * <b>HID API notes</b>
    *
-   * <p>Under the covers the HID library will set the first byte of data[] to the Report ID of the report to be read.
-   * Upon return, the first byte will still contain the Report ID, and the report data will start in data[1]</p>
-   * <p>This method handles all the wide string and array manipulation for you</p>
+   * Under the covers the HID library will set the first byte of data[] to the Report ID of the report to be read.
+   * Upon return, the first byte will still contain the Report ID, and the report data will start in data[1]
+   * This method handles all the wide string and array manipulation for you
    *
    * @param device   The HID device
    * @param data     The buffer to contain the report
@@ -355,21 +354,21 @@ public class HidApi {
   }
 
   /**
-   * <p>Send a Feature report to the device using a simplified interface</p>
+   * Send a Feature report to the device using a simplified interface
    *
    * <b>HID API notes</b>
    *
-   * <p>Under the covers, feature reports are sent over the Control endpoint as a Set_Report transfer.
+   * Under the covers, feature reports are sent over the Control endpoint as a Set_Report transfer.
    * The first byte of data[] must contain the Report ID. For devices which only support a single report,
-   * this must be set to 0x0. The remaining bytes contain the report data</p>
-   * <p>Since the Report ID is mandatory, calls to hid_send_feature_report() will always contain one more byte than
-   * the report contains.</p>
+   * this must be set to 0x0. The remaining bytes contain the report data
+   * Since the Report ID is mandatory, calls to hid_send_feature_report() will always contain one more byte than
+   * the report contains.
    *
-   * <p>For example, if a hid report is 16 bytes long, 17 bytes must be passed to
+   * For example, if a hid report is 16 bytes long, 17 bytes must be passed to
    * hid_send_feature_report(): the Report ID (or 0x00, for devices which do not use numbered reports), followed by
-   * the report data (16 bytes). In this example, the bytes written would be 17.</p>
+   * the report data (16 bytes). In this example, the bytes written would be 17.
    *
-   * <p>This method handles all the array manipulation for you</p>
+   * This method handles all the array manipulation for you
    *
    * @param device   The HID device
    * @param data     The feature report data (will be widened and have the report ID pre-pended)
@@ -395,22 +394,22 @@ public class HidApi {
   }
 
   /**
-   * <p>Write an Output report to a HID device using a simplified interface</p>
+   * Write an Output report to a HID device using a simplified interface
    *
    * <b>HID API notes</b>
    *
-   * <p>In USB HID the first byte of the data packet must contain the Report ID.
+   * In USB HID the first byte of the data packet must contain the Report ID.
    * For devices which only support a single report, this must be set to 0x00.
    * The remaining bytes contain the report data. Since the Report ID is mandatory,
    * calls to <code>hid_write()</code> will always contain one more byte than the report
-   * contains.</p>
+   * contains.
    *
-   * <p>For example, if a HID report is 16 bytes long, 17 bytes must be passed to <code>hid_write()</code>,
+   * For example, if a HID report is 16 bytes long, 17 bytes must be passed to <code>hid_write()</code>,
    * the Report ID (or 0x00, for devices with a single report), followed by the report data (16 bytes).
-   * In this example, the length passed in would be 17.</p>
+   * In this example, the length passed in would be 17.
    *
-   * <p><code>hid_write()</code> will send the data on the first OUT endpoint, if one exists.
-   * If it does not, it will send the data through the Control Endpoint (Endpoint 0)</p>
+   * <code>hid_write()</code> will send the data on the first OUT endpoint, if one exists.
+   * If it does not, it will send the data through the Control Endpoint (Endpoint 0)
    *
    * @param device   The device
    * @param data     The report data to write (should not include the Report ID)
@@ -447,7 +446,7 @@ public class HidApi {
   }
 
   /**
-   * <p>Get a string from a HID device, based on its string index</p>
+   * Get a string from a HID device, based on its string index
    *
    * @param device The HID device
    * @param idx    The index

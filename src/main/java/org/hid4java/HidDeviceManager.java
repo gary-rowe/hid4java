@@ -32,14 +32,13 @@ import org.hid4java.jna.HidDeviceInfoStructure;
 import java.util.*;
 
 /**
- * <p>Manager to provide the following to HID services:</p>
+ * Manager to provide the following to HID services:
  * <ul>
  * <li>Access to the underlying JNA and hidapi library</li>
  * <li>Device attach/detach detection</li>
  * </ul>
  *
  * @since 0.0.1
- *  
  */
 class HidDeviceManager {
 

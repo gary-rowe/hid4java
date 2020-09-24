@@ -26,13 +26,12 @@
 package org.hid4java;
 
 /**
- * <p>Caught exception to provide the following to API consumers:</p>
+ * Caught exception to provide the following to API consumers:
  * <ul>
  * <li>Notification of a serious problem with HID</li>
  * </ul>
  *
  * @since 0.0.1
- *  
  */
 public class HidException extends RuntimeException {
 

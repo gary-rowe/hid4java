@@ -28,8 +28,9 @@ package org.hid4java.jna;
 import com.sun.jna.Native;
 
 /**
- * <p>JNA library interface to act as the proxy for the underlying native library</p>
- * <p>This approach removes the need for any JNI or native code</p>
+ * JNA library interface to act as the proxy for the underlying native library
+ * This approach removes the need for any JNI or native code
+ * @since 0.7.0
  */
 public interface LibusbHidApiLibrary extends HidrawHidApiLibrary {
 

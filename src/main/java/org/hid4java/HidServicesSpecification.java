@@ -26,13 +26,12 @@
 package org.hid4java;
 
 /**
- * <p>Specification to provide the following to API consumers:</p>
+ * Specification to provide the following to API consumers:
  * <ul>
  * <li>Flexible configuration of HID services parameters</li>
  * </ul>
  *
  * @since 0.5.0
- *  
  */
 public class HidServicesSpecification {
 

@@ -31,7 +31,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * <p>Wrapper for a wide character (WCHAR) structure</p>
+ * Wrapper for a wide character (WCHAR) structure
+ * @since 0.1.0
  */
 public class WideStringBuffer extends Structure implements Structure.ByReference {
 
@@ -51,7 +52,7 @@ public class WideStringBuffer extends Structure implements Structure.ByReference
   }
 
   /**
-   * <p>hidapi uses wchar_t which is written l i k e   t h i s (with '\0' in between)</p>
+   * HIDAPI uses wchar_t which is written l i k e   t h i s (with '\0' in between)
    */
   public String toString() {
     StringBuilder str = new StringBuilder();

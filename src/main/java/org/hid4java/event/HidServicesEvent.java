@@ -29,13 +29,12 @@ import org.hid4java.HidDevice;
 
 
 /**
- * <p>Event to provide the following to API consumers:</p>
+ * Event to provide the following to API consumers:
  * <ul>
  * <li>Provision of HID device information</li>
  * </ul>
  *
  * @since 0.0.1
- *  
  */
 public class HidServicesEvent {
 

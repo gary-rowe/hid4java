@@ -30,25 +30,26 @@ import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 
 /**
- * <p>JNA library interface to act as the proxy for the underlying native library</p>
- * <p>This approach removes the need for any JNI or native code</p>
+ * JNA library interface to act as the proxy for the underlying native library
+ * This approach removes the need for any JNI or native code
+ * @since 0.1.0
  */
 public interface HidApiLibrary extends Library {
 
   /**
-   * <p>Initialize the HIDAPI library.</p>
-   * <p>This function initializes the HIDAPI library. Calling it is not strictly necessary,
+   * Initialize the HIDAPI library.
+   * This function initializes the HIDAPI library. Calling it is not strictly necessary,
    * as it will be called automatically by hid_enumerate() and any of the hid_open_*() functions
    * if it is needed. This function should be called at the beginning of execution however,
-   * if there is a chance of HIDAPI handles being opened by different threads simultaneously.</p>
+   * if there is a chance of HIDAPI handles being opened by different threads simultaneously.
    */
   void hid_init();
 
   /**
-   * <p>Finalize the HIDAPI library.</p>
-   *
-   * <p>This function frees all of the static data associated with HIDAPI. It should be called
-   * at the end of execution to avoid memory leaks.</p>
+   * Finalize the HIDAPI library.
+   * <p>
+   * This function frees all of the static data associated with HIDAPI. It should be called
+   * at the end of execution to avoid memory leaks.
    */
   void hid_exit();
 

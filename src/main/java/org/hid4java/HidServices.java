@@ -35,14 +35,13 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 /**
- * <p>JNA bridge class to provide the following to USB HID:</p>
+ * JNA bridge class to provide the following to USB HID:
  * <ul>
  * <li>Access to the <code>signal11/hidapi</code> via JNA</li>
  * </ul>
- * <p>Requires the hidapi to be present on the classpath or the system library search path.</p>
+ * Requires the hidapi to be present on the classpath or the system library search path.
  *
  * @since 0.0.1
- *  
  */
 public class HidServices {
 

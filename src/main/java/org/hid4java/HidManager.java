@@ -26,13 +26,12 @@
 package org.hid4java;
 
 /**
- * <p>Factory to provide the following to API consumers:</p>
+ * Factory to provide the following to API consumers:
  * <ul>
  * <li>Access to configured HID services</li>
  * </ul>
  *
  * @since 0.0.1
- *  
  */
 public class HidManager {
 
@@ -41,8 +40,8 @@ public class HidManager {
   private static HidServices hidServices = null;
 
   /**
-   * <p>Simple service provider providing generally safe defaults. If you find you are experiencing problems, particularly
-   * with constrained devices, consider exploring the {@link HidServicesSpecification} options.</p>
+   * Simple service provider providing generally safe defaults. If you find you are experiencing problems, particularly
+   * with constrained devices, consider exploring the {@link HidServicesSpecification} options.
    *
    * @return A single instance of the HID services using the default specification
    */
@@ -60,12 +59,10 @@ public class HidManager {
   }
 
   /**
-   * <p>Fully configurable service provider</p>
+   * Fully configurable service provider
    *
    * @param hidServicesSpecification Provides various parameters for configuring HID services
-   *
    * @return A single instance of the HID services using specified parameters
-   *
    * @since 0.5.0
    */
   public static HidServices getHidServices(HidServicesSpecification hidServicesSpecification) throws HidException {

@@ -31,7 +31,7 @@ import org.hid4java.jna.HidApi;
 import java.security.SecureRandom;
 
 /*
- * <p>Demonstrate the USB HID interface using a FIDO2 USB device</p>
+ * Demonstrate the USB HID interface using a FIDO2 USB device
  *
  * @since 0.8.0
  */

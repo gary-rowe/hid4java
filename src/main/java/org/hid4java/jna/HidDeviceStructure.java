@@ -32,7 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <p>Low level JNA value object to provide a HID device pointer</p>
+ * Low level JNA value object to provide a HID device pointer
+ * @since 0.1.0
  */
 public class HidDeviceStructure extends Structure implements Structure.ByReference {
 
