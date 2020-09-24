@@ -63,6 +63,16 @@ public class HidApi {
   public static boolean useLibUsbVariant = false;
 
   /**
+   * <p>Enables HID traffic logging to stdout to assist debugging. This will show all bytes (including the extra report ID)
+   * that were sent or received via HIDAPI buffers. It does not log direct string calls (e.g. getEnumeratedString()).</p>
+   *
+   * <p>Format is '>' for host to device then '[count]' then hex bytes.</p>
+   *
+   * <p>This may present a security issue if left enabled in production, although a packet sniffer would see the same data.</p>
+   */
+  public static boolean logTraffic = false;
+
+  /**
    * The HID API library
    */
   private static HidApiLibrary hidApiLibrary;
@@ -271,7 +281,12 @@ public class HidApi {
 
     WideStringBuffer wBuffer = new WideStringBuffer(buffer);
 
-    return hidApiLibrary.hid_read(device.ptr(), wBuffer, wBuffer.buffer.length);
+    int result = hidApiLibrary.hid_read(device.ptr(), wBuffer, wBuffer.buffer.length);
+
+    logTraffic(wBuffer, false);
+
+    return result;
+
   }
 
   /**
@@ -292,7 +307,11 @@ public class HidApi {
 
     WideStringBuffer wBuffer = new WideStringBuffer(buffer);
 
-    return hidApiLibrary.hid_read_timeout(device.ptr(), wBuffer, buffer.length, timeoutMillis);
+    int result = hidApiLibrary.hid_read_timeout(device.ptr(), wBuffer, buffer.length, timeoutMillis);
+
+    logTraffic(wBuffer, false);
+
+    return result;
 
   }
 
@@ -328,6 +347,8 @@ public class HidApi {
 
     // Avoid index out of bounds exception
     System.arraycopy(report.buffer, 1, data, 0, Math.min(res, data.length));
+
+    logTraffic(report, false);
 
     return res;
 
@@ -366,6 +387,9 @@ public class HidApi {
     report.buffer[0] = reportId;
 
     System.arraycopy(data, 0, report.buffer, 1, data.length);
+
+    logTraffic(report, true);
+
     return hidApiLibrary.hid_send_feature_report(device.ptr(), report, report.buffer.length);
 
   }
@@ -381,9 +405,9 @@ public class HidApi {
    * calls to <code>hid_write()</code> will always contain one more byte than the report
    * contains.</p>
    *
-   * <p>For example, if a hid report is 16 bytes long, 17 bytes must be passed to <code>hid_write()</code>,
+   * <p>For example, if a HID report is 16 bytes long, 17 bytes must be passed to <code>hid_write()</code>,
    * the Report ID (or 0x00, for devices with a single report), followed by the report data (16 bytes).
-   * In this example, the length passed in would be 17</p>
+   * In this example, the length passed in would be 17.</p>
    *
    * <p><code>hid_write()</code> will send the data on the first OUT endpoint, if one exists.
    * If it does not, it will send the data through the Control Endpoint (Endpoint 0)</p>
@@ -416,6 +440,8 @@ public class HidApi {
       System.arraycopy(data, 0, report.buffer, 1, len);
     }
 
+    logTraffic(report, true);
+
     return hidApiLibrary.hid_write(device.ptr(), report, report.buffer.length);
 
   }
@@ -438,4 +464,25 @@ public class HidApi {
 
     return res == -1 ? null : wStr.toString();
   }
+
+  /**
+   *
+   * @param buffer The buffer to serialise for traffic
+   * @param isWrite True if writing (from host to device)
+   */
+  private static void logTraffic(WideStringBuffer buffer, boolean isWrite) {
+    if (HidApi.logTraffic && buffer != null) {
+      if (isWrite) {
+        System.out.print("> ");
+      } else {
+        System.out.print("< ");
+      }
+      System.out.printf("[%02x]:", buffer.buffer.length);
+      for (byte b : buffer.buffer) {
+        System.out.printf(" %02x", b);
+      }
+      System.out.println();
+    }
+  }
+
 }
