@@ -208,29 +208,38 @@ public class Fido2AuthenticationExample extends BaseExample {
 
     // Write message to device with zero byte padding
     System.out.println(ANSI_GREEN + "Sending CTAPHID_INIT..." + ANSI_RESET);
-    int val = hidDevice.write(initialiseRequest, CTAP_MAX_REPORT_LEN, (byte) 0x00, true);
-    if (val < 0) {
+    int bytesWritten = hidDevice.write(initialiseRequest, CTAP_MAX_REPORT_LEN, (byte) 0x00, true);
+    if (bytesWritten < 0) {
       System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
+      return;
     }
 
-    // Prepare to read a single data packet
-    boolean moreData = true;
-    while (moreData) {
-      byte[] buffer = new byte[CTAP_MAX_REPORT_LEN];
-      // This method will now block for 500ms or until data is read
-      val = hidDevice.read(buffer, 500);
-      switch (val) {
-        case -1:
-          System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
-          break;
-        case 0:
-          moreData = false;
-          break;
-        default:
-          // Loop for more data
-          break;
-      }
+    // Read everything from the device
+    byte[] initialiseResponse = hidDevice.readAll();
+    if (initialiseResponse == null || initialiseResponse.length == 0) {
+      System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
+      return;
     }
+
+    System.out.println(ANSI_GREEN + "Response is:" + ANSI_RESET);
+    System.out.printf("Channel id: %02x %02x %02x %02x%n",
+      initialiseResponse[0], initialiseResponse[1], initialiseResponse[2], initialiseResponse[3]
+    );
+    System.out.printf("Command (0x86): %02x%n", initialiseResponse[4]);
+    System.out.printf("Byte count (0x00 0x11): %02x %02x%n", initialiseResponse[5], initialiseResponse[6]);
+    System.out.printf("Nonce (%02x %02x %02x %02x %02x %02x %02x %02x): %02x %02x %02x %02x %02x %02x %02x %02x%n",
+      nonce[0], nonce[1], nonce[2], nonce[3], nonce[4], nonce[5], nonce[6], nonce[7],
+      initialiseResponse[7], initialiseResponse[8],initialiseResponse[9], initialiseResponse[10],
+      initialiseResponse[11], initialiseResponse[12],initialiseResponse[13], initialiseResponse[14]
+    );
+    System.out.printf("New channel id: %02x %02x %02x %02x%n",
+      initialiseResponse[15], initialiseResponse[16],initialiseResponse[17], initialiseResponse[18]
+    );
+    System.out.printf("Protocol (0x02): %02x%n", initialiseResponse[19]);
+    System.out.printf("Major: %02x%n", initialiseResponse[20]);
+    System.out.printf("Minor: %02x%n", initialiseResponse[21]);
+    System.out.printf("Build: %02x%n", initialiseResponse[22]);
+    System.out.printf("Capabilities: %02x%n", initialiseResponse[23]);
 
   }
 
