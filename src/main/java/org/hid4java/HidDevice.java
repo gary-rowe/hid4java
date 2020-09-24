@@ -29,6 +29,8 @@ import org.hid4java.jna.HidApi;
 import org.hid4java.jna.HidDeviceInfoStructure;
 import org.hid4java.jna.HidDeviceStructure;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -213,19 +215,13 @@ public class HidDevice {
   }
 
   /**
-   *
    * Set the device handle to be non-blocking
-   *
-   *
    *
    * In non-blocking mode calls to hid_read() will return immediately with a
    * value of 0 if there is no data to be read. In blocking mode, hid_read()
    * will wait (block) until there is data to read before returning
    *
-   *
-   *
    * Non-blocking can be turned on and off at any time
-   *
    *
    * @param nonBlocking True if non-blocking mode is required
    * @since 0.1.0
@@ -238,14 +234,11 @@ public class HidDevice {
   }
 
   /**
-   *
    * Read an Input report from a HID device
-   *
    *
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
    * reports
-   *
    *
    * @param data The buffer to read into
    * @return The actual number of bytes read and -1 on error. If no packet was
@@ -261,14 +254,11 @@ public class HidDevice {
   }
 
   /**
-   *
    * Read an Input report from a HID device
-   *
    *
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
    * reports
-   *
    *
    * @param amountToRead  the number of bytes to read
    * @param timeoutMillis The number of milliseconds to wait before giving up
@@ -314,14 +304,13 @@ public class HidDevice {
   }
 
   /**
-   * Read an Input report from a HID device
+   * Read an Input report (64 bytes) from a HID device with a 1000ms timeout.
    *
    * Input reports are returned to the host through the INTERRUPT IN endpoint.
    * The first byte will contain the Report number if the device uses numbered
-   * reports
+   * reports.
    *
-   *
-   * @return a Byte array of the read data
+   * @return A Byte array of the read data
    * @since 0.1.0
    */
   public Byte[] read() {
@@ -346,17 +335,47 @@ public class HidDevice {
   }
 
   /**
+   * Read an Input report from a HID device with timeout
    *
+   * @return A byte[] of the read data
+   * @since 0.8.0
+   */
+  public byte[] readAll() {
+
+    // Overall data storage
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+    // Prepare to read a single HID packet
+    boolean morePackets = true;
+    while (morePackets) {
+      byte[] packet = new byte[64];
+
+      // This method will block while awaiting data
+      int bytesRead = read(packet, 500);
+
+      if (bytesRead > 0) {
+        try {
+          output.write(packet);
+        } catch (IOException e) {
+          morePackets = false;
+        }
+      } else {
+        morePackets = false;
+      }
+    }
+
+    return output.toByteArray();
+  }
+
+
+  /**
    * Get a feature report from a HID device
-   *
    *
    * Under the covers the HID library will set the first byte of data[] to the
    * Report ID of the report to be read. Upon return, the first byte will
    * still contain the Report ID, and the report data will start in data[1]
    *
-   *
    * This method handles all the wide string and array manipulation for you
-   *
    *
    * @param data     The buffer to contain the report
    * @param reportId The report ID (or (byte) 0x00)
@@ -372,16 +391,12 @@ public class HidDevice {
   }
 
   /**
-   *
    * Send a Feature report to the device
-   *
-   *
    *
    * Under the covers, feature reports are sent over the Control endpoint as a
    * Set_Report transfer. The first byte of data[] must contain the Report ID.
    * For devices which only support a single report, this must be set to 0x0.
    * The remaining bytes contain the report data
-   *
    *
    * Since the Report ID is mandatory, calls to hid_send_feature_report() will
    * always contain one more byte than the report contains. For example, if a
@@ -390,10 +405,7 @@ public class HidDevice {
    * not use numbered reports), followed by the report data (16 bytes). In
    * this example, the length passed in would be 17
    *
-   *
-   *
    * This method handles all the array manipulation for you
-   *
    *
    * @param data     The feature report data (will be widened and have the report
    *                 ID pre-pended)
@@ -410,9 +422,7 @@ public class HidDevice {
   }
 
   /**
-   *
    * Get a string from a HID device, based on its string index
-   *
    *
    * @param index The index
    * @return The string
