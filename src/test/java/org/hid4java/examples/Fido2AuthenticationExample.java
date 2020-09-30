@@ -124,6 +124,9 @@ public class Fido2AuthenticationExample extends BaseExample {
   // Secure random source for nonce
   private static SecureRandom secureRandom = new SecureRandom();
 
+  // Instance variables
+  private byte[] fidoChannel = new byte[4];
+
   public static void main(String[] args) throws HidException {
 
     Fido2AuthenticationExample example = new Fido2AuthenticationExample();
@@ -158,7 +161,10 @@ public class Fido2AuthenticationExample extends BaseExample {
       // Shut down and rely on auto-shutdown hook to clear HidApi resources
       System.out.println(ANSI_YELLOW + "No FIDO2 devices attached." + ANSI_RESET);
     } else {
-      getFidoFeatures(fidoDevice);
+      if (handleInitialise(fidoDevice)) {
+        // TODO Expand example to include a registration request
+        //handleRegister(fidoDevice);
+      }
     }
 
     waitAndShutdown(hidServices);
@@ -173,7 +179,12 @@ public class Fido2AuthenticationExample extends BaseExample {
 
   }
 
-  private void getFidoFeatures(HidDevice hidDevice) {
+  /**
+   * Initialise the FIDO2 device and set a communications channel
+   * @param hidDevice The device to use
+   * @return True if the device is now initialised for use
+   */
+  private boolean handleInitialise(HidDevice hidDevice) {
 
     // Ensure device is open after an attach/detach event
     if (!hidDevice.isOpen()) {
@@ -182,28 +193,12 @@ public class Fido2AuthenticationExample extends BaseExample {
 
     byte[] nonce = generateNonce();
 
-    // Ping
-    byte[] pingRequest = new byte[]{
-      (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, // Broadcast channel
-      (byte) ((byte) 0x80 + CTAP_CMD_PING), // Command
-      0x00, 0x08, // Payload byte count (BCNT)
-      nonce[0], nonce[1], nonce[2], nonce[3], nonce[4], nonce[5], nonce[6], nonce[7]
-    };
-
     // Initialise
     byte[] initialiseRequest = new byte[]{
       (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, // Broadcast channel
-      (byte) ((byte) 0x80 + CTAP_CMD_INIT), // Command
+      (byte) ((byte) 0x80 + CTAP_CMD_INIT), // Initialise command
       0x00, 0x08, // Payload byte count (BCNT)
       nonce[0], nonce[1], nonce[2], nonce[3], nonce[4], nonce[5], nonce[6], nonce[7]
-    };
-
-    // GetInfo
-    byte[] getInfoRequest = new byte[]{
-      0x01, 0x02, 0x03, 0x04, // Response channel (supplied by device)
-      (byte) ((byte) 0x80 + CTAP_CMD_CBOR), // Command
-      0x00, 0x01, // // Payload byte count (BCNT)
-      CTAP_CBOR_GETINFO
     };
 
     // Write message to device with zero byte padding
@@ -211,16 +206,17 @@ public class Fido2AuthenticationExample extends BaseExample {
     int bytesWritten = hidDevice.write(initialiseRequest, CTAP_MAX_REPORT_LEN, (byte) 0x00, true);
     if (bytesWritten < 0) {
       System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
-      return;
+      return false;
     }
 
     // Read everything from the device
     byte[] initialiseResponse = hidDevice.readAll();
     if (initialiseResponse == null || initialiseResponse.length == 0) {
       System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
-      return;
+      return false;
     }
 
+    // Decode the response
     System.out.println(ANSI_GREEN + "Response is:" + ANSI_RESET);
     System.out.printf("Channel id: %02x %02x %02x %02x%n",
       initialiseResponse[0], initialiseResponse[1], initialiseResponse[2], initialiseResponse[3]
@@ -240,6 +236,14 @@ public class Fido2AuthenticationExample extends BaseExample {
     System.out.printf("Minor: %02x%n", initialiseResponse[21]);
     System.out.printf("Build: %02x%n", initialiseResponse[22]);
     System.out.printf("Capabilities: %02x%n", initialiseResponse[23]);
+
+    // Copy the channel for ongoing communications
+    fidoChannel[0] = initialiseResponse[15];
+    fidoChannel[1] = initialiseResponse[16];
+    fidoChannel[2] = initialiseResponse[17];
+    fidoChannel[3] = initialiseResponse[18];
+
+    return true;
 
   }
 
