@@ -63,6 +63,7 @@ public abstract class BaseExample implements HidServicesListener {
     sleepNoInterruption();
 
     // Shut down and rely on auto-shutdown hook to clear HidApi resources
+    System.out.printf(ANSI_YELLOW + "Triggering shutdown...%n" + ANSI_RESET);
     hidServices.shutdown();
   }
 
@@ -73,7 +74,7 @@ public abstract class BaseExample implements HidServicesListener {
   public static void sleepNoInterruption() {
     boolean interrupted = false;
     try {
-      long remainingNanos = TimeUnit.SECONDS.toNanos(30);
+      long remainingNanos = TimeUnit.SECONDS.toNanos(5);
       long end = System.nanoTime() + remainingNanos;
       while (true) {
         try {
@@ -110,6 +111,19 @@ public abstract class BaseExample implements HidServicesListener {
   public void hidFailure(HidServicesEvent event) {
 
     System.out.println(ANSI_RED + "HID failure: " + event + ANSI_RESET);
+
+  }
+
+  @Override
+  public void hidDataReceived(HidServicesEvent event) {
+
+    System.out.printf(ANSI_PURPLE + "Data received:%n");
+    byte[] dataReceived = event.getDataReceived();
+    System.out.printf("< [%02x]:", dataReceived.length);
+    for (byte b : dataReceived) {
+      System.out.printf(" %02x", b);
+    }
+    System.out.println(ANSI_RESET);
 
   }
 

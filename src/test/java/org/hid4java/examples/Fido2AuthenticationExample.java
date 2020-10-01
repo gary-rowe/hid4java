@@ -26,6 +26,7 @@
 package org.hid4java.examples;
 
 import org.hid4java.*;
+import org.hid4java.event.HidServicesEvent;
 import org.hid4java.jna.HidApi;
 
 import java.security.SecureRandom;
@@ -125,6 +126,7 @@ public class Fido2AuthenticationExample extends BaseExample {
   private static SecureRandom secureRandom = new SecureRandom();
 
   // Instance variables
+  private byte[] nonce = new byte[8];
   private byte[] fidoChannel = new byte[4];
 
   public static void main(String[] args) throws HidException {
@@ -138,14 +140,27 @@ public class Fido2AuthenticationExample extends BaseExample {
 
     printPlatform();
 
+    // Demonstrate low level traffic logging
     HidApi.logTraffic = true;
 
     // Configure to use custom specification
     HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
 
+    // Use manual start
+    hidServicesSpecification.setAutoStart(false);
+
+    // Use data received events
+    hidServicesSpecification.setAutoDataRead(true);
+    hidServicesSpecification.setDataReadInterval(500);
+
     // Get HID services using custom specification
     HidServices hidServices = HidManager.getHidServices(hidServicesSpecification);
+
+    // Register for service events
     hidServices.addHidServicesListener(this);
+
+    // Manually start HID services
+    hidServices.start();
 
     // Enumerate devices looking for = 0xf1d0 usage page
     HidDevice fidoDevice = null;
@@ -171,11 +186,12 @@ public class Fido2AuthenticationExample extends BaseExample {
 
   }
 
-  private byte[] generateNonce() {
+  /**
+   * Generate a random set of 8 bytes for use as a nonce
+   */
+  private void generateNonce() {
 
-    byte[] nonce = new byte[8];
     secureRandom.nextBytes(nonce);
-    return nonce;
 
   }
 
@@ -186,12 +202,12 @@ public class Fido2AuthenticationExample extends BaseExample {
    */
   private boolean handleInitialise(HidDevice hidDevice) {
 
-    // Ensure device is open after an attach/detach event
+    // Ensure device is open
     if (!hidDevice.isOpen()) {
       hidDevice.open();
     }
 
-    byte[] nonce = generateNonce();
+    generateNonce();
 
     // Initialise
     byte[] initialiseRequest = new byte[]{
@@ -209,12 +225,16 @@ public class Fido2AuthenticationExample extends BaseExample {
       return false;
     }
 
-    // Read everything from the device
-    byte[] initialiseResponse = hidDevice.readAll();
-    if (initialiseResponse == null || initialiseResponse.length == 0) {
-      System.out.println(ANSI_RED + hidDevice.getLastErrorMessage() + ANSI_RESET);
-      return false;
-    }
+    return true;
+
+  }
+
+  @Override
+  public void hidDataReceived(HidServicesEvent event) {
+    super.hidDataReceived(event);
+
+    // Analyse the response
+    byte[] initialiseResponse = event.getDataReceived();
 
     // Decode the response
     System.out.println(ANSI_GREEN + "Response is:" + ANSI_RESET);
@@ -243,8 +263,5 @@ public class Fido2AuthenticationExample extends BaseExample {
     fidoChannel[2] = initialiseResponse[17];
     fidoChannel[3] = initialiseResponse[18];
 
-    return true;
-
   }
-
 }
