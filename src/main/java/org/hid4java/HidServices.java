@@ -101,7 +101,7 @@ public class HidServices {
   }
 
   /**
-   * Stop scanning for devices and shut down the {@link HidApi}
+   * Stop all device threads and shut down the {@link HidApi}
    */
   public void shutdown() {
     stop();
@@ -113,14 +113,18 @@ public class HidServices {
   }
 
   /**
-   * Stop scanning for devices
+   * Stop all threads (enumeration, data read etc), close all devices
+   * and clear all listeners
+   *
+   * Normally part of an application shutdown
    */
   public void stop() {
     hidDeviceManager.stop();
+    this.listeners.clear();
   }
 
   /**
-   * Start scanning for devices (if not already scanning)
+   * Start all threads (enumeration, data read etc) as configured
    */
   public void start() {
     hidDeviceManager.start();
