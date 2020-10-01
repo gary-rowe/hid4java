@@ -39,24 +39,31 @@ import java.util.EventListener;
  */
 public interface HidServicesListener extends EventListener {
   /**
-   * A HID device was attached
+   * A HID was attached
    *
    * @param event The event
    */
   void hidDeviceAttached(HidServicesEvent event);
 
   /**
-   * A HID device was detached
+   * A HID was detached
    *
    * @param event The event
    */
   void hidDeviceDetached(HidServicesEvent event);
 
   /**
-   * A HID failure occurred during scanning
+   * A HID failure occurred (enumeration, data transfer etc)
    *
    * @param event The event
    */
   void hidFailure(HidServicesEvent event);
+
+  /**
+   * A HID input data buffer was populated
+   *
+   * @param event The event
+   */
+  void hidDataReceived(HidServicesEvent event);
 
 }
