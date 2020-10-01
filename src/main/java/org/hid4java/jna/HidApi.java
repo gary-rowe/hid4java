@@ -282,7 +282,9 @@ public class HidApi {
 
     int result = hidApiLibrary.hid_read(device.ptr(), wBuffer, wBuffer.buffer.length);
 
-    logTraffic(wBuffer, false);
+    if (result > 0) {
+      logTraffic(wBuffer, false);
+    }
 
     return result;
 
@@ -308,7 +310,9 @@ public class HidApi {
 
     int result = hidApiLibrary.hid_read_timeout(device.ptr(), wBuffer, buffer.length, timeoutMillis);
 
-    logTraffic(wBuffer, false);
+    if (result > 0) {
+      logTraffic(wBuffer, false);
+    }
 
     return result;
 
@@ -470,7 +474,7 @@ public class HidApi {
    * @param isWrite True if writing (from host to device)
    */
   private static void logTraffic(WideStringBuffer buffer, boolean isWrite) {
-    if (HidApi.logTraffic && buffer != null) {
+    if (HidApi.logTraffic && buffer != null && buffer.size() > 0) {
       if (isWrite) {
         System.out.print("> ");
       } else {
