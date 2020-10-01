@@ -170,5 +170,31 @@ public class HidServicesListenerList {
       });
 
   }
+
+  /**
+   * Fire the HID data received event
+   *
+   * @param hidDevice The device that triggered the data input
+   * @param dataReceived The buffer with the data received
+   */
+  public void fireHidDataReceived(final HidDevice hidDevice, final byte[] dataReceived) {
+
+    // Broadcast on a different thread
+    executorService.submit(
+      new Runnable() {
+        @Override
+        public void run() {
+
+          HidServicesEvent event = new HidServicesEvent(hidDevice, dataReceived);
+
+          for (final HidServicesListener listener : toArray()) {
+            listener.hidDataReceived(event);
+          }
+
+        }
+      });
+
+  }
+
 }
 

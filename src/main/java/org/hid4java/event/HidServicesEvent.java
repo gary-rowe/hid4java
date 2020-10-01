@@ -27,6 +27,8 @@ package org.hid4java.event;
 
 import org.hid4java.HidDevice;
 
+import java.util.Arrays;
+
 
 /**
  * Event to provide the following to API consumers:
@@ -39,12 +41,24 @@ import org.hid4java.HidDevice;
 public class HidServicesEvent {
 
   private final HidDevice hidDevice;
+  private final byte[] dataReceived;
 
   /**
    * @param device The HidDevice involved in the event
    */
   public HidServicesEvent(HidDevice device) {
     hidDevice = device;
+    dataReceived = null;
+  }
+
+  /**
+   * @param device The HidDevice involved in the event
+   * @param dataReceived The contents of all data read
+   * @since 0.8.0
+   */
+  public HidServicesEvent(HidDevice device, byte[] dataReceived) {
+    hidDevice = device;
+    this.dataReceived = Arrays.copyOf(dataReceived, dataReceived.length);
   }
 
   /**
@@ -52,6 +66,13 @@ public class HidServicesEvent {
    */
   public HidDevice getHidDevice() {
     return hidDevice;
+  }
+
+  /**
+   * @return The data received (might be multiple packets of data)
+   */
+  public byte[] getDataReceived() {
+    return dataReceived;
   }
 
   @Override
