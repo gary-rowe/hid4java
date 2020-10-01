@@ -35,7 +35,8 @@ import java.util.*;
  * Manager to provide the following to HID services:
  * <ul>
  * <li>Access to the underlying JNA and hidapi library</li>
- * <li>Device attach/detach detection</li>
+ * <li>Device attach/detach detection (if configured)</li>
+ * <li>Device data read (if configured)</li>
  * </ul>
  *
  * @since 0.0.1
@@ -114,12 +115,17 @@ class HidDeviceManager {
   }
 
   /**
-   * Stop the scan executor and block until terminated (max 5 seconds)
+   * Stop the scan thread and close all attached devices
+   *
+   * This is normally part of a general application shutdown
    */
   public synchronized void stop() {
 
-    if (isScanning()) {
-      scanThread.interrupt();
+    stopScanThread();
+
+    // Close all attached devices
+    for (HidDevice hidDevice: attachedDevices.values()) {
+        hidDevice.close();
     }
 
   }
@@ -193,7 +199,7 @@ class HidDeviceManager {
       root = HidApi.enumerateDevices(0, 0);
     } catch (Throwable e) {
       // Could not initialise hidapi (possibly an unknown platform)
-      // Prevent further scanning as a fail safe
+      // Trigger a general stop as something serious has happened
       stop();
       // Inform the caller that something serious has gone wrong
       throw new HidException("Unable to start HidApi: " + e.getMessage());
@@ -204,7 +210,7 @@ class HidDeviceManager {
       HidDeviceInfoStructure hidDeviceInfoStructure = root;
       do {
         // Wrap in HidDevice
-        hidDeviceList.add(new HidDevice(hidDeviceInfoStructure, this));
+        hidDeviceList.add(new HidDevice(hidDeviceInfoStructure, this, hidServicesSpecification ));
         // Move to the next in the linked list
         hidDeviceInfoStructure = hidDeviceInfoStructure.next();
       } while (hidDeviceInfoStructure != null);
@@ -222,7 +228,7 @@ class HidDeviceManager {
   public void afterDeviceWrite() {
 
     if (ScanMode.SCAN_AT_FIXED_INTERVAL_WITH_PAUSE_AFTER_WRITE == hidServicesSpecification.getScanMode() && isScanning()) {
-      stop();
+      stopScanThread();
       // Ensure we have a new scan executor service available
       configureScanThread(getScanRunnable());
 
@@ -231,18 +237,44 @@ class HidDeviceManager {
   }
 
   /**
-   * Configures the scan executor service to allow recovery from stop or pause
+   * Indicate that an automatic data read has occurred which may require an event to be fired
+   *
+   * @param hidDevice The device that has received data
+   * @param dataReceived The data received
+   * @since 0.8.0
+   */
+  public void afterDeviceDataRead(HidDevice hidDevice, byte[] dataReceived) {
+
+    if (dataReceived != null && dataReceived.length > 0) {
+      this.listenerList.fireHidDataReceived(hidDevice, dataReceived);
+    }
+
+  }
+
+  /**
+   * Stop the scan thread
+   */
+  private synchronized void stopScanThread() {
+
+    if (isScanning()) {
+      scanThread.interrupt();
+    }
+
+  }
+
+  /**
+   * Configures the scan thread to allow recovery from stop or pause
    */
   private synchronized void configureScanThread(Runnable scanRunnable) {
 
     if (isScanning()) {
-      stop();
+      stopScanThread();
     }
 
     // Require a new one
     scanThread = new Thread(scanRunnable);
     scanThread.setDaemon(true);
-    scanThread.setName("hid4java Device Scanner");
+    scanThread.setName("hid4java device scanner");
     scanThread.start();
 
   }

@@ -45,6 +45,7 @@ import java.util.Arrays;
 public class HidDevice {
 
   private final HidDeviceManager hidDeviceManager;
+  private final HidServicesSpecification hidServicesSpecification;
   private HidDeviceStructure hidDeviceStructure;
 
   private final String path;
@@ -59,13 +60,23 @@ public class HidDevice {
   private final int interfaceNumber;
 
   /**
+   * The data read thread
+   *
+   * We use a Thread instead of Executor since it may be stopped/paused/restarted frequently
+   * and executors are more heavyweight in this regard
+   */
+  private Thread dataReadThread = null;
+
+  /**
    * @param infoStructure    The HID device info structure providing details
    * @param hidDeviceManager The HID device manager providing access to device enumeration for post IO scanning
+   * @param hidServicesSpecification The HID services specification providing access to required configuration
    * @since 0.1.0
    */
-  public HidDevice(HidDeviceInfoStructure infoStructure, HidDeviceManager hidDeviceManager) {
+  public HidDevice(HidDeviceInfoStructure infoStructure, HidDeviceManager hidDeviceManager, HidServicesSpecification hidServicesSpecification) {
 
     this.hidDeviceManager = hidDeviceManager;
+    this.hidServicesSpecification = hidServicesSpecification;
 
     this.hidDeviceStructure = null;
 
@@ -91,6 +102,97 @@ public class HidDevice {
     this.usagePage = infoStructure.usage_page;
     this.usage = infoStructure.usage;
     this.interfaceNumber = infoStructure.interface_number;
+  }
+
+  /**
+   * Handles the process of starting the data read thread
+   */
+  private void startDataReadThread() {
+
+    // Check for previous start
+    if (this.isDataRead()) {
+      return;
+    }
+
+    // Perform an immediate data read
+    dataRead();
+
+    // Ensure we have a scan thread available
+    configureDataReadThread(getDataReadRunnable());
+
+  }
+
+  /**
+   * Stop the data read thread
+   */
+  private synchronized void stopDataReadThread() {
+
+    if (isDataRead()) {
+      dataReadThread.interrupt();
+    }
+
+  }
+
+  /**
+   * Configures the data read thread to allow recovery from stop or pause
+   */
+  private synchronized void configureDataReadThread(Runnable dataReadRunnable) {
+
+    if (hidServicesSpecification.isAutoDataRead()) {
+      stopDataReadThread();
+    }
+
+    // Require a new one
+    dataReadThread = new Thread(dataReadRunnable);
+    dataReadThread.setDaemon(true);
+    dataReadThread.setName("hid4java data reader");
+    dataReadThread.start();
+
+  }
+
+  private synchronized Runnable getDataReadRunnable() {
+
+    final int dataReadInterval = hidServicesSpecification.getDataReadInterval();
+
+    return new Runnable() {
+      @Override
+      public void run() {
+
+        while (true) {
+          try {
+            Thread.sleep(dataReadInterval);
+          } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            break;
+          }
+          dataRead();
+        }
+      }
+    };
+
+  }
+
+  /**
+   * @return True if the data read thread is running
+   */
+  private boolean isDataRead() {
+    return dataReadThread != null && dataReadThread.isAlive();
+  }
+
+
+  /**
+   * Attempt to read all data from the device input buffer as part
+   * of the automatic data read process
+   *
+   * Will fire attach/detach events as appropriate.
+   */
+  private synchronized void dataRead() {
+
+    byte[] dataRead = readAll(100);
+
+    // Fire the event on a separate thread
+    hidDeviceManager.afterDeviceDataRead(this, dataRead);
+
   }
 
   /**
@@ -190,6 +292,12 @@ public class HidDevice {
    */
   public boolean open() {
     hidDeviceStructure = HidApi.open(path);
+
+    // Configure automatic data read
+    if (hidServicesSpecification.isAutoDataRead()) {
+      startDataReadThread();
+    }
+
     return hidDeviceStructure != null;
   }
 
@@ -210,7 +318,14 @@ public class HidDevice {
     if (!isOpen()) {
       return;
     }
+
+    // Prevent further automatic data read attempts
+    stopDataReadThread();
+
+    // Close the Hidapi reference
     HidApi.close(hidDeviceStructure);
+
+    // Ensure structure is removed from memory and prevent further interaction
     hidDeviceStructure = null;
   }
 
@@ -337,10 +452,14 @@ public class HidDevice {
   /**
    * Read an Input report from a HID device with timeout
    *
+   * @param timeoutMillis The number of milliseconds to wait before giving up
    * @return A byte[] of the read data
    * @since 0.8.0
    */
-  public byte[] readAll() {
+  public byte[] readAll(int timeoutMillis) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
 
     // Overall data storage
     ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -351,7 +470,7 @@ public class HidDevice {
       byte[] packet = new byte[64];
 
       // This method will block while awaiting data
-      int bytesRead = read(packet, 500);
+      int bytesRead = read(packet, timeoutMillis);
 
       if (bytesRead > 0) {
         try {
@@ -429,6 +548,9 @@ public class HidDevice {
    * @since 0.1.0
    */
   public String getIndexedString(int index) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     return HidApi.getIndexedString(hidDeviceStructure, index);
   }
 
@@ -444,6 +566,9 @@ public class HidDevice {
    * @since 0.1.0
    */
   public int write(byte[] message, int packetLength, byte reportId) {
+    if (!isOpen()) {
+      throw new IllegalStateException("Device has not been opened");
+    }
     return write(message, packetLength, reportId, false);
   }
 
