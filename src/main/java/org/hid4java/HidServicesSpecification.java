@@ -40,6 +40,8 @@ public class HidServicesSpecification {
   private int scanInterval = 500;
   private int pauseInterval = 5000;
   private boolean autoStart = true;
+  private boolean autoDataRead = false;
+  private int dataReadInterval = 500;
 
   public ScanMode getScanMode() {
     return scanMode;
@@ -101,10 +103,33 @@ public class HidServicesSpecification {
   }
 
   /**
-   *
    * @param autoStart True if the HidServices should start before any listeners are registered (default is backwards compatible to 0.6.0 and below)
    */
   public void setAutoStart(boolean autoStart) {
     this.autoStart = autoStart;
+  }
+
+  public boolean isAutoDataRead() {
+    return autoDataRead;
+  }
+
+  /**
+   * @param autoDataRead True if device input buffer should be automatically checked and read
+   * @since 0.8.0
+   */
+  public void setAutoDataRead(boolean autoDataRead) {
+    this.autoDataRead = autoDataRead;
+  }
+
+  public int getDataReadInterval() {
+    return dataReadInterval;
+  }
+
+  /**
+   *
+   * @param dataReadInterval The interval in milliseconds between attempts to read device input buffer
+   */
+  public void setDataReadInterval(int dataReadInterval) {
+    this.dataReadInterval = dataReadInterval;
   }
 }
