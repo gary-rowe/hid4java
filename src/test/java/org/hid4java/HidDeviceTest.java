@@ -4,6 +4,7 @@ import com.sun.jna.WString;
 import org.hid4java.jna.HidDeviceInfoStructure;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HidDeviceTest {
@@ -42,5 +43,37 @@ class HidDeviceTest {
 
   }
 
+  @Test
+  void verifyFields() {
+
+    // Arrange
+    mockStructure.path="path";
+    mockStructure.vendor_id=1;
+    mockStructure.product_id=2;
+    mockStructure.serial_number=new WString("serial");
+    mockStructure.release_number=3;
+    mockStructure.manufacturer_string=new WString("manufacturer");
+    mockStructure.product_string = new WString("product");
+    mockStructure.usage_page=4;
+    mockStructure.usage=5;
+    mockStructure.interface_number=6;
+    mockStructure.next=null;
+
+    // Act
+    HidDevice testObject = new HidDevice(mockStructure, null, null);
+
+    // Assert
+    assertEquals("path", testObject.getPath());
+    assertEquals(1, testObject.getVendorId());
+    assertEquals(2, testObject.getProductId());
+    assertEquals("serial", testObject.getSerialNumber());
+    assertEquals(3, testObject.getReleaseNumber());
+    assertEquals("manufacturer", testObject.getManufacturer());
+    assertEquals("product", testObject.getProduct());
+    assertEquals(4,testObject.getUsagePage());
+    assertEquals(5, testObject.getUsage());
+    assertEquals(6, testObject.getInterfaceNumber());
+
+  }
 
 }
