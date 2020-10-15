@@ -204,7 +204,9 @@ public class Fido2AuthenticationExample extends BaseExample {
 
     // Ensure device is open
     if (!hidDevice.isOpen()) {
-      hidDevice.open();
+      if (!hidDevice.open()) {
+        throw new IllegalStateException("Unable to open device");
+      }
     }
 
     generateNonce();
