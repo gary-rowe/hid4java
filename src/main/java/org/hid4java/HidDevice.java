@@ -45,7 +45,6 @@ import java.util.Arrays;
 public class HidDevice {
 
   private final HidDeviceManager hidDeviceManager;
-  private final HidServicesSpecification hidServicesSpecification;
   private HidDeviceStructure hidDeviceStructure;
 
   private final String path;
@@ -59,24 +58,28 @@ public class HidDevice {
   private final int usage;
   private final int interfaceNumber;
 
+  private final boolean autoDataRead;
+  private final int dataReadInterval;
+
   /**
    * The data read thread
-   *
    * We use a Thread instead of Executor since it may be stopped/paused/restarted frequently
    * and executors are more heavyweight in this regard
    */
   private Thread dataReadThread = null;
 
   /**
-   * @param infoStructure    The HID device info structure providing details
-   * @param hidDeviceManager The HID device manager providing access to device enumeration for post IO scanning
-   * @param hidServicesSpecification The HID services specification providing access to required configuration
+   * @param infoStructure            The HID device info structure providing details
+   * @param hidDeviceManager         The HID device manager providing access to device enumeration for post IO scanning
+   * @param hidServicesSpecification The HID services specification providing configuration details
    * @since 0.1.0
    */
   public HidDevice(HidDeviceInfoStructure infoStructure, HidDeviceManager hidDeviceManager, HidServicesSpecification hidServicesSpecification) {
 
     this.hidDeviceManager = hidDeviceManager;
-    this.hidServicesSpecification = hidServicesSpecification;
+
+    this.dataReadInterval = hidServicesSpecification.getDataReadInterval();
+    this.autoDataRead = hidServicesSpecification.isAutoDataRead();
 
     this.hidDeviceStructure = null;
 
@@ -138,7 +141,7 @@ public class HidDevice {
    */
   private synchronized void configureDataReadThread(Runnable dataReadRunnable) {
 
-    if (hidServicesSpecification.isAutoDataRead()) {
+    if (autoDataRead) {
       stopDataReadThread();
     }
 
@@ -152,14 +155,13 @@ public class HidDevice {
 
   private synchronized Runnable getDataReadRunnable() {
 
-    final int dataReadInterval = hidServicesSpecification.getDataReadInterval();
-
     return new Runnable() {
       @Override
       public void run() {
 
         while (true) {
           try {
+            //noinspection BusyWait
             Thread.sleep(dataReadInterval);
           } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -294,7 +296,7 @@ public class HidDevice {
     hidDeviceStructure = HidApi.open(path);
 
     // Configure automatic data read
-    if (hidServicesSpecification.isAutoDataRead()) {
+    if (autoDataRead) {
       startDataReadThread();
     }
 
@@ -304,9 +306,19 @@ public class HidDevice {
   /**
    * @return True if the device structure is present
    * @since 0.1.0
+   * @deprecated Use isClosed() instead of !isOpen() to improve code clarity
    */
+  @Deprecated
   public boolean isOpen() {
-    return hidDeviceStructure != null;
+    return !isClosed();
+  }
+
+  /**
+   * @return True if the device structure is not present (device closed)
+   * @since 0.8.0
+   */
+  public boolean isClosed() {
+    return hidDeviceStructure == null;
   }
 
   /**
@@ -315,7 +327,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public void close() {
-    if (!isOpen()) {
+    if (isClosed()) {
       return;
     }
 
@@ -342,7 +354,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public void setNonBlocking(boolean nonBlocking) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     HidApi.setNonBlocking(hidDeviceStructure, nonBlocking);
@@ -362,7 +374,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public int read(byte[] data) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     return HidApi.read(hidDeviceStructure, data);
@@ -381,7 +393,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public Byte[] read(int amountToRead, int timeoutMillis) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
 
@@ -405,7 +417,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public Byte[] read(int amountToRead) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
 
@@ -442,7 +454,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public int read(byte[] bytes, int timeoutMillis) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     return HidApi.read(hidDeviceStructure, bytes, timeoutMillis);
@@ -457,7 +469,7 @@ public class HidDevice {
    * @since 0.8.0
    */
   public byte[] readAll(int timeoutMillis) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
 
@@ -503,7 +515,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public int getFeatureReport(byte[] data, byte reportId) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     return HidApi.getFeatureReport(hidDeviceStructure, data, reportId);
@@ -534,7 +546,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public int sendFeatureReport(byte[] data, byte reportId) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     return HidApi.sendFeatureReport(hidDeviceStructure, data, reportId);
@@ -548,7 +560,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public String getIndexedString(int index) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     return HidApi.getIndexedString(hidDeviceStructure, index);
@@ -566,7 +578,7 @@ public class HidDevice {
    * @since 0.1.0
    */
   public int write(byte[] message, int packetLength, byte reportId) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
     return write(message, packetLength, reportId, false);
@@ -585,7 +597,7 @@ public class HidDevice {
    * @since 0.8.0
    */
   public int write(byte[] message, int packetLength, byte reportId, boolean applyPadding) {
-    if (!isOpen()) {
+    if (isClosed()) {
       throw new IllegalStateException("Device has not been opened");
     }
 
