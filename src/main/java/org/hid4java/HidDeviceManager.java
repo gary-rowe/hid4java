@@ -138,7 +138,7 @@ class HidDeviceManager {
    */
   public synchronized void scan() {
 
-    List<String> removeList = new ArrayList<String>();
+    List<String> removeList = new ArrayList<>();
 
     List<HidDevice> attachedHidDeviceList = getAttachedHidDevices();
 
@@ -190,7 +190,7 @@ class HidDeviceManager {
    */
   public List<HidDevice> getAttachedHidDevices() {
 
-    List<HidDevice> hidDeviceList = new ArrayList<HidDevice>();
+    List<HidDevice> hidDeviceList = new ArrayList<>();
 
     final HidDeviceInfoStructure root;
     try {
@@ -210,7 +210,10 @@ class HidDeviceManager {
       HidDeviceInfoStructure hidDeviceInfoStructure = root;
       do {
         // Wrap in HidDevice
-        hidDeviceList.add(new HidDevice(hidDeviceInfoStructure, this, hidServicesSpecification ));
+        hidDeviceList.add(new HidDevice(
+          hidDeviceInfoStructure,
+          this,
+          hidServicesSpecification));
         // Move to the next in the linked list
         hidDeviceInfoStructure = hidDeviceInfoStructure.next();
       } while (hidDeviceInfoStructure != null);
@@ -299,6 +302,7 @@ class HidDeviceManager {
 
             while (true) {
               try {
+                //noinspection BusyWait
                 Thread.sleep(scanInterval);
               } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -322,6 +326,7 @@ class HidDeviceManager {
             // Switch to continuous running
             while (true) {
               try {
+                //noinspection BusyWait
                 Thread.sleep(scanInterval);
               } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
