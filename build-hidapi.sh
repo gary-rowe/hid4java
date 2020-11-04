@@ -13,7 +13,7 @@
 #
 # Supported command line arguments are:
 #
-# all - build all variants (except linux-arm which is built on an RPi at present)
+# all - build all variants
 # windows - build all Windows variants
 # linux - build all Linux variants
 # osx - build all OS X variants
@@ -34,7 +34,7 @@ echo -e "\033[33mTarget build for HIDAPI is $1\033[0m"
 # Dockcross latest release
 
 echo -e "\033[32mConfiguring Dockcross\033[0m"
-cd ~/Workspaces/Docker/dockcross/
+cd ~/Workspaces/Docker/dockcross/ || exit
 git checkout master
 git pull
 
@@ -106,7 +106,7 @@ echo -e "\033[32m---------------------------------------------------------------
 
 # HIDAPI latest release
 echo -e "\033[32mConfiguring HIDAPI\033[0m"
-cd ~/Workspaces/Cpp/hidapi/
+cd ~/Workspaces/Cpp/hidapi/ || exit
 git checkout master
 git pull
 
@@ -240,10 +240,11 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
 fi
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
+# 32-bit ARMv7 hard float (linux-arm)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
   then
     echo -e "\033[32mBuilding ARMv7 hard float\033[0m"
-    dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
+    dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
