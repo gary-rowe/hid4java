@@ -65,7 +65,7 @@ public class HidApi {
    * Enables HID traffic logging to stdout to assist debugging. This will show all bytes (including the extra report ID)
    * that were sent or received via HIDAPI buffers. It does not log direct string calls (e.g. getEnumeratedString()).
    *
-   * Format is '>' for host to device then '[count]' then hex bytes.
+   * Format is '&gt;' for host to device then '[count]' then hex bytes.
    *
    * This may present a security issue if left enabled in production, although a packet sniffer would see the same data.
    */
