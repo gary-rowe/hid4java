@@ -114,7 +114,7 @@ echo -e "\033[32m---------------------------------------------------------------
 
 # Windows environments
 
-# 64-bit
+# 64-bit x86-64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]]
   then
     echo -e "\033[32mBuilding Windows 64-bit\033[0m"
@@ -133,7 +133,27 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]
 fi
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
-# 32-bit
+# 64-bit ARM win32-aarch64
+if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
+  then
+    echo -e "\033[32mBuilding Windows 64-bit ARM\033[0m"
+# Not working yet
+#    dockcross-windows-shared-x64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-w64-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw64 CC=aarch64-w64-gnu-gcc && sudo make'
+    if [[ "$?" -ne 0 ]]
+      then
+        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
+        exit
+      else
+        echo -e "\033[32mOK\033[0m"
+        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
+    fi
+  else
+    echo -e "\033[33mSkipping win32-x86-64\033[0m"
+fi
+echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+
+# 32-bit x86
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
   then
     echo -e "\033[32mBuilding Windows 32-bit\033[0m"
