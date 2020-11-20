@@ -187,6 +187,17 @@
       <version>5.7.0-SNAPSHOT</version>
     </dependency>
 
+    <!-- Alternative JNA approach for local build -->
+    <!--
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>5.7.0-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/jna.jar</systemPath>
+    </dependency>
+    -->
+
     <!-- JUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
