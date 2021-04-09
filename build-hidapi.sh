@@ -16,8 +16,8 @@
 # all - build all variants
 # windows - build all Windows variants
 # linux - build all Linux variants
-# osx - build all OS X variants
-# darwin - OS X 64-bit
+# osx - build all macOS variants
+# darwin - macOS 64-bit
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
 # linux-arm - Linux ARMv7 hard float 32-bit
@@ -118,8 +118,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]]
   then
     echo -e "\033[32mBuilding Windows 64-bit\033[0m"
-    dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
@@ -136,10 +135,19 @@ echo -e "\033[32m---------------------------------------------------------------
 # 64-bit ARM win32-aarch64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
+    if [[ -d "./llvm" ]]
+      then
+        # Pull down LLVM-mingw support and unzip outside of Docker
+        echo -e "\033[32mDownloading LLVM-mingw support\033[0m"
+        wget https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-x86_64.zip
+        unzip llvm-mingw-20201020-msvcrt-x86_64.zip
+        wget
+    fi
+
     echo -e "\033[32mBuilding Windows 64-bit ARM\033[0m"
-# Not working yet
-#    dockcross-windows-shared-x64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-w64-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw64 CC=aarch64-w64-gnu-gcc && sudo make'
-    if [[ "$?" -ne 0 ]]
+    # TODO Debug here
+    # shellcheck disable=SC2016
+    if ! dockcross-windows-shared-x64 bash -c 'export PATH="./llvm-mingw/bin:$PATH" && sudo make clean && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
@@ -157,8 +165,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
   then
     echo -e "\033[32mBuilding Windows 32-bit\033[0m"
-    dockcross-windows-shared-x86 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-windows-shared-x86 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
@@ -178,8 +185,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
   then
     echo -e "\033[32mBuilding Linux 64-bit\033[0m"
     # Note the use of a double sudo apt-get update here
-    dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
@@ -202,8 +208,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
   then
     echo -e "\033[32mBuilding Linux 32-bit\033[0m"
-    dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
@@ -224,8 +229,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
   then
     echo -e "\033[32mBuilding ARM64/aarch64 (ARMv8)\033[0m"
-    dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
@@ -244,8 +248,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
   then
     echo -e "\033[32mBuilding ARMv6 EABI\033[0m"
-    dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
@@ -264,8 +267,7 @@ echo -e "\033[32m---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
   then
     echo -e "\033[32mBuilding ARMv7 hard float\033[0m"
-    dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make'
-    if [[ "$?" -ne 0 ]]
+    if ! dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make';
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
@@ -279,17 +281,16 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
 fi
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
-# OS X environments
+# macOS environments
 
 # Darwin
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
   then
-    echo -e "\033[32mBuilding OS X Darwin\033[0m"
+    echo -e "\033[32mBuilding macOS Darwin\033[0m"
     make clean
     ./bootstrap
     ./configure
-    make
-    if [[ "$?" -ne 0 ]]
+    if ! make;
       then
         echo -e "\033[31mFailed\033[0m - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
@@ -350,8 +351,8 @@ file -b ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-
 
 echo -e "\033[32m------------------------------------------------------------------------\033[0m"
 
-# OS X
-echo -e "\033[32mOS X\033[0m"
+# macOS
+echo -e "\033[32mmacOS\033[0m"
 
 echo -e "\033[32mdarwin\033[0m"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
