@@ -82,6 +82,12 @@ docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
 mv ./dockcross-windows-shared-x86 /usr/local/bin
 
+# 64-bit (ARM64)
+echo -e "${green}Configuring Windows 64-bit ARM64{plain}"
+docker run --rm dockcross/linux-x64-clang > ./dockcross-linux-x64-clang
+chmod +x ./dockcross-linux-x64-clang
+mv ./dockcross-linux-x64-clang /usr/local/bin
+
 echo -e "${green}Configuring Linux environments${plain}"
 
 # Linux cross compilers
@@ -153,19 +159,22 @@ echo -e "${green}---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
     echo -e "${green}Building Windows 64-bit ARM${plain}"
-# Not working yet
-#    dockcross-windows-shared-x64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-w64-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw64 CC=aarch64-w64-gnu-gcc && sudo make'
+    # FIXME: Still not working
+    llvm_mingw="https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-ubuntu-18.04.tar.xz"
+    download_extract='sudo mkdir -p /usr/src/mxe && wget -qO- '$llvm_mingw' | sudo tar xJvf - --strip 1 -C /usr/src/mxe/ > /dev/null && export PATH=/usr/src/mxe/bin:$PATH'
+    unsets='unset CC CPP CXX LD FC'
+    dockcross-linux-x64-clang bash -c "$unsets && $download_extract"' && sudo apt-get install --yes clang && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
+        rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
-        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
+        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
     fi
   else
-    echo -e "${yellow}Skipping win32-x86-64${plain}"
+    echo -e "${yellow}Skipping win32-aarch64${plain}"
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
@@ -329,6 +338,10 @@ file -b ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
 
 echo -e "${green}win32-x86${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
+
+echo -e "${green}win32-aarch64${plain}"
+file -b ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
+
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
