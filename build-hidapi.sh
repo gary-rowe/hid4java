@@ -4,12 +4,22 @@
 # Directory structure is
 # ~/Workspaces
 #  + Cpp
-#    + hidapi
+#    + hidapi (https://github.com/libusb/hidapi)
 #  + Docker
 #    + dockcross
 #  + Java
 #    + Personal
-#      + hid4java
+#      + hid4java (https://github.com/gary-rowe/hid4java)
+#
+# Dependencies:
+# - git
+# - docker
+# - docker-machine
+# - virtualbox, docker-machine-parallels or another docker-machine compatible driver
+#
+# Place a symlink to this script in the root of ~/Workspaces
+#   cd ~/Workspaces
+#   ln -s Java/Personal/hid4java/build-hidapi.sh ./build-hidapi.sh
 #
 # Supported command line arguments are:
 #
@@ -28,56 +38,62 @@
 # win32-x86-64 - Windows 64-bit
 #
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
-echo -e "\033[33mTarget build for HIDAPI is $1\033[0m"
+# Console colors
+red="\033[31m"
+yellow="\033[33m"
+green="\033[32m"
+plain="\033[0m"
+
+echo -e "${green}------------------------------------------------------------------------${plain}"
+echo -e "${yellow}Target build for HIDAPI is $1${plain}"
 
 # Dockcross latest release
 
-echo -e "\033[32mConfiguring Dockcross\033[0m"
+echo -e "${green}Configuring Dockcross${plain}"
 cd ~/Workspaces/Docker/dockcross/ || exit
 git checkout master
 git pull
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Ensure Docker is running
 
-echo -e "\033[32mConfiguring Docker\033[0m"
+echo -e "${green}Configuring Docker${plain}"
 if docker_result=$(docker-machine env default); then
     eval "$docker_result"
-    echo -e "\033[32mOK\033[0m"
+    echo -e "${green}OK${plain}"
 else
-    echo -e "\033[31mFailed\033[0m - Docker not running. Use 'docker-machine start default'"
+    echo -e "${red}Failed${plain} - Docker not running. Use 'docker-machine start default'"
     exit
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Windows cross compilers
 
 # 64-bit
-echo -e "\033[32mConfiguring Windows 64-bit\033[0m"
+echo -e "${green}Configuring Windows 64-bit${plain}"
 docker run --rm dockcross/windows-shared-x64 > ./dockcross-windows-shared-x64
 chmod +x ./dockcross-windows-shared-x64
 mv ./dockcross-windows-shared-x64 /usr/local/bin
 
 # 32-bit
-echo -e "\033[32mConfiguring Windows 32-bit\033[0m"
+echo -e "${green}Configuring Windows 32-bit${plain}"
 docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
 mv ./dockcross-windows-shared-x86 /usr/local/bin
 
-echo -e "\033[32mConfiguring Linux environments\033[0m"
+echo -e "${green}Configuring Linux environments${plain}"
 
 # Linux cross compilers
 
 # 64 bit
-echo -e "\033[32mConfiguring Linux 64-bit\033[0m"
+echo -e "${green}Configuring Linux 64-bit${plain}"
 docker run --rm dockcross/linux-x64 > ./dockcross-linux-x64
 chmod +x ./dockcross-linux-x64
 mv ./dockcross-linux-x64 /usr/local/bin
 
 # 32 bit
-echo -e "\033[32mConfiguring Linux 32-bit\033[0m"
+echo -e "${green}Configuring Linux 32-bit${plain}"
 docker run --rm dockcross/linux-x86 > ./dockcross-linux-x86
 chmod +x ./dockcross-linux-x86
 mv ./dockcross-linux-x86 /usr/local/bin
@@ -85,277 +101,277 @@ mv ./dockcross-linux-x86 /usr/local/bin
 # ARM cross compilers
 
 # 32-bit ARMv6 EABI
-echo -e "\033[32mConfiguring ARMv6 EABI 32-bit\033[0m"
+echo -e "${green}Configuring ARMv6 EABI 32-bit${plain}"
 docker run --rm dockcross/linux-armv6 > ./dockcross-linux-armv6
 chmod +x ./dockcross-linux-armv6
 mv ./dockcross-linux-armv6 /usr/local/bin
 
 # 32-bit ARMv7 hard float
-echo -e "\033[32mConfiguring ARMv7 32-bit\033[0m"
+echo -e "${green}Configuring ARMv7 32-bit${plain}"
 docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
 chmod +x ./dockcross-linux-armv7
 mv ./dockcross-linux-armv7 /usr/local/bin
 
 # 64-bit (arm64, aarch64)
-echo -e "\033[32mConfiguring ARM 64-bit\033[0m"
+echo -e "${green}Configuring ARM 64-bit${plain}"
 docker run --rm dockcross/linux-arm64 > ./dockcross-linux-arm64
 chmod +x ./dockcross-linux-arm64
 mv ./dockcross-linux-arm64 /usr/local/bin
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # HIDAPI latest release
-echo -e "\033[32mConfiguring HIDAPI\033[0m"
+echo -e "${green}Configuring HIDAPI${plain}"
 cd ~/Workspaces/Cpp/hidapi/ || exit
 git checkout master
 git pull
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Windows environments
 
 # 64-bit x86-64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]]
   then
-    echo -e "\033[32mBuilding Windows 64-bit\033[0m"
+    echo -e "${green}Building Windows 64-bit${plain}"
     dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
         exit
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
     fi
   else
-    echo -e "\033[33mSkipping win32-x86-64\033[0m"
+    echo -e "${yellow}Skipping win32-x86-64${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # 64-bit ARM win32-aarch64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
-    echo -e "\033[32mBuilding Windows 64-bit ARM\033[0m"
+    echo -e "${green}Building Windows 64-bit ARM${plain}"
 # Not working yet
 #    dockcross-windows-shared-x64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-w64-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw64 CC=aarch64-w64-gnu-gcc && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
         exit
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
     fi
   else
-    echo -e "\033[33mSkipping win32-x86-64\033[0m"
+    echo -e "${yellow}Skipping win32-x86-64${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # 32-bit x86
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
   then
-    echo -e "\033[32mBuilding Windows 32-bit\033[0m"
+    echo -e "${green}Building Windows 32-bit${plain}"
     dockcross-windows-shared-x86 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
     fi
   else
-    echo -e "\033[33mSkipping win32-x86\033[0m"
+    echo -e "${yellow}Skipping win32-x86${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Linux environments
 
 # 64-bit
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
   then
-    echo -e "\033[32mBuilding Linux 64-bit\033[0m"
+    echo -e "${green}Building Linux 64-bit${plain}"
     # Note the use of a double sudo apt-get update here
     dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
         rm ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
         rm ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
     fi
   else
-    echo -e "\033[33mSkipping linux-x86-64\033[0m"
+    echo -e "${yellow}Skipping linux-x86-64${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # 32-bit
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
   then
-    echo -e "\033[32mBuilding Linux 32-bit\033[0m"
+    echo -e "${green}Building Linux 32-bit${plain}"
     dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
     fi
   else
-    echo -e "\033[33mSkipping linux-x86\033[0m"
+    echo -e "${yellow}Skipping linux-x86${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # ARM environments
 
 # 64-bit (arm64/aarch64)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
   then
-    echo -e "\033[32mBuilding ARM64/aarch64 (ARMv8)\033[0m"
+    echo -e "${green}Building ARM64/aarch64 ARMv8${plain}"
     dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
         rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
     fi
   else
-    echo -e "\033[33mSkipping linux-aarch64\033[0m"
+    echo -e "${yellow}Skipping linux-aarch64${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # 32-bit ARMv6 EABI (linux-armel)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
   then
-    echo -e "\033[32mBuilding ARMv6 EABI\033[0m"
+    echo -e "${green}Building ARMv6 EABI${plain}"
     dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
         rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
     fi
   else
-    echo -e "\033[33mSkipping linux-armel\033[0m"
+    echo -e "${yellow}Skipping linux-armel${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # 32-bit ARMv7 hard float (linux-arm)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
   then
-    echo -e "\033[32mBuilding ARMv7 hard float\033[0m"
+    echo -e "${green}Building ARMv7 hard float${plain}"
     dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make'
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi-libusb.so
     fi
   else
-    echo -e "\033[33mSkipping linux-arm\033[0m"
+    echo -e "${yellow}Skipping linux-arm${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # OS X environments
 
 # Darwin
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
   then
-    echo -e "\033[32mBuilding OS X Darwin\033[0m"
+    echo -e "${green}Building OS X Darwin${plain}"
     make clean
     ./bootstrap
     ./configure
     make
     if [[ "$?" -ne 0 ]]
       then
-        echo -e "\033[31mFailed\033[0m - Removing damaged targets"
+        echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
       else
-        echo -e "\033[32mOK\033[0m"
+        echo -e "${green}OK${plain}"
         cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
     fi
   else
-    echo -e "\033[33mSkipping darwin\033[0m"
+    echo -e "${yellow}Skipping darwin${plain}"
 fi
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # List all file info
-echo -e "\033[32mResulting build files placed in hid4java:\033[0m"
+echo -e "${green}Resulting build files placed in hid4java:${plain}"
 
 # Windows environments
-echo -e "\033[32mWindows\033[0m"
+echo -e "${green}Windows${plain}"
 
-echo -e "\033[32mwin32-x86-64\033[0m"
+echo -e "${green}win32-x86-64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
 
-echo -e "\033[32mwin32-x86\033[0m"
+echo -e "${green}win32-x86${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Linux environments
-echo -e "\033[32mLinux\033[0m"
+echo -e "${green}Linux${plain}"
 
-echo -e "\033[32mlinux-x86-64\033[0m"
+echo -e "${green}linux-x86-64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
 
-echo -e "\033[32mlinux-amd64\033[0m"
+echo -e "${green}linux-amd64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
 
-echo -e "\033[32mlinux-x86\033[0m"
+echo -e "${green}linux-x86${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # ARM
-echo -e "\033[32mARM\033[0m"
+echo -e "${green}ARM${plain}"
 
-echo -e "\033[32mlinux-arm\033[0m"
+echo -e "${green}linux-arm${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi-libusb.so
 
-echo -e "\033[32mlinux-armel\033[0m"
+echo -e "${green}linux-armel${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
 
-echo -e "\033[32mlinux-aarch64\033[0m"
+echo -e "${green}linux-aarch64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # OS X
-echo -e "\033[32mOS X\033[0m"
+echo -e "${green}OS X${plain}"
 
-echo -e "\033[32mdarwin\033[0m"
+echo -e "${green}darwin${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
 
-echo -e "\033[32m------------------------------------------------------------------------\033[0m"
+echo -e "${green}------------------------------------------------------------------------${plain}"
 
-echo -e "\033[32mDone - Check all OK in summary above.\033[0m"
+echo -e "${green}Done - Check all OK in summary above.${plain}"
