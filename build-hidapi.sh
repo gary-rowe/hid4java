@@ -6,7 +6,7 @@
 #  + Cpp
 #    + hidapi (https://github.com/libusb/hidapi)
 #  + Docker
-#    + dockcross
+#    + dockcross (https://github.com/dockcross/dockcross)
 #  + Java
 #    + Personal
 #      + hid4java (https://github.com/gary-rowe/hid4java)
@@ -28,6 +28,7 @@
 # linux - build all Linux variants
 # osx - build all OS X variants
 # darwin - OS X 64-bit
+# darwin-aarch64 - OS X 64-bit ARM
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
 # linux-arm - Linux ARMv7 hard float 32-bit
@@ -36,6 +37,7 @@
 # linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
 # win32-x86-64 - Windows 64-bit
+# win32-aarch64 - Windows 64-bit ARM
 #
 
 # Console colors
@@ -306,14 +308,14 @@ echo -e "${green}---------------------------------------------------------------
 
 # OS X environments
 
-# Darwin
+# Darwin x86_64
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
   then
     echo -e "${green}Building OS X Darwin${plain}"
     make clean
     ./bootstrap
     ./configure
-    make
+    make CFLAGS="-arch x86_64"
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -326,6 +328,28 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
     echo -e "${yellow}Skipping darwin${plain}"
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
+
+# Darwin ARM64
+if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
+  then
+    echo -e "${green}Building OS X Darwin ARM64${plain}"
+    make clean
+    ./bootstrap
+    ./configure
+    make CFLAGS="-arch arm64"
+    if [[ "$?" -ne 0 ]]
+      then
+        echo -e "${red}Failed${plain} - Removing damaged targets"
+        rm ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+      else
+        echo -e "${green}OK${plain}"
+        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+    fi
+  else
+    echo -e "${yellow}Skipping Darwin ARM64${plain}"
+fi
+echo -e "${green}------------------------------------------------------------------------${plain}"
+
 
 # List all file info
 echo -e "${green}Resulting build files placed in hid4java:${plain}"
@@ -384,6 +408,9 @@ echo -e "${green}OS X${plain}"
 
 echo -e "${green}darwin${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+
+echo -e "${green}darwin-aarch64${plain}"
+file -b ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
