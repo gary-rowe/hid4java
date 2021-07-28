@@ -146,7 +146,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
+        rm -f ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
@@ -169,7 +169,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" 
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
+        rm -f ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
@@ -188,7 +188,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
+        rm -f ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
       else
         echo -e "${green}OK${plain}"
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
@@ -209,10 +209,10 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
@@ -233,8 +233,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
@@ -255,8 +255,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
@@ -275,8 +275,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
@@ -295,7 +295,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
+        rm -f ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
       else
         echo -e "${green}OK${plain}"
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
@@ -319,10 +319,13 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+        rm -f ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
       else
         echo -e "${green}OK${plain}"
-        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+        # arch suffix used since jna 5.8.0
+        rm -rf ../../Java/Personal/hid4java/src/main/resources/darwin/
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/
+        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
     fi
   else
     echo -e "${yellow}Skipping darwin${plain}"
@@ -340,9 +343,12 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+        rm -f ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
       else
         echo -e "${green}OK${plain}"
+        # arch suffix used since jna 5.8.0
+        rm -rf ../../Java/Personal/hid4java/src/main/resources/darwin/
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/
         cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
     fi
   else
