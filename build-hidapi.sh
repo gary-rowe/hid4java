@@ -150,6 +150,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]
         exit
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
     fi
   else
@@ -173,6 +174,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" 
         exit
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
     fi
   else
@@ -191,6 +193,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
         rm -f ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/win32-x86/
         cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
     fi
   else
@@ -215,6 +218,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
         rm -f ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-amd64/
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-amd64/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
@@ -237,6 +242,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
         rm -f ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-x86/
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
     fi
@@ -259,6 +265,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
         rm -f ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
     fi
@@ -279,6 +286,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
         rm -f ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-armel/
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
     fi
@@ -298,6 +306,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
         rm -f ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-arm/
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi-libusb.so
     fi
@@ -413,7 +422,7 @@ echo -e "${green}---------------------------------------------------------------
 echo -e "${green}OS X${plain}"
 
 echo -e "${green}darwin${plain}"
-file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+file -b ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
 
 echo -e "${green}darwin-aarch64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
