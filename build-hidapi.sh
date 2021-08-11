@@ -134,6 +134,13 @@ cd ~/Workspaces/Cpp/hidapi/ || exit
 git checkout master
 git pull
 
+function git-clean {
+  echo -e "Resetting Cpp/hidapi"
+  git clean -ffdx > /dev/null 2>&1 || exit     # remove all untracked files
+  git reset --hard > /dev/null 2>&1 || exit  # reset all tracked files
+}
+
+
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Windows environments
@@ -141,8 +148,8 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit x86-64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]]
   then
-    echo -e "${green}Building Windows 64-bit${plain}"
-    dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make'
+    echo -e "${green}Building Windows 64-bit${plain}" && git-clean
+    dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -161,12 +168,11 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit ARM win32-aarch64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
-    echo -e "${green}Building Windows 64-bit ARM${plain}"
-    # FIXME: Still not working
+    echo -e "${green}Building Windows 64-bit ARM${plain}" && git-clean
     llvm_mingw="https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-ubuntu-18.04.tar.xz"
     download_extract='sudo mkdir -p /usr/src/mxe && wget -qO- '$llvm_mingw' | sudo tar xJvf - --strip 1 -C /usr/src/mxe/ > /dev/null && export PATH=/usr/src/mxe/bin:$PATH'
     unsets='unset CC CPP CXX LD FC'
-    dockcross-linux-x64-clang bash -c "$unsets && $download_extract"' && sudo apt-get install --yes clang && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
+    dockcross-linux-x64-clang bash -c "$unsets && $download_extract"' && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -185,8 +191,8 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit x86
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
   then
-    echo -e "${green}Building Windows 32-bit${plain}"
-    dockcross-windows-shared-x86 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make'
+    echo -e "${green}Building Windows 32-bit${plain}" && git-clean
+    dockcross-windows-shared-x86 bash -c 'sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -206,9 +212,9 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
   then
-    echo -e "${green}Building Linux 64-bit${plain}"
+    echo -e "${green}Building Linux 64-bit${plain}" && git-clean
     # Note the use of a double sudo apt-get update here
-    dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
+    dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -233,8 +239,8 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
   then
-    echo -e "${green}Building Linux 32-bit${plain}"
-    dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make'
+    echo -e "${green}Building Linux 32-bit${plain}" && git-clean
+    dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo ./bootstrap && sudo ./configure && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -256,8 +262,8 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit (arm64/aarch64)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
   then
-    echo -e "${green}Building ARM64/aarch64 ARMv8${plain}"
-    dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make'
+    echo -e "${green}Building ARM64/aarch64 ARMv8${plain}" && git-clean
+    dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -277,8 +283,8 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit ARMv6 EABI (linux-armel)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
   then
-    echo -e "${green}Building ARMv6 EABI${plain}"
-    dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
+    echo -e "${green}Building ARMv6 EABI${plain}" && git-clean
+    dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -298,8 +304,8 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit ARMv7 hard float (linux-arm)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
   then
-    echo -e "${green}Building ARMv7 hard float${plain}"
-    dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make'
+    echo -e "${green}Building ARMv7 hard float${plain}" && git-clean
+    dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make'
     if [[ "$?" -ne 0 ]]
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -318,10 +324,9 @@ echo -e "${green}---------------------------------------------------------------
 # OS X environments
 
 # Darwin x86_64
-if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
+if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-x86-64" ]]
   then
-    echo -e "${green}Building OS X Darwin${plain}"
-    make clean
+    echo -e "${green}Building OS X Darwin${plain}" && git-clean
     ./bootstrap
     ./configure
     make CFLAGS="-arch x86_64"
@@ -344,8 +349,7 @@ echo -e "${green}---------------------------------------------------------------
 # Darwin ARM64
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
   then
-    echo -e "${green}Building OS X Darwin ARM64${plain}"
-    make clean
+    echo -e "${green}Building OS X Darwin ARM64${plain}" && git-clean
     ./bootstrap
     ./configure
     make CFLAGS="-arch arm64"
