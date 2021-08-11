@@ -27,7 +27,7 @@
 # windows - build all Windows variants
 # linux - build all Linux variants
 # osx - build all OS X variants
-# darwin - OS X 64-bit
+# darwin-x86-64 - OS X 64-bit
 # darwin-aarch64 - OS X 64-bit ARM
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
@@ -136,8 +136,8 @@ git pull
 
 function git-clean {
   echo -e "Resetting Cpp/hidapi"
-  git clean -ffdx > /dev/null 2>&1 || exit     # remove all untracked files
-  git reset --hard > /dev/null 2>&1 || exit  # reset all tracked files
+  git clean -ffdx > /dev/null 2>&1 || exit    # remove all untracked files
+  git reset --hard > /dev/null 2>&1 || exit   # reset all tracked files
 }
 
 
@@ -327,6 +327,11 @@ echo -e "${green}---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-x86-64" ]]
   then
     echo -e "${green}Building OS X Darwin${plain}" && git-clean
+    if [ -z "$SDKROOT" ] || [ -z "$MACOSX_DEPLOYMENT_TARGET" ];
+      then
+        echo -e "${yellow}WARNING: For production builds, please set \$SDKROOT and \$MACOSX_DEPLOYMENT_TARGET before building${plain}"
+        echo -e "${yellow}  See also https://github.com/gary-rowe/hid4java/issues/120${plain}"
+    fi
     ./bootstrap
     ./configure
     make CFLAGS="-arch x86_64"
@@ -347,9 +352,14 @@ fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # Darwin ARM64
-if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
+if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-aarch64" ]]
   then
     echo -e "${green}Building OS X Darwin ARM64${plain}" && git-clean
+    if [ -z "$SDKROOT" ] || [ -z "$MACOSX_DEPLOYMENT_TARGET" ];
+      then
+        echo -e "${yellow}WARNING: For production builds, please set \$SDKROOT and \$MACOSX_DEPLOYMENT_TARGET before building${plain}"
+        echo -e "${yellow}  See also https://github.com/gary-rowe/hid4java/issues/120${plain}"
+    fi
     ./bootstrap
     ./configure
     make CFLAGS="-arch arm64"
@@ -427,9 +437,17 @@ echo -e "${green}OS X${plain}"
 
 echo -e "${green}darwin${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
+if command -v otool &> /dev/null
+  then
+    otool -l ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib |grep -E 'LC_VERSION_MIN_MACOSX|LC_BUILD_VERSION' -A4
+fi
 
 echo -e "${green}darwin-aarch64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+if command -v otool &> /dev/null
+  then
+    otool -l ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib |grep -E 'LC_VERSION_MIN_MACOSX|LC_BUILD_VERSION' -A4
+fi
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
