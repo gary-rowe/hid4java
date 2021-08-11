@@ -85,7 +85,7 @@ chmod +x ./dockcross-windows-shared-x86
 mv ./dockcross-windows-shared-x86 /usr/local/bin
 
 # 64-bit (ARM64)
-echo -e "${green}Configuring Windows 64-bit ARM64{plain}"
+echo -e "${green}Configuring Windows 64-bit ARM64${plain}"
 docker run --rm dockcross/linux-x64-clang > ./dockcross-linux-x64-clang
 chmod +x ./dockcross-linux-x64-clang
 mv ./dockcross-linux-x64-clang /usr/local/bin
