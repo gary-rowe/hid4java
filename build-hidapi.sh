@@ -158,7 +158,7 @@ echo -e "${green}---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
     echo -e "${green}Building Windows 64-bit ARM${plain}"
-    if ! dockcross-windows-arm64 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
+    if ! dockcross-windows-arm64 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure LDFLAGS="-static" --host=aarch64-w64-mingw32 && sudo make'
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
