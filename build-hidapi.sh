@@ -6,7 +6,7 @@
 #  + Cpp
 #    + hidapi (https://github.com/libusb/hidapi)
 #  + Docker
-#    + dockcross
+#    + dockcross (https://github.com/dockcross/dockcross)
 #  + Java
 #    + Personal
 #      + hid4java (https://github.com/gary-rowe/hid4java)
@@ -16,6 +16,7 @@
 # - docker
 # - docker-machine
 # - virtualbox, docker-machine-parallels or another docker-machine compatible driver
+# - XCode v12.5.1 or higher for darwin-aarch64 cross compiler support
 #
 # Place a symlink to this script in the root of ~/Workspaces
 #   cd ~/Workspaces
@@ -27,7 +28,8 @@
 # windows - build all Windows variants
 # linux - build all Linux variants
 # osx - build all macOS variants
-# darwin - macOS 64-bit
+# darwin - OS X 64-bit
+# darwin-aarch64 - OS X ARM64
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
 # linux-arm - Linux ARMv7 hard float 32-bit
@@ -36,9 +38,10 @@
 # linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
 # win32-x86-64 - Windows 64-bit
+# win32-aarch64 - Windows 64-bit ARM64
 #
 
-# Console colors
+# Console colours
 red="\033[31m"
 yellow="\033[33m"
 green="\033[32m"
@@ -158,7 +161,6 @@ echo -e "${green}---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
     echo -e "${green}Building Windows 64-bit ARM${plain}"
-    # FIXME: Still not working
     llvm_mingw="https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-ubuntu-18.04.tar.xz"
     download_extract='sudo mkdir -p /usr/src/mxe && wget -qO- '$llvm_mingw' | sudo tar xJvf - --strip 1 -C /usr/src/mxe/ > /dev/null && export PATH=/usr/src/mxe/bin:$PATH'
     unsets='unset CC CPP CXX LD FC'
@@ -296,7 +298,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
-# macOS environments
+# OS X environments
 
 # Darwin
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
