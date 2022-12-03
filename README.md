@@ -83,10 +83,12 @@ If you're unfamiliar with Maven and git the wiki provides [an easy guide to crea
 
 The project uses the standard Maven build process and can be used without having external hardware attached. Just do the usual
 
-```
+```shell
 cd <workspace>
 git clone https://github.com/gary-rowe/hid4java.git
 cd hid4java
+
+# Maven build
 mvn clean install
 ```
 
@@ -94,7 +96,7 @@ and you're good to go.
 
 # 🤔 More information
 
-Much of the information previously in this README has been migrated to the project Wiki as it was getting rather long. Here are some useful jumping off points that should help:
+Much of the information previously in this README has been migrated to the [project Wiki](https://github.com/gary-rowe/hid4java/wiki/Home) as it was getting rather long. Here are some useful jumping off points that should help:
 
 * [Home](https://github.com/gary-rowe/hid4java/wiki/Home) - The wiki Home page with lots of useful launch points
 * [FAQ](https://github.com/gary-rowe/hid4java/wiki/FAQ) - Frequently asked questions

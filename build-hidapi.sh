@@ -16,7 +16,7 @@
 # - docker
 # - docker-machine
 # - virtualbox, docker-machine-parallels or another docker-machine compatible driver
-# - XCode v12.5.1 or higher for darwin-aarch64 cross compiler support
+# - XCode v12.5.1 or higher for darwin-x86-64-aarch64 cross compiler support
 #
 # Place a symlink to this script in the root of ~/Workspaces
 #   cd ~/Workspaces
@@ -28,8 +28,8 @@
 # windows - build all Windows variants
 # linux - build all Linux variants
 # osx - build all macOS variants
-# darwin - OS X 64-bit
-# darwin-aarch64 - OS X ARM64
+# darwin-x86-64 - OS X 64-bit
+# darwin-x86-64-aarch64 - OS X ARM64
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
 # linux-arm - Linux ARMv7 hard float 32-bit
@@ -310,10 +310,10 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
     if ! make;
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+        rm ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
       else
         echo -e "${green}OK${plain}"
-        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
     fi
   else
     echo -e "${yellow}Skipping darwin${plain}"
@@ -375,7 +375,7 @@ echo -e "${green}---------------------------------------------------------------
 echo -e "${green}OS X${plain}"
 
 echo -e "${green}darwin${plain}"
-file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+file -b ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
