@@ -29,11 +29,11 @@
 # linux - build all Linux variants
 # osx - build all macOS variants
 # darwin-x86-64 - OS X 64-bit
-# darwin-x86-64-aarch64 - OS X ARM64
+# darwin-aarch64 - OS X ARM64
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
-# linux-arm - Linux ARMv7 hard float 32-bit
-# linux-armel - Linux ARMv6 EABI 32-bit
+# linux-arm - Linux ARMv7 hard float 32-bit (RPi)
+# linux-armel - Linux ARMv6 EABI 32-bit (RPi)
 # linux-x86-64 - Linux x86 64-bit
 # linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
@@ -249,7 +249,7 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit ARMv6 EABI (linux-armel)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
   then
-    echo -e "${green}Building ARMv6 EABI${plain}"
+    echo -e "${green}Building ARMv6 EABI (RPi)${plain}"
     if ! dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -268,7 +268,7 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit ARMv7 hard float (linux-arm)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
   then
-    echo -e "${green}Building ARMv7 hard float${plain}"
+    echo -e "${green}Building ARMv7 hard float  (RPi)${plain}"
     if ! dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -286,9 +286,9 @@ echo -e "${green}---------------------------------------------------------------
 # OS X environments
 
 # Darwin Intel (local)
-if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
+if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-x86-64" ]]
   then
-    echo -e "${green}Building OS X Darwin${plain}"
+    echo -e "${green}Building OS X Darwin Intel (x86-64)${plain}"
     make clean
     ./bootstrap
     ./configure
@@ -303,6 +303,25 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
   else
     echo -e "${yellow}Skipping darwin${plain}"
 fi
+
+if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
+  then
+    echo -e "${green}Building OS X Darwin AMD64 (aarch64)${plain}"
+    make clean
+    ./bootstrap
+    ./configure
+    if ! make;
+      then
+        echo -e "${red}Failed${plain} - Removing damaged targets"
+        rm ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+      else
+        echo -e "${green}OK${plain}"
+        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+    fi
+  else
+    echo -e "${yellow}Skipping darwin${plain}"
+fi
+
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
 # List all file info
