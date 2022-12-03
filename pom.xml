@@ -56,8 +56,10 @@
   <properties>
     <!-- Ensure source is under UTF-8 -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>19</maven.compiler.source>
-    <maven.compiler.target>19</maven.compiler.target>
+    <!-- Support basic language features only -->
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <!-- Target the oldest long term support at time of compilation -->
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <profiles>
@@ -95,12 +97,6 @@
 
   <build>
     <plugins>
-      <!-- Ensure compilation is done under Java 6 for compatibility -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
-      </plugin>
 
       <!-- Filter out functional tests by Maven (an IDE will run all tests including functional) -->
       <plugin>

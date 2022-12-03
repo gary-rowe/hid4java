@@ -59,18 +59,6 @@ git pull
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
-# Ensure Docker is running
-
-echo -e "${green}Configuring Docker${plain}"
-if docker_result=$(docker-machine env default); then
-    eval "$docker_result"
-    echo -e "${green}OK${plain}"
-else
-    echo -e "${red}Failed${plain} - Docker not running. Use 'docker-machine start default'"
-    exit
-fi
-echo -e "${green}------------------------------------------------------------------------${plain}"
-
 # Windows cross compilers
 
 # 64-bit
@@ -85,11 +73,17 @@ docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
 mv ./dockcross-windows-shared-x86 /usr/local/bin
 
+# 64-bit (ARMv7)
+echo -e "${green}Configuring Windows 64-bit ARMv7{plain}"
+docker run --rm dockcross/windows-armv7 > ./dockcross/windows-armv7
+chmod +x ./dockcross/windows-armv7
+mv ./dockcross/windows-armv7 /usr/local/bin
+
 # 64-bit (ARM64)
-echo -e "${green}Configuring Windows 64-bit ARM64{plain}"
-docker run --rm dockcross/linux-x64-clang > ./dockcross-linux-x64-clang
-chmod +x ./dockcross-linux-x64-clang
-mv ./dockcross-linux-x64-clang /usr/local/bin
+echo -e "${green}Configuring Windows 64-bit ARM64 (aarch64){plain}"
+docker run --rm dockcross/windows-arm64 > ./dockcross/windows-arm64
+chmod +x ./dockcross/windows-arm64
+mv ./dockcross/windows-arm64 /usr/local/bin
 
 echo -e "${green}Configuring Linux environments${plain}"
 
@@ -160,19 +154,29 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit ARM win32-aarch64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
-    echo -e "${green}Building Windows 64-bit ARM${plain}"
-    llvm_mingw="https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-ubuntu-18.04.tar.xz"
-    download_extract='sudo mkdir -p /usr/src/mxe && wget -qO- '$llvm_mingw' | sudo tar xJvf - --strip 1 -C /usr/src/mxe/ > /dev/null && export PATH=/usr/src/mxe/bin:$PATH'
-    unsets='unset CC CPP CXX LD FC'
-    if ! dockcross-linux-x64-clang bash -c "$unsets && $download_extract"' && sudo apt-get install --yes clang && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
+    echo -e "${green}Building Windows 64-bit ARM64${plain}"
+#    llvm_mingw="https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/llvm-mingw-20201020-msvcrt-ubuntu-18.04.tar.xz"
+#    download_extract='sudo mkdir -p /usr/src/mxe && wget -qO- '$llvm_mingw' | sudo tar xJvf - --strip 1 -C /usr/src/mxe/ > /dev/null && export PATH=/usr/src/mxe/bin:$PATH'
+#    unsets='unset CC CPP CXX LD FC'
+#    if ! dockcross-linux-x64-clang bash -c "$unsets && $download_extract"' && sudo apt-get install --yes clang && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make'
+#      then
+#        echo -e "${red}Failed${plain} - Removing damaged targets"
+#        rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
+#        exit
+#      else
+#        echo -e "${green}OK${plain}"
+#        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
+#    fi
+    if ! dockcross-windows-shared-armv7 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
-        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
+        cp windows/.libs/libhidapi-0.dll ../../Java/Personal/hid4java/src/main/resources/win32-aarxh64/hidapi.dll
     fi
+
   else
     echo -e "${yellow}Skipping win32-aarch64${plain}"
 fi
