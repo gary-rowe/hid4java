@@ -13,9 +13,7 @@
 #
 # Dependencies:
 # - git
-# - docker
-# - docker-machine
-# - virtualbox, docker-machine-parallels or another docker-machine compatible driver
+# - Docker Desktop
 # - XCode v12.5.1 or higher for darwin-x86-64-aarch64 cross compiler support
 #
 # Place a symlink to this script in the root of ~/Workspaces
@@ -27,14 +25,13 @@
 # all - build all variants
 # windows - build all Windows variants
 # linux - build all Linux variants
-# osx - build all macOS variants
+# osx - build all macOS variants (not recommended)
 # darwin-x86-64 - OS X 64-bit
 # darwin-aarch64 - OS X ARM64
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
-# linux-arm - Linux ARMv7 hard float 32-bit (RPi)
-# linux-armel - Linux ARMv6 EABI 32-bit (RPi)
-# linux-x86-64 - Linux x86 64-bit
+# linux-arm - Linux ARMv6 hard float 32-bit (RPi)
+# linux-x86-64 - Linux x86 64-bit (same as AMD64)
 # linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
 # win32-x86-64 - Windows 64-bit
@@ -252,26 +249,6 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
     fi
   else
     echo -e "${yellow}Skipping linux-aarch64${plain}"
-fi
-echo -e "${green}------------------------------------------------------------------------${plain}"
-
-# 32-bit ARMv6 EABI soft float (linux-armel)
-if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
-  then
-    echo -e "${yellow}Skipping linux-armel (use RPi direct instead)${plain}" && git-clean
-#    echo -e "${green}Building ARMv6 EABI (RPi)${plain}"
-#    if ! dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make';
-#      then
-#        echo -e "${red}Failed${plain} - Removing damaged targets"
-#        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
-#        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
-#      else
-#        echo -e "${green}OK${plain}"
-#        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
-#        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
-#    fi
-  else
-    echo -e "${yellow}Skipping linux-armel${plain}"
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
