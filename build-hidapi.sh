@@ -125,13 +125,20 @@ git pull
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
+# @Tresf: Function to do "make clean" without incurring issues during build
+function git-clean {
+  echo -e "Resetting Cpp/hidapi"
+  git clean -fd > /dev/null 2>&1 || exit     # remove all untracked files
+  git reset --hard > /dev/null 2>&1 || exit  # reset all tracked files
+}
+
 # Windows environments
 
 # 64-bit x86-64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]]
   then
-    echo -e "${green}Building Windows 64-bit${plain}"
-    if ! dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make';
+    echo -e "${green}Building Windows 64-bit${plain}" && git-clean
+    if ! dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86-64/hidapi.dll
@@ -148,8 +155,8 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit ARM win32-aarch64
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" ]]
   then
-    echo -e "${green}Building Windows 64-bit ARM64 (aarch64)${plain}"
-    if ! dockcross-windows-arm64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make';
+    echo -e "${green}Building Windows 64-bit ARM64 (aarch64)${plain}" && git-clean
+    if ! dockcross-windows-arm64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-aarch64/hidapi.dll
@@ -166,8 +173,8 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit x86
 if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
   then
-    echo -e "${green}Building Windows 32-bit${plain}"
-    if ! dockcross-windows-shared-x86 bash -c 'sudo make clean && sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make';
+    echo -e "${green}Building Windows 32-bit${plain}" && git-clean
+    if ! dockcross-windows-shared-x86 bash -c 'sudo ./bootstrap && sudo ./configure --host=i686-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/win32-x86/hidapi.dll
@@ -185,9 +192,9 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
   then
-    echo -e "${green}Building Linux 64-bit${plain}"
+    echo -e "${green}Building Linux 64-bit${plain}" && git-clean
     # Note the use of a double sudo apt-get update here
-    if ! dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make';
+    if ! dockcross-linux-x64 bash -c 'sudo apt-get update || sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86-64/libhidapi.so
@@ -209,8 +216,8 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
   then
-    echo -e "${green}Building Linux 32-bit${plain}"
-    if ! dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo make clean && sudo ./bootstrap && sudo ./configure && sudo make';
+    echo -e "${green}Building Linux 32-bit${plain}" && git-clean
+    if ! dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo ./bootstrap && sudo ./configure && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-x86/libhidapi.so
@@ -230,8 +237,8 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit (arm64/aarch64)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
   then
-    echo -e "${green}Building ARM64/aarch64 ARMv8${plain}"
-    if ! dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo make clean && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make';
+    echo -e "${green}Building ARM64/aarch64 ARMv8${plain}" && git-clean
+    if ! dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
         rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
@@ -246,38 +253,40 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
-# 32-bit ARMv6 EABI (linux-armel)
+# 32-bit ARMv6 EABI soft float (linux-armel)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
   then
-    echo -e "${green}Building ARMv6 EABI (RPi)${plain}"
-    if ! dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make';
-      then
-        echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
-      else
-        echo -e "${green}OK${plain}"
-        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
-        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
-    fi
+    echo -e "${yellow}Skipping linux-armel (use RPi direct instead)${plain}" && git-clean
+#    echo -e "${green}Building ARMv6 EABI (RPi)${plain}"
+#    if ! dockcross-linux-armv6 bash -c 'sudo dpkg --add-architecture armhf && sudo apt-get update && sudo apt-get --yes install gcc-arm-linux-gnueabihf libudev-dev:armhf libusb-1.0-0-dev:armhf && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf && sudo make';
+#      then
+#        echo -e "${red}Failed${plain} - Removing damaged targets"
+#        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
+#        rm ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
+#      else
+#        echo -e "${green}OK${plain}"
+#        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi.so
+#        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-libusb.so
+#    fi
   else
     echo -e "${yellow}Skipping linux-armel${plain}"
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
-# 32-bit ARMv7 hard float (linux-arm)
+# 32-bit ARMv6 hard float (linux-arm)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
   then
-    echo -e "${green}Building ARMv7 hard float  (RPi)${plain}"
-    if ! dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo make clean && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make';
-      then
-        echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
-      else
-        echo -e "${green}OK${plain}"
-        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
-        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi-libusb.so
-    fi
+    echo -e "${yellow}Skipping linux-arm (use RPi direct instead)${plain}" && git-clean
+#    echo -e "${green}Building ARMv7 hard float  (RPi)${plain}"
+#    if ! dockcross-linux-armv7 bash -c 'sudo dpkg --add-architecture armhf && sudo rm -Rf /var/lib/apt/lists && sudo apt-get update && sudo apt-get --yes install libudev-dev:armhf libusb-1.0-0-dev:armhf gcc-arm-linux-gnueabihf && sudo ./bootstrap && sudo ./configure --host=arm-linux-gnueabihf CC=arm-linux-gnueabihf-gcc && sudo make';
+#      then
+#        echo -e "${red}Failed${plain} - Removing damaged targets"
+#        rm ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
+#      else
+#        echo -e "${green}OK${plain}"
+#        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi.so
+#        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-arm/libhidapi-libusb.so
+#    fi
   else
     echo -e "${yellow}Skipping linux-arm${plain}"
 fi
@@ -288,7 +297,7 @@ echo -e "${green}---------------------------------------------------------------
 # Darwin Intel (local)
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-x86-64" ]]
   then
-    echo -e "${green}Building OS X Darwin Intel (x86-64)${plain}"
+    echo -e "${green}Building OS X Darwin Intel (x86-64)${plain}" && git-clean
     make clean
     ./bootstrap
     ./configure
@@ -301,13 +310,12 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-x86-64" ]]
         cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
     fi
   else
-    echo -e "${yellow}Skipping darwin${plain}"
+    echo -e "${yellow}Skipping darwin-x86-64${plain}"
 fi
 
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
   then
-    echo -e "${green}Building OS X Darwin AMD64 (aarch64)${plain}"
-    make clean
+    echo -e "${green}Building OS X Darwin AMD64 (aarch64)${plain}" && git-clean
     ./bootstrap
     ./configure
     if ! make;
@@ -319,7 +327,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin-aarch64" ]]
         cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
     fi
   else
-    echo -e "${yellow}Skipping darwin${plain}"
+    echo -e "${yellow}Skipping darwin-aarch64${plain}"
 fi
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
