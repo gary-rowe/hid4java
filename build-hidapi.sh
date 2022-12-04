@@ -189,7 +189,7 @@ echo -e "${green}---------------------------------------------------------------
 
 # Linux environments
 
-# 64-bit
+# 64-bit (x86-64/amd64)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
   then
     echo -e "${green}Building Linux 64-bit${plain}" && git-clean
@@ -217,6 +217,7 @@ echo -e "${green}---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
   then
     echo -e "${green}Building Linux 32-bit${plain}" && git-clean
+    # TODO Incorrect argument, i686 version fails with no libudev
     if ! dockcross-linux-x86 bash -c 'sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev libudev-dev:i386 libusb-1.0-0-dev:i386 && sudo ./bootstrap && sudo ./configure && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
@@ -238,6 +239,7 @@ echo -e "${green}---------------------------------------------------------------
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
   then
     echo -e "${green}Building ARM64/aarch64 ARMv8${plain}" && git-clean
+    # TODO Package error during "apt" phase
     if ! dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
