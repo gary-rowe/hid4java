@@ -62,6 +62,14 @@ public class HidApi {
   public static boolean useLibUsbVariant = false;
 
   /**
+   * When false - all devices will be opened in exclusive mode. (Default)
+   * When true - all devices will be opened in non-exclusive mode.
+   * <p>
+   * See {@link DarwinHidApiLibrary#hid_darwin_set_open_exclusive(int)} for more information.
+   */
+  public static boolean darwinOpenDevicesNonExclusive = false;
+
+  /**
    * Enables HID traffic logging to stdout to assist debugging. This will show all bytes (including the extra report ID)
    * that were sent or received via HIDAPI buffers. It does not log direct string calls (e.g. getEnumeratedString()).
    *
@@ -110,11 +118,17 @@ public class HidApi {
 
     if (useLibUsbVariant && Platform.isLinux()) {
       hidApiLibrary = LibusbHidApiLibrary.INSTANCE;
+    } else if (Platform.isMac()) {
+      hidApiLibrary = DarwinHidApiLibrary.INSTANCE;
     } else {
       hidApiLibrary = HidrawHidApiLibrary.INSTANCE;
     }
 
     hidApiLibrary.hid_init();
+
+    if (hidApiLibrary instanceof DarwinHidApiLibrary) {
+      ((DarwinHidApiLibrary) hidApiLibrary).hid_darwin_set_open_exclusive(darwinOpenDevicesNonExclusive ? 0 : 1);
+    }
   }
 
   /**
