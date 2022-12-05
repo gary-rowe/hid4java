@@ -488,4 +488,18 @@ public class HidApi {
     }
   }
 
+  /**
+   * Returns the full version of the underlying hidapi library
+   *
+   * @return The version in major.minor.patch format
+   *
+   * @see org.hid4java.HidServices#getNativeVersion
+   */
+  public static String getVersion() {
+    if(hidApiLibrary == null) {
+      init();
+    }
+    return hidApiLibrary.hid_version_str();
+  }
+
 }

@@ -269,4 +269,11 @@ public interface HidApiLibrary extends Library {
    * @return The pointer if successful or null
    */
   Pointer hid_open_path(String path);
+
+  /**
+   * Get version of hidapi library
+   *
+   * @return Version in major.minor.patch format
+   */
+  String hid_version_str();
 }

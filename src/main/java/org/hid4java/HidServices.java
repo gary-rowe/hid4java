@@ -205,4 +205,13 @@ public class HidServices {
       return value;
     }
   }
+
+  /**
+   * Returns the full version of the underlying hidapi library
+   *
+   * @return The version in major.minor.patch format
+   */
+  public static String getNativeVersion() {
+    return HidApi.getVersion();
+  }
 }
