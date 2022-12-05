@@ -6,7 +6,7 @@
 #  + Cpp
 #    + hidapi (https://github.com/libusb/hidapi)
 #  + Docker
-#    + dockcross
+#    + dockcross (https://github.com/dockcross/dockcross)
 #  + Java
 #    + Personal
 #      + hid4java (https://github.com/gary-rowe/hid4java)
@@ -16,6 +16,7 @@
 # - docker
 # - docker-machine
 # - virtualbox, docker-machine-parallels or another docker-machine compatible driver
+# - XCode v12.5.1 or higher for darwin-x86-64-aarch64 cross compiler support
 #
 # Place a symlink to this script in the root of ~/Workspaces
 #   cd ~/Workspaces
@@ -27,7 +28,8 @@
 # windows - build all Windows variants
 # linux - build all Linux variants
 # osx - build all macOS variants
-# darwin - macOS 64-bit
+# darwin-x86-64 - OS X 64-bit
+# darwin-x86-64-aarch64 - OS X ARM64
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
 # linux-arm - Linux ARMv7 hard float 32-bit
@@ -36,9 +38,10 @@
 # linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
 # win32-x86-64 - Windows 64-bit
+# win32-aarch64 - Windows 64-bit ARM64
 #
 
-# Console colors
+# Console colours
 red="\033[31m"
 yellow="\033[33m"
 green="\033[32m"
@@ -47,62 +50,50 @@ plain="\033[0m"
 echo -e "${green}------------------------------------------------------------------------${plain}"
 echo -e "${yellow}Target build for HIDAPI is $1${plain}"
 
-# Dockcross latest release
+echo -e "${green}------------------------------------------------------------------------${plain}"
+
+# Always use Dockcross latest release
 
 echo -e "${green}Configuring Dockcross${plain}"
 cd ~/Workspaces/Docker/dockcross/ || exit
 git checkout master
 git pull
 
-echo -e "${green}------------------------------------------------------------------------${plain}"
-
-# Ensure Docker is running
-
-echo -e "${green}Configuring Docker${plain}"
-if docker_result=$(docker-machine env default); then
-    eval "$docker_result"
-    echo -e "${green}OK${plain}"
-else
-    echo -e "${red}Failed${plain} - Docker not running. Use 'docker-machine start default'"
-    exit
-fi
-echo -e "${green}------------------------------------------------------------------------${plain}"
-
 # Windows cross compilers
 
-# 64-bit
+# 64-bit (Intel)
 echo -e "${green}Configuring Windows 64-bit${plain}"
 docker run --rm dockcross/windows-shared-x64 > ./dockcross-windows-shared-x64
 chmod +x ./dockcross-windows-shared-x64
-mv ./dockcross-windows-shared-x64 /usr/local/bin
+mv ./dockcross-windows-shared-x64 ~/bin
 
-# 32-bit
+# 32-bit (Intel)
 echo -e "${green}Configuring Windows 32-bit${plain}"
 docker run --rm dockcross/windows-shared-x86 > ./dockcross-windows-shared-x86
 chmod +x ./dockcross-windows-shared-x86
-mv ./dockcross-windows-shared-x86 /usr/local/bin
+mv ./dockcross-windows-shared-x86 ~/bin
 
 # 64-bit (ARM64)
-echo -e "${green}Configuring Windows 64-bit ARM64${plain}"
+echo -e "${green}Configuring Windows 64-bit ARM64 (aarch64)${plain}"
 docker run --rm dockcross/windows-arm64 > ./dockcross-windows-arm64
 chmod +x ./dockcross-windows-arm64
-mv ./dockcross-windows-arm64 /usr/local/bin
+mv ./dockcross-windows-arm64 ~/bin
 
 echo -e "${green}Configuring Linux environments${plain}"
 
 # Linux cross compilers
 
-# 64 bit
+# 64 bit (Intel)
 echo -e "${green}Configuring Linux 64-bit${plain}"
 docker run --rm dockcross/linux-x64 > ./dockcross-linux-x64
 chmod +x ./dockcross-linux-x64
-mv ./dockcross-linux-x64 /usr/local/bin
+mv ./dockcross-linux-x64 ~/bin
 
-# 32 bit
+# 32 bit (Intel)
 echo -e "${green}Configuring Linux 32-bit${plain}"
 docker run --rm dockcross/linux-x86 > ./dockcross-linux-x86
 chmod +x ./dockcross-linux-x86
-mv ./dockcross-linux-x86 /usr/local/bin
+mv ./dockcross-linux-x86 ~/bin
 
 # ARM cross compilers
 
@@ -110,19 +101,19 @@ mv ./dockcross-linux-x86 /usr/local/bin
 echo -e "${green}Configuring ARMv6 EABI 32-bit${plain}"
 docker run --rm dockcross/linux-armv6 > ./dockcross-linux-armv6
 chmod +x ./dockcross-linux-armv6
-mv ./dockcross-linux-armv6 /usr/local/bin
+mv ./dockcross-linux-armv6 ~/bin
 
 # 32-bit ARMv7 hard float
 echo -e "${green}Configuring ARMv7 32-bit${plain}"
 docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
 chmod +x ./dockcross-linux-armv7
-mv ./dockcross-linux-armv7 /usr/local/bin
+mv ./dockcross-linux-armv7 ~/bin
 
 # 64-bit (arm64, aarch64)
 echo -e "${green}Configuring ARM 64-bit${plain}"
 docker run --rm dockcross/linux-arm64 > ./dockcross-linux-arm64
 chmod +x ./dockcross-linux-arm64
-mv ./dockcross-linux-arm64 /usr/local/bin
+mv ./dockcross-linux-arm64 ~/bin
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
@@ -292,9 +283,9 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
-# macOS environments
+# OS X environments
 
-# Darwin
+# Darwin Intel (local)
 if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
   then
     echo -e "${green}Building OS X Darwin${plain}"
@@ -304,10 +295,10 @@ if [[ "$1" == "all" ]] || [[ "$1" == "osx" ]] || [[ "$1" == "darwin" ]]
     if ! make;
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+        rm ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
       else
         echo -e "${green}OK${plain}"
-        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+        cp mac/.libs/libhidapi.0.dylib ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
     fi
   else
     echo -e "${yellow}Skipping darwin${plain}"
@@ -369,7 +360,10 @@ echo -e "${green}---------------------------------------------------------------
 echo -e "${green}OS X${plain}"
 
 echo -e "${green}darwin${plain}"
-file -b ../../Java/Personal/hid4java/src/main/resources/darwin/libhidapi.dylib
+file -b ../../Java/Personal/hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
+
+echo -e "${green}darwin-aarch64${plain}"
+file -b ../../Java/Personal/hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
