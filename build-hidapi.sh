@@ -31,6 +31,7 @@
 # linux-aarch64 - Linux ARMv8 64-bit
 # linux-amd64 - Linux AMD 64-bit
 # linux-arm - Linux ARMv6 hard float 32-bit (RPi)
+# linux-riscv64 - Linux RISC-V 64-bit
 # linux-x86-64 - Linux x86 64-bit (same as AMD64)
 # linux-x86 - Linux x86 32-bit
 # win32-x86 - Windows 32-bit
@@ -55,6 +56,10 @@ echo -e "${green}Configuring Dockcross${plain}"
 cd ~/Workspaces/Docker/dockcross/ || exit
 git checkout master
 git pull
+
+# Ensure ~/bin exists and is on our PATH
+mkdir -p ~/bin
+PATH="$PATH:~/bin"
 
 # Windows cross compilers
 
@@ -111,6 +116,15 @@ echo -e "${green}Configuring ARM 64-bit${plain}"
 docker run --rm dockcross/linux-arm64 > ./dockcross-linux-arm64
 chmod +x ./dockcross-linux-arm64
 mv ./dockcross-linux-arm64 ~/bin
+
+# RISC-V cross compilers
+
+# 64-bit (RISC-V)
+echo -e "${green}Configuring RISC-V 64-bit${plain}"
+docker run --rm dockcross/linux-riscv64 > ./dockcross-linux-riscv64
+chmod +x ./dockcross-linux-riscv64
+mv ./dockcross-linux-riscv64 ~/bin
+
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
@@ -235,7 +249,7 @@ echo -e "${green}---------------------------------------------------------------
 # 64-bit (arm64/aarch64)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
   then
-    echo -e "${green}Building ARM64/aarch64 ARMv8${plain}" && git-clean
+    echo -e "${green}Building Linux ARM64/aarch64 ARMv8${plain}" && git-clean
     # TODO Package error during "apt" phase
     if ! dockcross-linux-arm64 bash -c 'sudo dpkg --add-architecture arm64 && sudo apt-get update && sudo apt-get --yes install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libudev-dev:arm64 libusb-1.0-0-dev:arm64 && sudo ./bootstrap && sudo ./configure --host=aarch64-linux-gnu CC=aarch64-linux-gnu-gcc && sudo make';
       then
@@ -244,6 +258,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
         rm ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-aarch64
         cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
         cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
     fi
@@ -270,6 +285,54 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
     echo -e "${yellow}Skipping linux-arm${plain}"
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
+
+# RISC-V environments
+
+# 64-bit (riscv64)
+if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-riscv64" ]]
+  then
+    echo -e "${green}Building Linux riscv64${plain}" && git-clean
+    make clean &> /dev/null
+
+    # Disabling building hidtest
+    sed -i'' -e 's/SUBDIRS \+= hidtest//g' Makefile.am
+
+    # risv64 hasn't reached debian stable, fetch from "sid"
+    arch=riscv64
+    debs=(
+        "libusb-1.0-0"
+        "libusb-1.0-0-dev"
+        "libhidapi-libusb0"
+        "libudev1"
+        "libudev-dev"
+    )
+    deps="echo \"Obtaining $arch dependencies from Debian sid...\""
+    deps="$deps && echo 'deb [arch=$arch] http://deb.debian.org/debian sid main' | sudo tee -a /etc/apt/sources.list"
+    deps="$deps && sudo apt-get update"
+    deps="$deps && mkdir -p debs && pushd debs"
+    deps="$deps && for deb in "${debs[@]}"; do echo \"- Downloading \$deb...\" && apt-get download \$deb:$arch && ar x \$deb* && tar -xf data.tar.xz && rm -f \$deb*.deb ; done"
+    deps="$deps && sudo cp -rf ./usr/* /usr/"
+    deps="$deps && popd"
+    deps="$deps && rm -rf debs"
+    deps="$deps && cp /usr/include/libudev.h ./libudev.h"
+    deps="$deps && export PKG_CONFIG_PATH=/usr/lib/$arch-linux-gnu/pkgconfig/"
+
+    if ! dockcross-linux-riscv64 bash -c "sudo $deps && sudo ./bootstrap && sudo ./configure --host=riscv64-unknown-linux-gnu && sudo make";
+      then
+        echo -e "${red}Failed${plain} - Removing damaged targets"
+        rm ../../Java/Personal/hid4java/src/main/resources/linux-riscv64/libhidapi.so
+        rm ../../Java/Personal/hid4java/src/main/resources/linux-riscv64/libhidapi-libusb.so
+      else
+        echo -e "${green}OK${plain}"
+        mkdir -p ../../Java/Personal/hid4java/src/main/resources/linux-riscv64
+        cp linux/.libs/libhidapi-hidraw.so ../../Java/Personal/hid4java/src/main/resources/linux-riscv64/libhidapi.so
+        cp libusb/.libs/libhidapi-libusb.so ../../Java/Personal/hid4java/src/main/resources/linux-riscv64/libhidapi-libusb.so
+    fi
+  else
+    echo -e "${yellow}Skipping linux-riscv64${plain}"
+fi
+echo -e "${green}------------------------------------------------------------------------${plain}"
+
 
 # OS X environments
 
@@ -359,6 +422,10 @@ file -b ../../Java/Personal/hid4java/src/main/resources/linux-armel/libhidapi-li
 echo -e "${green}linux-aarch64${plain}"
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi.so
 file -b ../../Java/Personal/hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
+
+echo -e "${green}linux-riscv64${plain}"
+file -b ../../Java/Personal/hid4java/src/main/resources/linux-riscv64/libhidapi.so
+file -b ../../Java/Personal/hid4java/src/main/resources/linux-riscv64/libhidapi-libusb.so
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
