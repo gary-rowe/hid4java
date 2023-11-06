@@ -281,7 +281,6 @@ echo -e "${green}---------------------------------------------------------------
 # 32-bit ARM soft float (linux-armel)
 if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-armel" ]]
   then
-    echo -e "${yellow}Skipping linux-arm (use RPi direct instead)${plain}"
     echo -e "${green}Building ARM soft float${plain}"  && git-clean
     make clean &> /dev/null
 
