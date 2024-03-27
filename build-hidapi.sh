@@ -38,13 +38,6 @@
 # win32-aarch64 - Windows 64-bit ARM64
 #
 
-# @Tresf: Function to do "make clean" without incurring issues during build
-function git-clean {
-  echo -e "Resetting Cpp/hidapi"
-  git clean -fd > /dev/null 2>&1 || exit     # remove all untracked files
-  git reset --hard > /dev/null 2>&1 || exit  # reset all tracked files
-}
-
 # Set environment
 hid4javaDir="${HOME}/Workspaces/Java/Personal/hid4java"
 hidapiDir="${HOME}/Workspaces/Cpp/hidapi"
@@ -53,12 +46,10 @@ dockcrossDir="${HOME}/Workspaces/Docker/dockcross"
 hardwareName=$(uname -m)
 if [[ "${hardwareName}" == "arm64" ]]
   then
-    platform="--platform linux/arm64"
+    platform="--platform linux/amd64"
   else
     platform=""
 fi
-echo "'${hardwareName}' selected "
-echo "'${platform}' selected "
 
 # Console colours
 red="\033[31m"
@@ -66,8 +57,15 @@ yellow="\033[33m"
 green="\033[32m"
 plain="\033[0m"
 
+# @Tresf: Function to do "make clean" without incurring issues during build
+function git-clean {
+  echo -e "${yellow}Cleaning hidapi${plain}"
+  git clean -fd > /dev/null 2>&1 || exit     # remove all untracked files
+  git reset --hard > /dev/null 2>&1 || exit  # reset all tracked files
+}
+
 echo -e "${green}------------------------------------------------------------------------${plain}"
-echo -e "${yellow}Target build for HIDAPI is $1${plain}"
+echo -e "${yellow}Using '$1' to perform build${plain}"
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
@@ -156,11 +154,11 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86-64" ]
     if ! dockcross-windows-shared-x64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure --host=x86_64-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ${hid4javaDir}/hid4java/src/main/resources/win32-x86-64/hidapi.dll
+        rm ${hid4javaDir}/src/main/resources/win32-x86-64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
-        cp windows/.libs/libhidapi-0.dll hid4java/src/main/resources/win32-x86-64/hidapi.dll
+        cp windows/.libs/libhidapi-0.dll ${hid4javaDir}/src/main/resources/win32-x86-64/hidapi.dll
     fi
   else
     echo -e "${yellow}Skipping win32-x86-64${plain}"
@@ -174,11 +172,11 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-aarch64" 
     if ! dockcross-windows-arm64 bash -c 'sudo apt-get update && sudo apt-get --yes install libudev-dev libusb-1.0-0-dev && sudo ./bootstrap && sudo ./configure --host=aarch64-w64-mingw32 && sudo make';
       then
         echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ${hid4javaDir}/hid4java/src/main/resources/win32-aarch64/hidapi.dll
+        rm ${hid4javaDir}/src/main/resources/win32-aarch64/hidapi.dll
         exit
       else
         echo -e "${green}OK${plain}"
-        cp windows/.libs/libhidapi-0.dll hid4java/src/main/resources/win32-aarch64/hidapi.dll
+        cp windows/.libs/libhidapi-0.dll ${hid4javaDir}/src/main/resources/win32-aarch64/hidapi.dll
     fi
   else
     echo -e "${yellow}Skipping win32-aarch64${plain}"
@@ -195,7 +193,7 @@ if [[ "$1" == "all" ]] || [[ "$1" == "windows" ]] || [[ "$1" == "win32-x86" ]]
         rm ${hid4javaDir}/src/main/resources/win32-x86/hidapi.dll
       else
         echo -e "${green}OK${plain}"
-        cp windows/.libs/libhidapi-0.dll hid4java/src/main/resources/win32-x86/hidapi.dll
+        cp windows/.libs/libhidapi-0.dll ${hid4javaDir}/src/main/resources/win32-x86/hidapi.dll
     fi
   else
     echo -e "${yellow}Skipping win32-x86${plain}"
@@ -218,10 +216,10 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86-64" ]]
         rm ${hid4javaDir}/src/main/resources/linux-amd64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
-        cp linux/.libs/libhidapi-hidraw.so hid4java/src/main/resources/linux-x86-64/libhidapi.so
-        cp linux/.libs/libhidapi-hidraw.so hid4java/src/main/resources/linux-amd64/libhidapi.so
-        cp libusb/.libs/libhidapi-libusb.so hid4java/src/main/resources/linux-x86-64/libhidapi-libusb.so
-        cp libusb/.libs/libhidapi-libusb.so hid4java/src/main/resources/linux-amd64/libhidapi-libusb.so
+        cp linux/.libs/libhidapi-hidraw.so ${hid4javaDir}/src/main/resources/linux-x86-64/libhidapi.so
+        cp linux/.libs/libhidapi-hidraw.so ${hid4javaDir}/src/main/resources/linux-amd64/libhidapi.so
+        cp libusb/.libs/libhidapi-libusb.so ${hid4javaDir}/src/main/resources/linux-x86-64/libhidapi-libusb.so
+        cp libusb/.libs/libhidapi-libusb.so ${hid4javaDir}/src/main/resources/linux-amd64/libhidapi-libusb.so
     fi
   else
     echo -e "${yellow}Skipping linux-x86-64${plain}"
@@ -240,8 +238,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-x86" ]]
         rm ${hid4javaDir}/src/main/resources/linux-x86/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
-        cp linux/.libs/libhidapi-hidraw.so hid4java/src/main/resources/linux-x86/libhidapi.so
-        cp libusb/.libs/libhidapi-libusb.so hid4java/src/main/resources/linux-x86/libhidapi-libusb.so
+        cp linux/.libs/libhidapi-hidraw.so ${hid4javaDir}/src/main/resources/linux-x86/libhidapi.so
+        cp libusb/.libs/libhidapi-libusb.so ${hid4javaDir}/src/main/resources/linux-x86/libhidapi-libusb.so
     fi
   else
     echo -e "${yellow}Skipping linux-x86${plain}"
@@ -262,8 +260,8 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-aarch64" ]]
         rm ${hid4javaDir}/src/main/resources/linux-aarch64/libhidapi-libusb.so
       else
         echo -e "${green}OK${plain}"
-        cp linux/.libs/libhidapi-hidraw.so hid4java/src/main/resources/linux-aarch64/libhidapi.so
-        cp libusb/.libs/libhidapi-libusb.so hid4java/src/main/resources/linux-aarch64/libhidapi-libusb.so
+        cp linux/.libs/libhidapi-hidraw.so ${hid4javaDir}/src/main/resources/linux-aarch64/libhidapi.so
+        cp libusb/.libs/libhidapi-libusb.so ${hid4javaDir}/src/main/resources/linux-aarch64/libhidapi-libusb.so
     fi
   else
     echo -e "${yellow}Skipping linux-aarch64${plain}"
@@ -281,52 +279,54 @@ if [[ "$1" == "all" ]] || [[ "$1" == "linux" ]] || [[ "$1" == "linux-arm" ]]
 #        rm ${hid4javaDir}/src/main/resources/linux-arm/libhidapi.so
 #      else
 #        echo -e "${green}OK${plain}"
-#        cp linux/.libs/libhidapi-hidraw.so hid4java/src/main/resources/linux-arm/libhidapi.so
-#        cp libusb/.libs/libhidapi-libusb.so hid4java/src/main/resources/linux-arm/libhidapi-libusb.so
+#        cp linux/.libs/libhidapi-hidraw.so ${hid4javaDir}/src/main/resources/linux-arm/libhidapi.so
+#        cp libusb/.libs/libhidapi-libusb.so ${hid4javaDir}/src/main/resources/linux-arm/libhidapi-libusb.so
 #    fi
   else
     echo -e "${yellow}Skipping linux-arm${plain}"
 fi
 echo -e "${green}------------------------------------------------------------------------${plain}"
 
-# macOS environments
+# macOS environments (require local build)
 
-# Darwin Intel (local)
-if [[ "$1" == "all" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-x86-64" ]]
+if [[ "${hardwareName}" == "arm64" ]]
   then
-    echo -e "${green}Building OS X Darwin Intel (x86-64)${plain}" && git-clean
-    make clean
-    ./bootstrap
-    ./configure
-    if ! make;
+    # Darwin ARM64 (local)
+    if [[ "$1" == "all" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-aarch64" ]]
       then
-        echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ${hid4javaDir}/src/main/resources/darwin-x86-64/libhidapi.dylib
+        echo -e "${green}Building OS X Darwin ARM64 (aarch64)${plain}" && git-clean
+        ./bootstrap
+        ./configure
+        if ! make;
+          then
+            echo -e "${red}Failed${plain} - Removing damaged targets"
+            rm ${hid4javaDir}/src/main/resources/darwin-aarch64/libhidapi.dylib
+          else
+            echo -e "${green}OK${plain}"
+            cp mac/.libs/libhidapi.0.dylib ${hid4javaDir}/src/main/resources/darwin-aarch64/libhidapi.dylib
+        fi
       else
-        echo -e "${green}OK${plain}"
-        cp mac/.libs/libhidapi.0.dylib hid4java/src/main/resources/darwin-x86-64/libhidapi.dylib
+        echo -e "${yellow}Skipping darwin-aarch64${plain}"
     fi
   else
-    echo -e "${yellow}Skipping darwin-x86-64${plain}"
-fi
-
-echo -e "${green}------------------------------------------------------------------------${plain}"
-
-if [[ "$1" == "all" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-aarch64" ]]
-  then
-    echo -e "${green}Building OS X Darwin AMD64 (aarch64)${plain}" && git-clean
-    ./bootstrap
-    ./configure
-    if ! make;
+    # Darwin Intel (local)
+    if [[ "$1" == "all" ]] || [[ "$1" == "darwin" ]] || [[ "$1" == "darwin-x86-64" ]]
       then
-        echo -e "${red}Failed${plain} - Removing damaged targets"
-        rm ${hid4javaDir}/src/main/resources/darwin-aarch64/libhidapi.dylib
+        echo -e "${green}Building OS X Darwin Intel (x86-64)${plain}" && git-clean
+        make clean
+        ./bootstrap
+        ./configure
+        if ! make;
+          then
+            echo -e "${red}Failed${plain} - Removing damaged targets"
+            rm ${hid4javaDir}/src/main/resources/darwin-x86-64/libhidapi.dylib
+          else
+            echo -e "${green}OK${plain}"
+            cp mac/.libs/libhidapi.0.dylib ${hid4javaDir}/src/main/resources/darwin-x86-64/libhidapi.dylib
+        fi
       else
-        echo -e "${green}OK${plain}"
-        cp mac/.libs/libhidapi.0.dylib hid4java/src/main/resources/darwin-aarch64/libhidapi.dylib
+        echo -e "${yellow}Skipping darwin-x86-64${plain}"
     fi
-  else
-    echo -e "${yellow}Skipping darwin-aarch64${plain}"
 fi
 
 echo -e "${green}------------------------------------------------------------------------${plain}"
