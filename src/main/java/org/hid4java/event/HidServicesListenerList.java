@@ -115,12 +115,15 @@ public class HidServicesListenerList {
           HidServicesEvent event = new HidServicesEvent(hidDevice);
 
           for (final HidServicesListener listener : toArray()) {
-            listener.hidDeviceAttached(event);
+            try {
+              listener.hidDeviceAttached(event);
+            } catch(Throwable cause) {
+              listener.hidListenerException(event, cause);
+            }
           }
 
         }
       });
-
   }
 
   /**
@@ -139,7 +142,11 @@ public class HidServicesListenerList {
           HidServicesEvent event = new HidServicesEvent(hidDevice);
 
           for (final HidServicesListener listener : toArray()) {
-            listener.hidDeviceDetached(event);
+            try {
+              listener.hidDeviceDetached(event);
+            } catch(Throwable cause) {
+              listener.hidListenerException(event, cause);
+            }
           }
 
         }
@@ -163,7 +170,11 @@ public class HidServicesListenerList {
           HidServicesEvent event = new HidServicesEvent(hidDevice);
 
           for (final HidServicesListener listener : toArray()) {
-            listener.hidFailure(event);
+            try {
+              listener.hidFailure(event);
+            } catch(Throwable cause) {
+              listener.hidListenerException(event, cause);
+            }
           }
 
         }
@@ -188,7 +199,11 @@ public class HidServicesListenerList {
           HidServicesEvent event = new HidServicesEvent(hidDevice, dataReceived);
 
           for (final HidServicesListener listener : toArray()) {
-            listener.hidDataReceived(event);
+            try {
+              listener.hidDataReceived(event);
+            } catch(Throwable cause) {
+              listener.hidListenerException(event, cause);
+            }
           }
 
         }

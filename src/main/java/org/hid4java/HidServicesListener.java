@@ -66,4 +66,18 @@ public interface HidServicesListener extends EventListener {
    */
   void hidDataReceived(HidServicesEvent event);
 
+  /**
+   * An uncaught exception was thrown
+   * <p>
+   * <b>Note:</b> Any exceptions that occur in this callback will
+   * be silently ignored.
+   *
+   * @param event The event
+   * @param cause The uncaught exception
+   */
+  @SuppressWarnings({"unused", "CallToPrintStackTrace"})
+  default void hidListenerException(HidServicesEvent event, Throwable cause) {
+      /* TODO: more robust logging */
+      cause.printStackTrace();
+  }
 }
