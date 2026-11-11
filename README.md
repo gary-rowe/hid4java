@@ -1,6 +1,14 @@
 # Project status
 
-[![Build Status](https://travis-ci.org/gary-rowe/hid4java.png?branch=master)](https://travis-ci.org/gary-rowe/hid4java) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java) [![Javadocs](http://www.javadoc.io/badge/org.hid4java/hid4java.svg)](http://www.javadoc.io/doc/org.hid4java/hid4java)
+🚨 OBSOLETE. DO NOT USE! 🚨
+
+I first created `hid4java` to support a specific hardware device over 10 years ago and it kind of grew from there. I no longer have the time or inclination to support the project and I would rather that someone else continue the work via a fork or complete rewrite.
+
+I'd like to express my thanks to all those developers who have contributed by generously providing code, testing, review and general feedback. I learned a great deal along the way with this project.
+
+I'll continue to leave this repository open for people to use as a reference point, but there will be no further development.
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hid4java/hid4java) [![Javadoc](https://javadoc.io/badge2/org.hid4java/hid4java/javadoc.svg)](https://javadoc.io/doc/org.hid4java/hid4java) 
 
 # 🌟 Summary 
 
